@@ -18,6 +18,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Activity>
@@ -68,7 +69,7 @@ class ActivityRepository extends ServiceEntityRepository
 
     public function findMostRecent(): ?Activity
     {
-        return $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
+        return $this->createQueryBuilder('a')->orderBy('a.createdAt', SortDirection::Descending)->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -80,8 +81,8 @@ class ActivityRepository extends ServiceEntityRepository
             ->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
             ->addSelect('u')
-            ->orderBy('a.createdAt', 'DESC')
-            ->addOrderBy('a.id', 'DESC')
+            ->orderBy('a.createdAt', SortDirection::Descending)
+            ->addOrderBy('a.id', SortDirection::Descending)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
@@ -192,7 +193,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->leftJoin('u.image', 'i')
             ->addSelect('i')
             ->where('a.id IN (:ids)')
-            ->orderBy('a.createdAt', 'DESC')
+            ->orderBy('a.createdAt', SortDirection::Descending)
             ->setParameter('ids', $activityIds)
             ->getQuery()
             ->getResult();

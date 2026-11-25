@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Comment>
@@ -31,7 +32,7 @@ class CommentRepository extends ServiceEntityRepository
             ->andWhere('c.targetId = :targetId')
             ->setParameter('targetType', $targetType)
             ->setParameter('targetId', $targetId)
-            ->orderBy('c.createdAt', 'DESC')
+            ->orderBy('c.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -52,7 +53,7 @@ class CommentRepository extends ServiceEntityRepository
             ->andWhere('c.targetId = :targetId')
             ->setParameter('targetType', $targetType)
             ->setParameter('targetId', $targetId)
-            ->orderBy('c.id', 'DESC')
+            ->orderBy('c.id', SortDirection::Descending)
             ->setMaxResults($limit);
 
         if ($before !== null) {
@@ -122,7 +123,7 @@ class CommentRepository extends ServiceEntityRepository
             ->addSelect('u')
             ->where('c.targetType = :targetType')
             ->setParameter('targetType', $targetType)
-            ->orderBy('c.createdAt', 'DESC')
+            ->orderBy('c.createdAt', SortDirection::Descending)
             ->setMaxResults($limit);
 
         if ($restrictToTargetIds !== null) {

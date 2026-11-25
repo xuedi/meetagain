@@ -6,6 +6,7 @@ use App\Entity\NotFoundLog;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<NotFoundLog>
@@ -41,7 +42,12 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function getTop100(?DateTimeImmutable $since = null): array
     {
-        $qb = $this->createQueryBuilder('n')->select('COUNT(n.id) as number', 'n.url')->groupBy('n.url')->orderBy('number', 'DESC')->setMaxResults(100);
+        $qb = $this
+            ->createQueryBuilder('n')
+            ->select('COUNT(n.id) as number', 'n.url')
+            ->groupBy('n.url')
+            ->orderBy('number', SortDirection::Descending)
+            ->setMaxResults(100);
 
         if ($since !== null) {
             $qb->where('n.createdAt >= :since')->setParameter('since', $since);
@@ -140,7 +146,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('n.createdAt >= :since')->setParameter('since', $since);
@@ -167,7 +173,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function findMostRecent(): ?NotFoundLog
     {
-        return $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
+        return $this->createQueryBuilder('n')->orderBy('n.createdAt', SortDirection::Descending)->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
     public function findLatestUnlinkedForOffender(string $ip, ?string $sessionId): ?NotFoundLog
@@ -176,7 +182,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('n')
             ->where('n.ip = :ip')
             ->andWhere('n.incident IS NULL')
-            ->orderBy('n.createdAt', 'DESC')
+            ->orderBy('n.createdAt', SortDirection::Descending)
             ->setParameter('ip', $ip)
             ->setMaxResults(1)
             ->getQuery()
@@ -193,7 +199,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
         ?DateTimeImmutable $from = null,
         ?DateTimeImmutable $to = null,
     ): array {
-        $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);
@@ -220,7 +226,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('n')
             ->select(sprintf('DATE_FORMAT(n.createdAt, \'%s\') AS bucket', $format), 'COUNT(n.id) AS number')
             ->groupBy('bucket')
-            ->orderBy('bucket', 'DESC')
+            ->orderBy('bucket', SortDirection::Descending)
             ->setMaxResults($limit);
 
         if ($since !== null) {
@@ -244,7 +250,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('n')
             ->select(sprintf('n.%s AS value', $field), 'COUNT(n.id) AS number')
             ->groupBy(sprintf('n.%s', $field))
-            ->orderBy('number', 'DESC')
+            ->orderBy('number', SortDirection::Descending)
             ->setMaxResults($limit);
 
         if ($since !== null) {

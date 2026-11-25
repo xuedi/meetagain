@@ -7,11 +7,13 @@ use App\Entity\Image as ImageEntity;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CmsBlock\FieldType;
 use App\Exception\BlockValidationException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 readonly class BlockHydrator
 {
     public function __construct(
+        #[Target('cmsContent')]
         private HtmlSanitizerInterface $cmsContent,
         private RichTextNormalizer $richTextNormalizer,
     ) {}

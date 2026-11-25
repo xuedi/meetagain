@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -37,7 +38,7 @@ class MessageRepository extends ServiceEntityRepository
                 'MAX(m.createdAt) AS lastMessage',
             )
             ->groupBy('partnerId')
-            ->orderBy('lastMessage', 'DESC')
+            ->orderBy('lastMessage', SortDirection::Descending)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
@@ -113,7 +114,7 @@ class MessageRepository extends ServiceEntityRepository
             return null;
         }
 
-        return $this->threadQuery($user, $partner)->orderBy('m.createdAt', 'ASC')->getQuery()->getResult();
+        return $this->threadQuery($user, $partner)->orderBy('m.createdAt', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     /**
@@ -123,7 +124,7 @@ class MessageRepository extends ServiceEntityRepository
     {
         return $this
             ->threadQuery($user, $partner)
-            ->orderBy('m.id', 'ASC')
+            ->orderBy('m.id', SortDirection::Ascending)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
@@ -151,7 +152,7 @@ class MessageRepository extends ServiceEntityRepository
                 ->createQueryBuilder('m')
                 ->where('m.receiver = :self')
                 ->setParameter('self', $user)
-                ->orderBy('m.createdAt', 'ASC')
+                ->orderBy('m.createdAt', SortDirection::Ascending)
                 ->getQuery()
                 ->getArrayResult(),
         );
@@ -163,7 +164,7 @@ class MessageRepository extends ServiceEntityRepository
             ->createQueryBuilder('m')
             ->where('m.receiver = :user AND m.wasRead = false')
             ->setParameter('user', $user)
-            ->orderBy('m.createdAt', 'ASC')
+            ->orderBy('m.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getArrayResult();
 
@@ -198,7 +199,7 @@ class MessageRepository extends ServiceEntityRepository
             ->addGroupBy('m.receiver')
             ->having('MIN(m.createdAt) <= :until')
             ->setParameter('until', $firstUnreadUntil)
-            ->orderBy('firstUnread', 'ASC');
+            ->orderBy('firstUnread', SortDirection::Ascending);
 
         if ($firstUnreadAfter instanceof DateTimeImmutable) {
             $qb->andHaving('MIN(m.createdAt) > :after')->setParameter('after', $firstUnreadAfter);

@@ -16,6 +16,7 @@ use Plugin\Glossary\Enum\DuplicatePolicy;
 use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\ValueObject\ImportFile;
 use Plugin\Glossary\ValueObject\ImportMapping;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 readonly class TransferService
 {
@@ -39,6 +40,7 @@ readonly class TransferService
         private TagService $tagService,
         private ItemTagAssignmentRepository $assignmentRepo,
         private ActivityService $activityService,
+        #[Target('privateStorage')]
         private FilesystemOperator $privateStorage,
     ) {}
 

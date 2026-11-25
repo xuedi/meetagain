@@ -8,6 +8,7 @@ use App\Enum\SecurityMeasureOutcome;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<SecurityMeasureLog>
@@ -139,7 +140,7 @@ class SecurityMeasureLogRepository extends ServiceEntityRepository
             ->addSelect('i')
             ->where('s.outcome = :outcome')
             ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
-            ->orderBy('s.createdAt', 'DESC')
+            ->orderBy('s.createdAt', SortDirection::Descending)
             ->setMaxResults($limit);
 
         if ($sinceDay !== null) {
@@ -169,7 +170,7 @@ class SecurityMeasureLogRepository extends ServiceEntityRepository
             ->where('s.outcome = :outcome')
             ->andWhere('s.context IS NOT NULL')
             ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
-            ->orderBy('s.context', 'ASC')
+            ->orderBy('s.context', SortDirection::Ascending)
             ->getQuery()
             ->getSingleColumnResult();
 

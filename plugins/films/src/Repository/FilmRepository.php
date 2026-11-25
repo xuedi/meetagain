@@ -5,6 +5,7 @@ namespace Plugin\Films\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Films\Entity\Film;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Film>
@@ -41,7 +42,7 @@ class FilmRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('f')->orderBy('f.title', 'ASC');
+        $qb = $this->createQueryBuilder('f')->orderBy('f.title', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->where('f.id IN (:ids)')->setParameter('ids', $allowedIds);

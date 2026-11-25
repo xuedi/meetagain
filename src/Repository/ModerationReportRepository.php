@@ -8,6 +8,7 @@ use App\Enum\ModerationReportStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<ModerationReport> */
 class ModerationReportRepository extends ServiceEntityRepository
@@ -25,7 +26,7 @@ class ModerationReportRepository extends ServiceEntityRepository
             ->addSelect('reporter', 'author')
             ->leftJoin('mr.reporter', 'reporter')
             ->leftJoin('mr.author', 'author')
-            ->orderBy('mr.createdAt', 'DESC')
+            ->orderBy('mr.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -37,7 +38,7 @@ class ModerationReportRepository extends ServiceEntityRepository
             ->createQueryBuilder('mr')
             ->where('mr.status = :status')
             ->setParameter('status', ModerationReportStatus::Open)
-            ->orderBy('mr.createdAt', 'DESC')
+            ->orderBy('mr.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }

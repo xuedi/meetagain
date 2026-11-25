@@ -5,6 +5,7 @@ namespace Module\Email\Internal\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Email\Internal\Entity\EmailBlocklistEntry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<EmailBlocklistEntry>
@@ -36,7 +37,7 @@ class EmailBlocklistRepository extends ServiceEntityRepository
      */
     public function findAllOrdered(): array
     {
-        return $this->createQueryBuilder('b')->orderBy('b.addedAt', 'DESC')->getQuery()->getResult();
+        return $this->createQueryBuilder('b')->orderBy('b.addedAt', SortDirection::Descending)->getQuery()->getResult();
     }
 
     public function deleteAll(): int

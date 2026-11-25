@@ -8,6 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Circulation\Contract\RequestStatus;
 use Module\Circulation\Internal\Entity\Request;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Request>
@@ -37,8 +38,8 @@ class RequestRepository extends ServiceEntityRepository
                 ->setParameter('itemId', $itemId)
                 ->andWhere('r.status IN (:open)')
                 ->setParameter('open', [RequestStatus::Waiting, RequestStatus::Offered])
-                ->orderBy('r.requestedAt', 'ASC')
-                ->addOrderBy('r.id', 'ASC')
+                ->orderBy('r.requestedAt', SortDirection::Ascending)
+                ->addOrderBy('r.id', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );
@@ -165,7 +166,7 @@ class RequestRepository extends ServiceEntityRepository
             ->setParameter('itemType', $itemType)
             ->andWhere('r.status IN (:open)')
             ->setParameter('open', [RequestStatus::Waiting, RequestStatus::Offered])
-            ->orderBy('r.requestedAt', 'ASC');
+            ->orderBy('r.requestedAt', SortDirection::Ascending);
 
         if ($allowedItemIds !== null) {
             if ($allowedItemIds === []) {

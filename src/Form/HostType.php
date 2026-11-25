@@ -8,6 +8,7 @@ use App\Filter\Admin\Member\AdminMemberListFilterService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Override;
+use SortDirection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -50,7 +51,7 @@ class HostType extends AbstractType
 
     private function userChoices(EntityRepository $repository, ?int $linkedUserId): QueryBuilder
     {
-        $query = $repository->createQueryBuilder('u')->orderBy('u.name', 'ASC');
+        $query = $repository->createQueryBuilder('u')->orderBy('u.name', SortDirection::Ascending);
         $userIds = $this->memberFilterService->getUserIdFilter()->getUserIds();
         if ($userIds === null) {
             return $query;

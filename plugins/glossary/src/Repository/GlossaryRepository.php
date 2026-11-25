@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Glossary\Entity\Glossary;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Glossary>
@@ -19,11 +20,11 @@ class GlossaryRepository extends ServiceEntityRepository
 
     /**
      * @param int[]|null            $ids   null = no restriction, [] = block all
-     * @param array<string, string> $order
+     * @param array<string, SortDirection> $order
      *
      * @return Glossary[]
      */
-    public function findAllowed(?array $ids, array $order = ['phrase' => 'ASC']): array
+    public function findAllowed(?array $ids, array $order = ['phrase' => SortDirection::Ascending]): array
     {
         if ($ids === []) {
             return [];
@@ -60,7 +61,7 @@ class GlossaryRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('g')->select('g.id')->orderBy('g.id', 'ASC');
+        $qb = $this->createQueryBuilder('g')->select('g.id')->orderBy('g.id', SortDirection::Ascending);
         if ($ids !== null) {
             $qb->andWhere('g.id IN (:ids)')->setParameter('ids', $ids);
         }

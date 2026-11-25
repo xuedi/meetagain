@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Ballot\Contract\BallotStatus;
 use Module\Ballot\Internal\Entity\Ballot;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Ballot>
@@ -27,7 +28,7 @@ class BallotRepository extends ServiceEntityRepository
             ->createQueryBuilder('b')
             ->where('b.status = :status')
             ->setParameter('status', BallotStatus::Open)
-            ->orderBy('b.deadline', 'ASC')
+            ->orderBy('b.deadline', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -43,7 +44,7 @@ class BallotRepository extends ServiceEntityRepository
             ->andWhere('b.deadline <= :now')
             ->setParameter('status', BallotStatus::Open)
             ->setParameter('now', $now)
-            ->orderBy('b.deadline', 'ASC')
+            ->orderBy('b.deadline', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -57,7 +58,7 @@ class BallotRepository extends ServiceEntityRepository
             ->createQueryBuilder('b')
             ->where('b.purpose = :purpose')
             ->setParameter('purpose', $purpose)
-            ->orderBy('b.id', 'DESC')
+            ->orderBy('b.id', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -73,7 +74,7 @@ class BallotRepository extends ServiceEntityRepository
             ->andWhere('b.subjectId = :id')
             ->setParameter('type', $subjectType)
             ->setParameter('id', $subjectId)
-            ->orderBy('b.id', 'DESC')
+            ->orderBy('b.id', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }

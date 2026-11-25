@@ -7,6 +7,7 @@ use App\Enum\CommandExecutionStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<CommandExecutionLog>
@@ -23,7 +24,7 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function getLastExecutionsByCommand(): array
     {
-        $logs = $this->createQueryBuilder('c')->orderBy('c.startedAt', 'DESC')->getQuery()->getResult();
+        $logs = $this->createQueryBuilder('c')->orderBy('c.startedAt', SortDirection::Descending)->getQuery()->getResult();
 
         $result = [];
         foreach ($logs as $log) {
@@ -73,7 +74,7 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('c')
             ->where('c.status IN (:statuses)')
             ->setParameter('statuses', [CommandExecutionStatus::Failed, CommandExecutionStatus::Timeout])
-            ->orderBy('c.startedAt', 'DESC')
+            ->orderBy('c.startedAt', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -88,7 +89,7 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('c')
             ->where('c.commandName = :name')
             ->setParameter('name', $commandName)
-            ->orderBy('c.startedAt', 'DESC')
+            ->orderBy('c.startedAt', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

@@ -7,6 +7,7 @@ use App\Enum\ItemReportStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<ItemReport> */
 class ItemReportRepository extends ServiceEntityRepository
@@ -23,7 +24,7 @@ class ItemReportRepository extends ServiceEntityRepository
             ->createQueryBuilder('r')
             ->where('r.status = :status')
             ->setParameter('status', ItemReportStatus::Open)
-            ->orderBy('r.createdAt', 'ASC')
+            ->orderBy('r.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

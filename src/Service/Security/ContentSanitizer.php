@@ -2,12 +2,15 @@
 
 namespace App\Service\Security;
 
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 final readonly class ContentSanitizer
 {
     public function __construct(
+        #[Target('messageContent')]
         private HtmlSanitizerInterface $messageContent,
+        #[Target('messagePlain')]
         private HtmlSanitizerInterface $messagePlain,
     ) {}
 

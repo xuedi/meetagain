@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Email\Contract\QueueStatus;
 use Module\Email\Internal\Entity\EmailQueue;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<EmailQueue>
@@ -39,10 +40,10 @@ class EmailQueueRepository extends ServiceEntityRepository
             $query
                 ->addSelect('CASE WHEN eq.template IN (:urgent) THEN 0 ELSE 1 END AS HIDDEN urgency')
                 ->setParameter('urgent', $urgentTemplates)
-                ->orderBy('urgency', 'ASC');
+                ->orderBy('urgency', SortDirection::Ascending);
         }
 
-        return array_map(intval(...), $query->addOrderBy('eq.id', 'ASC')->setMaxResults($limit)->getQuery()->getSingleColumnResult());
+        return array_map(intval(...), $query->addOrderBy('eq.id', SortDirection::Ascending)->setMaxResults($limit)->getQuery()->getSingleColumnResult());
     }
 
     /**
@@ -87,7 +88,11 @@ class EmailQueueRepository extends ServiceEntityRepository
         ?string $recipient = null,
         ?array $statuses = null,
     ): array {
-        $qb = $this->createQueryBuilder('eq')->orderBy('eq.createdAt', 'DESC')->addOrderBy('eq.id', 'DESC')->setMaxResults($limit);
+        $qb = $this
+            ->createQueryBuilder('eq')
+            ->orderBy('eq.createdAt', SortDirection::Descending)
+            ->addOrderBy('eq.id', SortDirection::Descending)
+            ->setMaxResults($limit);
         $this->applyFilters($qb, $since, $template, $recipient, $statuses);
 
         return $qb->getQuery()->getResult();
@@ -190,7 +195,7 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->createQueryBuilder('eq')
             ->where('eq.providerMessageId IS NOT NULL')
             ->andWhere('eq.providerStatus IS NULL')
-            ->orderBy('eq.createdAt', 'DESC')
+            ->orderBy('eq.createdAt', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

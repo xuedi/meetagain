@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\SuspiciousUrl;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<SuspiciousUrl>
@@ -26,7 +27,7 @@ class SuspiciousUrlRepository extends ServiceEntityRepository
      */
     public function findAllOrdered(): array
     {
-        return array_values($this->createQueryBuilder('s')->orderBy('s.url', 'ASC')->getQuery()->getResult());
+        return array_values($this->createQueryBuilder('s')->orderBy('s.url', SortDirection::Ascending)->getQuery()->getResult());
     }
 
     /**

@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Module\Circulation\Contract\HandoverStatus;
 use Module\Circulation\Internal\Entity\Copy;
 use Module\Circulation\Internal\Entity\Handover;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Handover>
@@ -37,7 +38,7 @@ class HandoverRepository extends ServiceEntityRepository
                 ->setParameter('open', HandoverStatus::Open)
                 ->andWhere('h.fromUser = :user OR h.toUser = :user')
                 ->setParameter('user', $user)
-                ->orderBy('h.openedAt', 'DESC')
+                ->orderBy('h.openedAt', SortDirection::Descending)
                 ->getQuery()
                 ->getResult(),
         );
@@ -75,7 +76,7 @@ class HandoverRepository extends ServiceEntityRepository
                 ->setParameter('context', $context)
                 ->andWhere('c.itemType = :itemType')
                 ->setParameter('itemType', $itemType)
-                ->orderBy('h.openedAt', 'DESC')
+                ->orderBy('h.openedAt', SortDirection::Descending)
                 ->getQuery()
                 ->getResult(),
         );

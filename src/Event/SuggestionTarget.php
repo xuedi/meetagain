@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use Module\Proposal\Contract\Suggestion\TargetProviderInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -37,6 +38,7 @@ final readonly class SuggestionTarget implements TargetProviderInterface
         private Security $security,
         private RequestStack $requestStack,
         private TranslatorInterface $translator,
+        #[Target('cmsContent')]
         private HtmlSanitizerInterface $cmsContent,
     ) {}
 

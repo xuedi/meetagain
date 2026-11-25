@@ -6,6 +6,7 @@ use App\Entity\AccessDeniedLog;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<AccessDeniedLog>
@@ -22,7 +23,7 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
      */
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('a.createdAt >= :since')->setParameter('since', $since);
@@ -36,7 +37,12 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
      */
     public function getTop100(?DateTimeImmutable $since = null): array
     {
-        $qb = $this->createQueryBuilder('a')->select('COUNT(a.id) AS number', 'a.url')->groupBy('a.url')->orderBy('number', 'DESC')->setMaxResults(100);
+        $qb = $this
+            ->createQueryBuilder('a')
+            ->select('COUNT(a.id) AS number', 'a.url')
+            ->groupBy('a.url')
+            ->orderBy('number', SortDirection::Descending)
+            ->setMaxResults(100);
 
         if ($since !== null) {
             $qb->where('a.createdAt >= :since')->setParameter('since', $since);
@@ -72,7 +78,7 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('a')
             ->where('a.ip = :ip')
             ->andWhere('a.incident IS NULL')
-            ->orderBy('a.createdAt', 'DESC')
+            ->orderBy('a.createdAt', SortDirection::Descending)
             ->setParameter('ip', $ip)
             ->setMaxResults(1)
             ->getQuery()
@@ -89,7 +95,7 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
         ?DateTimeImmutable $from = null,
         ?DateTimeImmutable $to = null,
     ): array {
-        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);

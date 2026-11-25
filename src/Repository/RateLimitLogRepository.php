@@ -6,6 +6,7 @@ use App\Entity\RateLimitLog;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<RateLimitLog>
@@ -22,7 +23,7 @@ class RateLimitLogRepository extends ServiceEntityRepository
      */
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this->createQueryBuilder('r')->orderBy('r.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('r')->orderBy('r.createdAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('r.createdAt >= :since')->setParameter('since', $since);
@@ -40,7 +41,7 @@ class RateLimitLogRepository extends ServiceEntityRepository
             ->createQueryBuilder('r')
             ->select('COUNT(r.id) AS number', 'r.limiter', 'r.ip')
             ->groupBy('r.limiter', 'r.ip')
-            ->orderBy('number', 'DESC')
+            ->orderBy('number', SortDirection::Descending)
             ->setMaxResults(100);
 
         if ($since !== null) {
@@ -82,7 +83,7 @@ class RateLimitLogRepository extends ServiceEntityRepository
         ?DateTimeImmutable $from = null,
         ?DateTimeImmutable $to = null,
     ): array {
-        $qb = $this->createQueryBuilder('r')->orderBy('r.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('r')->orderBy('r.createdAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('r.createdAt >= :since')->setParameter('since', $since);

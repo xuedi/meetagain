@@ -9,6 +9,7 @@ use DateTimeInterface;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use ZipArchive;
 
 readonly class Exporter
@@ -26,6 +27,7 @@ readonly class Exporter
         private ArchiveReader $archiveReader,
         private DateShifter $dateShifter,
         private ClockInterface $clock,
+        #[Target('imageStorage')]
         private FilesystemOperator $imageStorage,
     ) {}
 

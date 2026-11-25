@@ -5,6 +5,7 @@ namespace Plugin\Dishes\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Dishes\Entity\Dish;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Dish>
@@ -45,7 +46,7 @@ class DishRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('d')->orderBy('d.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('d')->orderBy('d.createdAt', SortDirection::Descending);
 
         if ($allowedIds !== null) {
             $qb->where('d.id IN (:ids)')->setParameter('ids', $allowedIds);

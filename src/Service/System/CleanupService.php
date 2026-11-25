@@ -33,6 +33,7 @@ use Module\Task\Contract\Status;
 use Module\Task\Contract\TaskInterface;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Throwable;
 
 readonly class CleanupService implements TaskInterface
@@ -67,6 +68,7 @@ readonly class CleanupService implements TaskInterface
         private EntityActionDispatcher $entityActionDispatcher,
         private ClockInterface $clock,
         private LoggerInterface $logger,
+        #[Target('privateStorage')]
         private FilesystemOperator $privateStorage,
     ) {}
 

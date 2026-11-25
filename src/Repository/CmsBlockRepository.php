@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\CmsBlock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 use Throwable;
 
 /**
@@ -56,7 +57,7 @@ class CmsBlockRepository extends ServiceEntityRepository
             ->andWhere('cb.language = :locale')
             ->setParameter('pageId', $pageId)
             ->setParameter('locale', $locale)
-            ->orderBy('cb.priority', 'ASC')
+            ->orderBy('cb.priority', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Task\Internal\Action\RequestState;
 use Module\Task\Internal\Entity\ActionRequest;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ActionRequest>
@@ -65,7 +66,7 @@ class ActionRequestRepository extends ServiceEntityRepository
             ->andWhere('r.createdAt < :cutoff')
             ->setParameter('pending', RequestState::Pending->value)
             ->setParameter('cutoff', $cutoff)
-            ->orderBy('r.id', 'ASC')
+            ->orderBy('r.id', SortDirection::Ascending)
             ->getQuery()
             ->getArrayResult();
 
@@ -128,7 +129,7 @@ class ActionRequestRepository extends ServiceEntityRepository
             ->createQueryBuilder('r')
             ->where('r.identifier = :identifier')
             ->setParameter('identifier', $identifier)
-            ->orderBy('r.id', 'DESC')
+            ->orderBy('r.id', SortDirection::Descending)
             ->getQuery()
             ->toIterable();
 

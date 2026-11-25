@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Task\Contract\Status;
 use Module\Task\Internal\Entity\Run;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Run>
@@ -52,7 +53,7 @@ class RunRepository extends ServiceEntityRepository
      */
     public function findFiltered(int $limit, ?DateTimeImmutable $since = null, ?string $identifier = null, ?array $statuses = null): array
     {
-        return $this->filtered($since, $identifier, $statuses)->orderBy('r.id', 'DESC')->setMaxResults($limit)->getQuery()->getResult();
+        return $this->filtered($since, $identifier, $statuses)->orderBy('r.id', SortDirection::Descending)->setMaxResults($limit)->getQuery()->getResult();
     }
 
     /**

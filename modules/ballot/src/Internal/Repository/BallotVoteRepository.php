@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Ballot\Internal\Entity\Ballot;
 use Module\Ballot\Internal\Entity\BallotVote;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<BallotVote>
@@ -91,7 +92,7 @@ class BallotVoteRepository extends ServiceEntityRepository
         $rows = $this
             ->createQueryBuilder('v')
             ->select('IDENTITY(v.ballot) AS ballotId', 'IDENTITY(v.user) AS userId', 'v.optionKey AS optionKey')
-            ->orderBy('v.id', 'ASC')
+            ->orderBy('v.id', SortDirection::Ascending)
             ->getQuery()
             ->getArrayResult();
 

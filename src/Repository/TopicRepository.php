@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Topic;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Topic>
@@ -26,7 +27,12 @@ class TopicRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('t')->leftJoin('t.author', 'a')->addSelect('a')->orderBy('t.createdAt', 'ASC')->addOrderBy('t.id', 'ASC');
+        $qb = $this
+            ->createQueryBuilder('t')
+            ->leftJoin('t.author', 'a')
+            ->addSelect('a')
+            ->orderBy('t.createdAt', SortDirection::Ascending)
+            ->addOrderBy('t.id', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->andWhere('t.id IN (:ids)')->setParameter('ids', $allowedIds);

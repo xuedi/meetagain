@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Glossary\Entity\TrainerDay;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<TrainerDay>
@@ -41,7 +42,7 @@ class TrainerDayRepository extends ServiceEntityRepository
             ->andWhere('d.reviewed > 0')
             ->setParameter('userId', $userId)
             ->setParameter('since', $since->setTime(0, 0), Types::DATE_IMMUTABLE)
-            ->orderBy('d.day', 'DESC')
+            ->orderBy('d.day', SortDirection::Descending)
             ->getQuery()
             ->getArrayResult();
 

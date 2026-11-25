@@ -5,6 +5,7 @@ namespace Plugin\Books\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Books\Entity\Book;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Book>
@@ -45,7 +46,7 @@ class BookRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('b')->orderBy('b.title', 'ASC');
+        $qb = $this->createQueryBuilder('b')->orderBy('b.title', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->where('b.id IN (:ids)')->setParameter('ids', $allowedIds);

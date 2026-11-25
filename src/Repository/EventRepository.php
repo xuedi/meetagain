@@ -16,6 +16,7 @@ use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -106,7 +107,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             $qb->innerJoin('e.location', 'cityLocation')->andWhere('cityLocation.cityId IN (:cityIds)')->setParameter('cityIds', $cityIds);
         }
 
-        $qb->orderBy('e.start', $sort->value);
+        $qb->orderBy('e.start', $sort === EventSortFilter::NewToOld ? SortDirection::Descending : SortDirection::Ascending);
 
         return $qb->getQuery()->getResult();
     }
@@ -134,7 +135,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
+        return $qb->orderBy('e.start', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     /**
@@ -154,7 +155,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->setParameter('notCanceled', false)
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->groupBy('e.id')
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -179,7 +180,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->groupBy('e.id')
             ->addGroupBy('t.id')
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -204,7 +205,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->setParameter('notCanceled', false)
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->setParameter('user', $user)
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -225,7 +226,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->setParameter('to', $to)
             ->setParameter('notCanceled', false)
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -273,7 +274,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->select('e.id')
             ->where('e.start > :date')
             ->setParameter('date', new DateTimeImmutable())
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->setMaxResults($number);
 
         if ($restrictToEventIds !== null) {
@@ -297,7 +298,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('pi')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -321,7 +322,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->select('e.id')
             ->where('e.start < :date')
             ->setParameter('date', new DateTimeImmutable())
-            ->orderBy('e.start', 'DESC')
+            ->orderBy('e.start', SortDirection::Descending)
             ->setMaxResults($number);
 
         if ($restrictToEventIds !== null) {
@@ -349,7 +350,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('pi')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ->orderBy('e.start', 'DESC')
+            ->orderBy('e.start', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -382,7 +383,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'DESC')->setMaxResults($number)->getQuery()->getResult();
+        return $qb->orderBy('e.start', SortDirection::Descending)->setMaxResults($number)->getQuery()->getResult();
     }
 
     /**
@@ -446,7 +447,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->andWhere('e.start > :greaterThan')
             ->setParameter('seriesId', $seriesId)
             ->setParameter('greaterThan', $greaterThan)
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery();
 
         return $query->getResult();
@@ -468,8 +469,8 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('t')
             ->where('e.series IN (:seriesIds)')
             ->setParameter('seriesIds', $seriesIds)
-            ->orderBy('e.start', 'ASC')
-            ->addOrderBy('e.id', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
+            ->addOrderBy('e.id', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -482,7 +483,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->andWhere('e.status != :locked')
             ->setParameter('seriesId', $seriesId)
             ->setParameter('locked', EventStatus::Locked->value)
-            ->orderBy('e.start', 'DESC')
+            ->orderBy('e.start', SortDirection::Descending)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
@@ -513,7 +514,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             return [];
         }
 
-        $idsQb = $this->createQueryBuilder('e')->select('e.id')->orderBy('e.start', 'DESC')->setMaxResults($limit);
+        $idsQb = $this->createQueryBuilder('e')->select('e.id')->orderBy('e.start', SortDirection::Descending)->setMaxResults($limit);
 
         if ($restrictToEventIds !== null) {
             $idsQb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
@@ -530,7 +531,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('t')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ->orderBy('e.start', 'DESC')
+            ->orderBy('e.start', SortDirection::Descending)
             ->getQuery()
             ->getResult();
 
@@ -586,7 +587,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'DESC')->setMaxResults($limit)->getQuery()->getResult();
+        return $qb->orderBy('e.start', SortDirection::Descending)->setMaxResults($limit)->getQuery()->getResult();
     }
 
     /**
@@ -631,7 +632,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->groupBy('e.id')
             ->having('COUNT(r.id) < :minYes')
             ->setParameter('minYes', $minYes)
-            ->orderBy('e.start', 'ASC');
+            ->orderBy('e.start', SortDirection::Ascending);
 
         if ($restrictToEventIds !== null) {
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
@@ -662,7 +663,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
+        return $qb->orderBy('e.start', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     /**
@@ -706,7 +707,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('pi')
             ->where('e.featured = :featured')
             ->setParameter('featured', true)
-            ->orderBy('e.start', 'DESC');
+            ->orderBy('e.start', SortDirection::Descending);
 
         if ($restrictToEventIds !== null) {
             $qb->andWhere('e.id IN (:ids)')->setParameter('ids', $restrictToEventIds);
@@ -763,7 +764,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
      * @param array<int> $eventIds
      * @return array<Event>
      */
-    public function findByIds(array $eventIds, string $orderBy = 'start', string $direction = 'DESC'): array
+    public function findByIds(array $eventIds, string $orderBy = 'start', SortDirection $direction = SortDirection::Descending): array
     {
         if ($eventIds === []) {
             return [];
@@ -812,8 +813,8 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
 
         $ids = $qb
             ->select('e.id')
-            ->orderBy('e.start', 'ASC')
-            ->addOrderBy('e.id', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
+            ->addOrderBy('e.id', SortDirection::Ascending)
             ->setMaxResults($limit)
             ->setFirstResult($offset)
             ->getQuery()
@@ -887,8 +888,8 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
 
         $ids = $qb
             ->select('e.id')
-            ->orderBy('e.start', 'ASC')
-            ->addOrderBy('e.id', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
+            ->addOrderBy('e.id', SortDirection::Ascending)
             ->setMaxResults($limit)
             ->setFirstResult($offset)
             ->getQuery()
@@ -941,7 +942,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->setParameter('from', $from)
             ->setParameter('until', $until)
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getSingleColumnResult();
@@ -958,7 +959,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('l')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ->orderBy('e.start', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -971,7 +972,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->andWhere('e.canceled = :notCanceled')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->setParameter('notCanceled', false)
-            ->orderBy('e.start', 'DESC')
+            ->orderBy('e.start', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -1022,8 +1023,8 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->andWhere('COALESCE(e.stop, e.start) >= :from')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->setParameter('from', $from)
-            ->orderBy('e.start', 'ASC')
-            ->addOrderBy('e.id', 'ASC')
+            ->orderBy('e.start', SortDirection::Ascending)
+            ->addOrderBy('e.id', SortDirection::Ascending)
             ->setMaxResults($limit);
 
         if ($to !== null) {

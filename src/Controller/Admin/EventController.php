@@ -56,6 +56,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Module\Ballot\Contract\BallotView;
 use Module\Task\Contract\TriggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
@@ -97,6 +98,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly TranslatorInterface $translator,
         private readonly AttendeeUpdateNotifier $attendeeNotifier,
         private readonly SeriesRescheduledEmail $seriesRescheduledEmail,
+        #[Target('cmsContent')]
         private readonly HtmlSanitizerInterface $cmsContent,
         private readonly EventCanonicalRebuildService $canonicalRebuildService,
         private readonly RecurrencePreviewService $recurrencePreviewService,

@@ -7,6 +7,7 @@ use App\Entity\SupportRequest;
 use App\Enum\SupportMessageAuthor;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<SupportMessage> */
 class SupportMessageRepository extends ServiceEntityRepository
@@ -25,8 +26,8 @@ class SupportMessageRepository extends ServiceEntityRepository
             ->leftJoin('sm.authorUser', 'au')
             ->where('sm.supportRequest = :request')
             ->setParameter('request', $request)
-            ->orderBy('sm.createdAt', 'ASC')
-            ->addOrderBy('sm.id', 'ASC')
+            ->orderBy('sm.createdAt', SortDirection::Ascending)
+            ->addOrderBy('sm.id', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -49,8 +50,8 @@ class SupportMessageRepository extends ServiceEntityRepository
             ->select('sm.author')
             ->where('sm.supportRequest = :request')
             ->setParameter('request', $request)
-            ->orderBy('sm.createdAt', 'DESC')
-            ->addOrderBy('sm.id', 'DESC')
+            ->orderBy('sm.createdAt', SortDirection::Descending)
+            ->addOrderBy('sm.id', SortDirection::Descending)
             ->getQuery()
             ->getArrayResult();
 

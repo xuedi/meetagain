@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserBlock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<UserBlock>
@@ -79,7 +80,7 @@ class UserBlockRepository extends ServiceEntityRepository
             ->addSelect('i')
             ->where('b.blocker = :user')
             ->setParameter('user', $user)
-            ->orderBy('b.createdAt', 'DESC')
+            ->orderBy('b.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }

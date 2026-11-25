@@ -5,6 +5,7 @@ namespace Plugin\Wishlist\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Wishlist\Entity\WishlistEntry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<WishlistEntry>
@@ -23,8 +24,8 @@ class WishlistEntryRepository extends ServiceEntityRepository
             ->createQueryBuilder('w')
             ->where('w.userId = :userId')
             ->setParameter('userId', $userId)
-            ->orderBy('w.priorityCounter', 'DESC')
-            ->addOrderBy('w.createdAt', 'ASC')
+            ->orderBy('w.priorityCounter', SortDirection::Descending)
+            ->addOrderBy('w.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -37,7 +38,12 @@ class WishlistEntryRepository extends ServiceEntityRepository
     /** @return WishlistEntry[] every wish, for the group view (user grouping happens in the service) */
     public function findAllForGroupView(): array
     {
-        return $this->createQueryBuilder('w')->orderBy('w.userId', 'ASC')->addOrderBy('w.priorityCounter', 'DESC')->getQuery()->getResult();
+        return $this
+            ->createQueryBuilder('w')
+            ->orderBy('w.userId', SortDirection::Ascending)
+            ->addOrderBy('w.priorityCounter', SortDirection::Descending)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -59,8 +65,8 @@ class WishlistEntryRepository extends ServiceEntityRepository
             ->where('w.itemType = :itemType')
             ->setParameter('itemType', $itemType)
             ->groupBy('w.itemId')
-            ->orderBy('wanter_count', 'DESC')
-            ->addOrderBy('total_priority', 'DESC');
+            ->orderBy('wanter_count', SortDirection::Descending)
+            ->addOrderBy('total_priority', SortDirection::Descending);
 
         if ($allowedItemIds !== null) {
             $qb->andWhere('w.itemId IN (:ids)')->setParameter('ids', $allowedItemIds);
