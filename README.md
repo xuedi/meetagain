@@ -1,10 +1,13 @@
 # MeetAgain
 
-[![Version](https://img.shields.io/badge/Version-v1.0.0-31c754.svg)](https://github.com/xuedi/meetagain/releases)
+[![Version](https://img.shields.io/github/v/release/xuedi/meetagain?label=Version&color=31c754)](https://github.com/xuedi/meetagain/releases)
+[![PHP](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/xuedi/meetagain/main/composer.json&query=$.require.php&label=PHP&color=31c754)](https://www.php.net/)
+[![Symfony](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/xuedi/meetagain/main/composer.json&query=$.require%5B'symfony%2Fframework-bundle'%5D&label=Symfony&color=31c754)](https://symfony.com/)
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
+[![Tests](https://github.com/xuedi/meetagain/actions/workflows/phpunit.yml/badge.svg?branch=main)](https://github.com/xuedi/meetagain/actions/workflows/phpunit.yml)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetagain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetagain/blob/main/src/Command/BadgeGenerateCommand.php)
 
-A self-hosted, open-source alternative to other cooperate meetup websites for organizing groups and scheduling events. Single group installation like WordPress
+A self-hosted, open-source alternative to other corporate meetup websites for organizing groups and scheduling events. Single group installation like WordPress
 
 ## Features
 
