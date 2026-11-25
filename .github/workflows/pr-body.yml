@@ -1,0 +1,31 @@
+name: PR Body
+
+on:
+  pull_request_target:
+    types: [ opened ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  fill:
+    name: Fill empty body with commits
+    if: ${{ !github.event.pull_request.body }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: List commits as bullets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          current=$(gh pr view "$PR" --repo "$REPO" --json body --jq '.body')
+          if [ -n "${current//[[:space:]]/}" ]; then
+            exit 0
+          fi
+          gh api --paginate "repos/$REPO/pulls/$PR/commits" \
+            --jq '.[] | select((.parents | length) == 1) | "- " + (.commit.message | split("\n")[0])' > body.md
+          if [ -s body.md ]; then
+            gh pr edit "$PR" --repo "$REPO" --body-file body.md
+          fi
