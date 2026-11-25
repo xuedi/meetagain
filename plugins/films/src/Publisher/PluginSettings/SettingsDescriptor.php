@@ -44,7 +44,7 @@ final readonly class SettingsDescriptor implements DescriptorInterface
         return SettingsType::class;
     }
 
-    public function getFormOptions(object $data): array
+    public function getFormOptions(object $data, ?string $scopeId): array
     {
         \assert($data instanceof Settings);
 

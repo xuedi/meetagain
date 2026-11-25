@@ -1,0 +1,13 @@
+framework:
+    cache:
+        pools:
+            cache.fediverse_remote_key:
+                adapter: cache.adapter.redis_tag_aware
+                default_lifetime: 86400
+
+when@test:
+    framework:
+        cache:
+            pools:
+                cache.fediverse_remote_key:
+                    adapter: cache.adapter.array

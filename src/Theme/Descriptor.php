@@ -65,7 +65,7 @@ final readonly class Descriptor implements DescriptorInterface
     }
 
     #[Override]
-    public function getFormOptions(object $data): array
+    public function getFormOptions(object $data, ?string $scopeId): array
     {
         return [];
     }

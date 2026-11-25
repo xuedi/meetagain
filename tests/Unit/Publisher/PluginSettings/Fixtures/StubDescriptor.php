@@ -44,7 +44,7 @@ final class StubDescriptor implements DescriptorInterface
         return 'StubFormType';
     }
 
-    public function getFormOptions(object $data): array
+    public function getFormOptions(object $data, ?string $scopeId): array
     {
         return [];
     }

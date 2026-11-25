@@ -1,0 +1,5 @@
+'fediverse_config.validator_username_format': 'Utilisez uniquement des lettres minuscules, des chiffres et des tirets bas.'
+'fediverse_config.validator_username_length': 'Le nom d''utilisateur peut compter au plus {{ limit }} caractères.'
+'fediverse_config.validator_account_summary_length': 'La description peut compter au plus {{ limit }} caractères.'
+'fediverse_config.validator_blocked_server': 'Saisissez un domaine par ligne, par exemple example.social.'
+'fediverse_config.validator_username_taken': 'Ce nom d''utilisateur est pris ou a déjà été utilisé.'

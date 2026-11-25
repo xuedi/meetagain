@@ -1,0 +1,5 @@
+'fediverse_config.validator_username_format': '只能使用小写字母、数字和下划线。'
+'fediverse_config.validator_username_length': '用户名最多 {{ limit }} 个字符。'
+'fediverse_config.validator_account_summary_length': '简介最多 {{ limit }} 个字符。'
+'fediverse_config.validator_blocked_server': '每行输入一个域名，例如 example.social。'
+'fediverse_config.validator_username_taken': '此用户名已被占用或曾被使用。'

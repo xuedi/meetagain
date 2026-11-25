@@ -1,0 +1,5 @@
+fediverse:
+    type: attribute
+    resource:
+        path: ../src/Controller/
+        namespace: Plugin\Fediverse\Controller

@@ -9,6 +9,7 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Publisher\PluginSettings\DescriptorInterface;
 use App\Publisher\PluginSettings\Resolver;
+use App\Publisher\PluginSettings\TopActionsInterface;
 use App\Service\Admin\PluginSettingsService;
 use App\Service\Config\PluginService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -74,11 +75,21 @@ final class PluginSettingsController extends AbstractController implements Admin
             }
         }
 
+        $actions = [];
+        foreach ($descriptors as $descriptor) {
+            if ($descriptor instanceof TopActionsInterface) {
+                array_push($actions, ...$descriptor->getTopActions());
+            }
+        }
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_plugin'),
+            icon: 'arrow-left',
+        );
+
         $adminTop = new AdminTop(info: [
             new AdminTopInfoText($this->pluginService->getName($key)),
-        ], actions: [
-            new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: $this->generateUrl('app_admin_plugin'), icon: 'arrow-left'),
-        ]);
+        ], actions: $actions);
 
         return $this->render('admin/system/plugin_settings/index.html.twig', [
             'pluginKey' => $key,
@@ -98,6 +109,6 @@ final class PluginSettingsController extends AbstractController implements Admin
 
     private function buildForm(DescriptorInterface $descriptor, object $data): FormInterface
     {
-        return $this->createForm($descriptor->getFormType(), $data, $descriptor->getFormOptions($data));
+        return $this->createForm($descriptor->getFormType(), $data, $descriptor->getFormOptions($data, null));
     }
 }

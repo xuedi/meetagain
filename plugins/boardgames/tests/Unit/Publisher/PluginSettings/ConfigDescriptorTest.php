@@ -45,8 +45,8 @@ class ConfigDescriptorTest extends TestCase
         $descriptor = $this->descriptor();
 
         // Act
-        $withoutToken = $descriptor->getFormOptions(new Config());
-        $withToken = $descriptor->getFormOptions(new Config()->setEncryptedBggToken('cipher'));
+        $withoutToken = $descriptor->getFormOptions(new Config(), null);
+        $withToken = $descriptor->getFormOptions(new Config()->setEncryptedBggToken('cipher'), null);
 
         // Assert
         static::assertSame(['bgg_token_set' => false], $withoutToken);

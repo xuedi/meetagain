@@ -39,7 +39,7 @@ final class ConfigDescriptor implements DescriptorInterface
         return ConfigType::class;
     }
 
-    public function getFormOptions(object $data): array
+    public function getFormOptions(object $data, ?string $scopeId): array
     {
         return [];
     }

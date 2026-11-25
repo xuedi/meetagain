@@ -32,8 +32,8 @@ class ConfigDescriptorTest extends TestCase
         $descriptor = $this->descriptor();
 
         // Act
-        $withoutKey = $descriptor->getFormOptions(new Config());
-        $withKey = $descriptor->getFormOptions(new Config()->setEncryptedYoutubeApiKey('cipher'));
+        $withoutKey = $descriptor->getFormOptions(new Config(), null);
+        $withKey = $descriptor->getFormOptions(new Config()->setEncryptedYoutubeApiKey('cipher'), null);
 
         // Assert
         static::assertSame(['youtube_api_key_set' => false], $withoutKey);

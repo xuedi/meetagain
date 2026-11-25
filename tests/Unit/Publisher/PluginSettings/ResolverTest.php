@@ -101,6 +101,22 @@ class ResolverTest extends TestCase
         static::assertSame($overrideOnly, $resolver->resolveStore('stub', '7'));
     }
 
+    public function testRunInScopeHandsTheIdToEveryScopeProviderAndReturnsTheWork(): void
+    {
+        // Arrange
+        $seen = [];
+        $first = $this->recordingScope($seen, 'first');
+        $second = $this->recordingScope($seen, 'second');
+        $resolver = $this->resolver([], [$first, $second]);
+
+        // Act
+        $result = $resolver->runInScope('7', static fn(): string => 'done');
+
+        // Assert
+        static::assertSame('done', $result);
+        static::assertEqualsCanonicalizing(['first:7', 'second:7'], $seen);
+    }
+
     /**
      * @param list<StoreInterface>         $stores
      * @param list<ScopeProviderInterface> $scopeProviders
@@ -138,6 +154,30 @@ class ResolverTest extends TestCase
         };
     }
 
+    /** @param list<string> $seen */
+    private function recordingScope(array &$seen, string $name): ScopeProviderInterface
+    {
+        return new class($seen, $name) implements ScopeProviderInterface {
+            /** @param list<string> $seen */
+            public function __construct(
+                private array &$seen,
+                private readonly string $name,
+            ) {}
+
+            public function getScopeId(): ?string
+            {
+                return null;
+            }
+
+            public function runIn(string $scopeId, callable $work): mixed
+            {
+                $this->seen[] = $this->name . ':' . $scopeId;
+
+                return $work();
+            }
+        };
+    }
+
     private function scope(?string $id): ScopeProviderInterface
     {
         return new class($id) implements ScopeProviderInterface {
@@ -148,6 +188,11 @@ class ResolverTest extends TestCase
             public function getScopeId(): ?string
             {
                 return $this->id;
+            }
+
+            public function runIn(string $scopeId, callable $work): mixed
+            {
+                return $work();
             }
         };
     }

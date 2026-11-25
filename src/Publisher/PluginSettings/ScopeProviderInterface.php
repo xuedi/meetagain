@@ -13,4 +13,14 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 interface ScopeProviderInterface
 {
     public function getScopeId(): ?string;
+
+    /**
+     * Runs the work with the given scope active, so everything resolved inside it sees that scope as a
+     * request served in it would. A provider that does not own the id runs the work unchanged.
+     *
+     * @template T
+     * @param  callable():T $work
+     * @return T
+     */
+    public function runIn(string $scopeId, callable $work): mixed;
 }
