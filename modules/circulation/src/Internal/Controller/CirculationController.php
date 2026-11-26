@@ -109,7 +109,7 @@ final class CirculationController extends AbstractController
         $this->guardCsrf($request, 'app_circulation_copy_retire' . $id);
 
         $copy = $this->circulation->findCopy($id);
-        if ($copy === null) {
+        if ($copy === null || !$this->dashboard->isInScope($copy)) {
             throw $this->createNotFoundException();
         }
 
