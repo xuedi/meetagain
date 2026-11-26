@@ -30,7 +30,7 @@
                             <small>{{ block.createdAt|date('Y-m-d') }}</small>
                         </td>
                         <td class="has-text-right">
-                            <a href="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}"
+                            <a data-action="profile-unblock-click" data-action-place="list" href="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}"
                                class="button is-warning is-small"
                                data-post
                                data-csrf-token="{{ csrf_token('app_profile_unblock_user' ~ block.blocked.id) }}">

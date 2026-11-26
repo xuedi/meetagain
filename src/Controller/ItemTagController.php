@@ -45,6 +45,7 @@ final class ItemTagController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->tagService->saveVocabulary($itemType, array_values((array) ($form->getData()['tags'] ?? [])));
             $this->addFlash('success', 'item.tag_flash_saved');
+            $this->addFlash('action', 'item-tags-success');
 
             return $this->redirectToRoute('app_item_tags', ['itemType' => $itemType]);
         }

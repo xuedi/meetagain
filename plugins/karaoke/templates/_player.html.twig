@@ -25,7 +25,7 @@
                 allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
                 data-karaoke-frame></iframe>
     {% else %}
-        <form class="karaoke-gate has-ratio has-background-light p-5 is-flex is-flex-direction-column is-justify-content-center"
+        <form data-action="karaoke-video-load-submit" class="karaoke-gate has-ratio has-background-light p-5 is-flex is-flex-direction-column is-justify-content-center"
               method="post" action="{{ loadUrl|default(path('app_plugin_karaoke_show', {id: song.id})) }}" data-karaoke-gate>
             <input type="hidden" name="load" value="1">
             <input type="hidden" name="_token" value="{{ csrf_token('external_media_consent') }}">
@@ -33,7 +33,7 @@
             <p class="mb-4">{{ 'karaoke.gate_text'|trans({'%provider%': provider.label}) }}</p>
             <div class="field">
                 <label class="checkbox is-hidden" data-karaoke-always>
-                    <input type="checkbox" name="always" value="1">
+                    <input data-action="karaoke-consent-always-toggle" type="checkbox" name="always" value="1">
                     {{ 'karaoke.gate_always'|trans }}
                 </label>
             </div>
@@ -43,7 +43,7 @@
                     <span class="icon"><i class="fa fa-play"></i></span>
                     <span>{{ 'karaoke.gate_button_load'|trans }}</span>
                 </button>
-                <a href="{{ path('app_cookie') }}" class="button is-text">{{ 'karaoke.gate_settings'|trans }}</a>
+                <a data-action="karaoke-consent-settings-click" href="{{ path('app_cookie') }}" class="button is-text">{{ 'karaoke.gate_settings'|trans }}</a>
             </div>
         </form>
     {% endif %}

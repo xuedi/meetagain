@@ -11,7 +11,8 @@
 
 <h1 class="title">{{ 'books_book.page_title_edit'|trans({'%title%': book.title}) }}</h1>
 
-{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'data-action': 'books-edit-submit'}}) }}
+{% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="books-edit-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 {{ form_errors(form) }}
 
 <div class="columns">
@@ -47,7 +48,7 @@
         <div class="field is-grouped mt-4">
             <div class="control">{{ form_widget(form.submit) }}</div>
             <div class="control">
-                <a href="{{ path('app_plugin_books_book_show', {id: book.id}) }}" class="button">
+                <a data-action="books-cancel-click" data-action-place="edit" href="{{ path('app_plugin_books_book_show', {id: book.id}) }}" class="button">
                     {{ 'books_book.button_cancel'|trans }}
                 </a>
             </div>

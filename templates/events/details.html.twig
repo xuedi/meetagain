@@ -87,11 +87,11 @@
                 </div>
                 <div class="column is-3">
                     {% include 'events/details/sidepanel.html.twig'%}
-                    <a class="button is-fullwidth mt-4" href="{{ path('app_event_calendar_download', {'id': event.id}) }}">
+                    <a data-action="event-calendar-click" class="button is-fullwidth mt-4" href="{{ path('app_event_calendar_download', {'id': event.id}) }}">
                         <span class="icon"><i class="fa-regular fa-calendar-plus"></i></span>
                         <span>{{ 'events.button_add_to_calendar'|trans }}</span>
                     </a>
-                    <a class="button is-fullwidth mt-2 modalTrigger"
+                    <a data-action="event-share-open" class="button is-fullwidth mt-2 modalTrigger"
                        href="{{ path('app_event_share', {'id': event.id}) }}"
                        data-modal-url="{{ path('app_event_share_modal', {'id': event.id}) }}">
                         <span class="icon"><i class="fa-solid fa-share-nodes"></i></span>

@@ -2,7 +2,7 @@
 <div class="columns is-multiline">
     {% if canAdd %}
         <div class="column is-1 p-1">
-            <a href="{{ path('app_plugin_photos_photo_add') }}" title="{{ 'photos_views.title_add'|trans }}">
+            <a data-action="photos-add-click" data-action-place="grid" href="{{ path('app_plugin_photos_photo_add') }}" title="{{ 'photos_views.title_add'|trans }}">
                 <figure class="image" style="background: hsl(217, 71%, 95%); display: flex; align-items: center; justify-content: center; aspect-ratio: 1;">
                     <span class="icon has-text-link"><i class="fa-solid fa-plus fa-lg"></i></span>
                 </figure>

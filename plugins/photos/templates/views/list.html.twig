@@ -9,7 +9,7 @@
             <th>{{ 'photos_views.col_uploader'|trans }}</th>
             <th class="has-text-right">
                 {% if canAdd %}
-                    <a href="{{ path('app_plugin_photos_photo_add') }}" title="{{ 'photos_views.title_add'|trans }}">
+                    <a data-action="photos-add-click" data-action-place="list" href="{{ path('app_plugin_photos_photo_add') }}" title="{{ 'photos_views.title_add'|trans }}">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                     </a>
                 {% endif %}

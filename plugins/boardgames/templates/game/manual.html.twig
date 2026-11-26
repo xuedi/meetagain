@@ -5,7 +5,8 @@
 {% block boardgames_body %}
 <h1 class="title">{{ 'boardgames_game.page_title_manual'|trans }}</h1>
 
-{{ form_start(form) }}
+{{ form_start(form, {attr: {'data-action': 'boardgames-manual-submit'}}) }}
+{% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="boardgames-manual-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 {{ form_errors(form) }}
 {% for field in [form.name, form.yearPublished, form.minPlayers, form.maxPlayers, form.minPlaytime, form.maxPlaytime, form.description] %}
 <div class="field">
@@ -19,7 +20,7 @@
 {% endif %}
 <div class="field mt-4">
     {{ form_widget(form.submit, {'attr': {'class': 'button is-primary'}}) }}
-    <a href="{{ path('app_boardgames_gamelist') }}" class="button ml-2">{{ 'boardgames_game.button_cancel'|trans }}</a>
+    <a data-action="boardgames-cancel-click" data-action-place="manual" href="{{ path('app_boardgames_gamelist') }}" class="button ml-2">{{ 'boardgames_game.button_cancel'|trans }}</a>
 </div>
 {{ form_end(form) }}
 {% endblock %}

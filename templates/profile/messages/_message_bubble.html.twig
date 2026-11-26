@@ -9,14 +9,14 @@
             <span class="ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</span>
         {% endif %}
         {% if withinWindow %}
-            <a href="#" class="message-edit-trigger ml-1"
+            <a data-action="messages-edit-click" href="#" class="message-edit-trigger ml-1"
                title="{{ 'profile_messages.edit_button'|trans }}"
                aria-label="{{ 'profile_messages.edit_button'|trans }}"
                data-content="{{ message.content }}">
                 <span class="icon is-small"><i class="fa fa-pen"></i></span>
             </a>
         {% elseif not isOwn %}
-            <a href="{{ path('app_report_subject', {'type': 'message', 'id': message.id}) }}"
+            <a data-action="messages-report-click" href="{{ path('app_report_subject', {'type': 'message', 'id': message.id}) }}"
                class="ml-1 has-text-grey"
                title="{{ 'profile_messages.report_button'|trans }}"
                aria-label="{{ 'profile_messages.report_button'|trans }}">

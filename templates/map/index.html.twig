@@ -17,7 +17,7 @@
 
             <h1 class="title is-4">{{ 'map.heading'|trans }}</h1>
 
-            {{ form_start(filter, {'attr': {'class': 'is-flex is-flex-wrap-wrap is-align-items-flex-end mb-4'}}) }}
+            {{ form_start(filter, {'attr': {'class': 'is-flex is-flex-wrap-wrap is-align-items-flex-end mb-4', 'data-action': 'map-filter-submit'}}) }}
             <div class="mr-3">{{ form_row(filter.from) }}</div>
             <div class="mr-3">{{ form_row(filter.to) }}</div>
             {% if filter.country is defined %}
@@ -47,7 +47,7 @@
                                 <p class="mb-1" data-field="start"></p>
                                 <p class="has-text-grey mb-1" data-field="where"></p>
                                 <p class="mb-3"><span data-field="rsvpCount"></span> {{ 'map.label_rsvps'|trans }}</p>
-                                <a class="button is-link is-small" data-field="url">{{ 'map.open_event'|trans }}</a>
+                                <a data-action="map-event-click" class="button is-link is-small" data-field="url">{{ 'map.open_event'|trans }}</a>
                             </div>
                             <p class="has-text-grey is-hidden" data-event-map-empty>{{ 'map.empty'|trans }}</p>
                         </div>
@@ -57,7 +57,7 @@
                 <div class="box has-text-centered is-flex is-flex-direction-column is-justify-content-center" style="min-height: 32rem;">
                     <p class="mb-3">{{ 'map.consent_needed'|trans }}</p>
                     {% if is_granted('ROLE_USER') %}
-                        <p><a class="button is-link" href="{{ path('app_profile_config') }}">{{ 'map.consent_profile'|trans }}</a></p>
+                        <p><a data-action="map-consent-click" class="button is-link" href="{{ path('app_profile_config') }}">{{ 'map.consent_profile'|trans }}</a></p>
                     {% else %}
                         <p class="has-text-grey">{{ 'map.consent_cookie'|trans }}</p>
                     {% endif %}

@@ -7,7 +7,8 @@
 
 <div class="columns">
     <div class="column is-8">
-        {{ form_start(form) }}
+        {{ form_start(form, {attr: {'data-action': 'films-manual-submit'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="films-manual-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
         <div class="field">
             {{ form_label(form.title, null, {'label_attr': {'class': 'label'}}) }}

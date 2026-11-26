@@ -19,7 +19,7 @@
 #}
 {% if image %}
     {% set caption = '<div style="text-align:center"><a href="' ~ href|e ~ '">' ~ title|e ~ '</a> &middot; ' ~ 'item.gallery_report_caption'|trans({'%url%': path('app_report_image', {'id': image.id})}) ~ '</div>' %}
-    <a data-fancybox="{{ group }}"
+    <a data-action="item-slide-open" data-fancybox="{{ group }}"
        data-caption="{{ caption }}"
        href="/images/thumbnails/{{ image.hash }}_{{ bigSize|default('h800') }}.webp"
        class="item-gallery-slide"

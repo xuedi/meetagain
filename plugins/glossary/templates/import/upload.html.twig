@@ -13,10 +13,11 @@
                     <p class="mb-4">{{ 'glossary_import.intro'|trans({'%cap%': rowCap}) }}</p>
 
                     <div class="box">
-                        {{ form_start(form) }}
+                        {{ form_start(form, {attr: {'data-action': 'glossary-import-upload-submit'}}) }}
+                        {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="glossary-import-upload-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
                         {{ form_row(form.file) }}
                         <div class="has-text-right mt-5">
-                            <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            <a data-action="glossary-cancel-click" data-action-place="upload" href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                             <button type="submit" class="button is-link">{{ 'glossary_import.button_upload'|trans }}</button>
                         </div>
                         {{ form_end(form) }}

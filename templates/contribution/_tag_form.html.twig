@@ -15,7 +15,7 @@
 <h1 class="title is-4">{{ 'item.tag_page_title'|trans({'%type%': typeLabelKey|trans}) }}</h1>
 <p class="subtitle is-6">{{ 'item.tag_page_intro'|trans }}</p>
 
-<form method="post" class="box">
+<form data-action="contribute-tags-submit" method="post" class="box">
     <input type="hidden" name="_token" value="{{ csrf_token('item_tag_suggest') }}">
     {% for row in rows %}
         <div class="is-flex is-align-items-center mb-3">

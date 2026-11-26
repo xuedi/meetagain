@@ -114,6 +114,7 @@ final class FilmController extends AbstractController
             ]);
 
             $this->addFlash('success', 'films_film.flash_added');
+            $this->addFlash('action', 'films-import-success');
 
             return $this->redirectToRoute('app_plugin_films_film_show', ['id' => $film->getId()]);
         } catch (RuntimeException $e) {
@@ -152,6 +153,7 @@ final class FilmController extends AbstractController
                 ]);
 
                 $this->addFlash('success', 'films_film.flash_added');
+                $this->addFlash('action', 'films-manual-success');
 
                 return $this->redirectToRoute('app_films_filmlist');
             } catch (RuntimeException $e) {

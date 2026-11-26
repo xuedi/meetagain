@@ -22,12 +22,12 @@
     <div class="level-right">
         <div class="buttons">
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path('app_member_view', {id: streamUser.id}) }}" class="button">
+                <a data-action="photos-profile-click" href="{{ path('app_member_view', {id: streamUser.id}) }}" class="button">
                     <span class="icon"><i class="fa fa-user"></i></span>
                     <span>{{ 'photos_stream.link_profile'|trans }}</span>
                 </a>
             {% endif %}
-            <a href="{{ path('app_plugin_photos_streams') }}" class="button">
+            <a data-action="photos-streams-click" data-action-place="stream" href="{{ path('app_plugin_photos_streams') }}" class="button">
                 <span class="icon"><i class="fa fa-users"></i></span>
                 <span>{{ 'photos_stream.button_all_streams'|trans }}</span>
             </a>

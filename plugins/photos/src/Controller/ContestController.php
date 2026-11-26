@@ -54,6 +54,7 @@ final class ContestController extends AbstractController
         try {
             $this->contestService->start((int) $this->getAuthedUser()->getId());
             $this->addFlash('success', 'photos_contest.flash_started');
+            $this->addFlash('action', 'photos-contest-start-success');
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }
@@ -70,6 +71,7 @@ final class ContestController extends AbstractController
         try {
             $this->contestService->submit($photo);
             $this->addFlash('success', 'photos_contest.flash_submitted');
+            $this->addFlash('action', 'photos-contest-enter-success');
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }
@@ -97,6 +99,7 @@ final class ContestController extends AbstractController
         try {
             $this->ballots->cast($id, (int) $this->getAuthedUser()->getId(), $this->submittedKeys($request));
             $this->addFlash('success', 'photos_contest.flash_voted');
+            $this->addFlash('action', 'photos-contest-vote-success');
         } catch (Throwable) {
             $this->addFlash('error', 'photos_contest.flash_vote_refused');
         }

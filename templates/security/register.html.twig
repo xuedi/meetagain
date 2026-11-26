@@ -13,7 +13,8 @@
                     <h1 class="title is-5">{{ "security.headline_register"|trans }}</h1>
                     {% set loginPath = path('app_login', redirect|default(null) ? {'redirect': redirect} : {}) %}
 
-                    {{ form_start(form) }}
+                    {{ form_start(form, {attr: {'data-action': 'register-form-submit'}}) }}
+                    {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="register-form-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
                     {% for flash_error in app.flashes('verify_email_error') %}
                         <div class="notification is-danger is-light mb-4" role="alert">{{ flash_error }}</div>
@@ -43,7 +44,7 @@
                     <div class="field is-grouped mt-4">
                         <div class="control">
                             <button class="button is-primary">{{ "security.button_register" | trans }}</button>
-                            <a class="button is-light" href="{{ path('app_catch_all', {'page': 'terms'}) }}" target="_blank" rel="noopener">{{ "security.button_terms" | trans }}</a>
+                            <a class="button is-light" data-action="register-terms-click" href="{{ path('app_catch_all', {'page': 'terms'}) }}" target="_blank" rel="noopener">{{ "security.button_terms" | trans }}</a>
                         </div>
                     </div>
                     {{ form_end(form) }}

@@ -64,7 +64,7 @@
             {% if isParticipant and handover.status.isOpen %}
                 <div class="buttons mt-4">
                     {% if not handover.hasConfirmed(app.user) %}
-                        <form method="post" action="{{ path('app_circulation_handover_confirm', {'id': handover.id}) }}">
+                        <form data-action="circulation-handover-confirm-submit" method="post" action="{{ path('app_circulation_handover_confirm', {'id': handover.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_handover_confirm' ~ handover.id) }}">
                             <button class="button is-link">
                                 <span class="icon"><i class="fa fa-handshake"></i></span>
@@ -72,7 +72,7 @@
                             </button>
                         </form>
                     {% endif %}
-                    <form method="post" action="{{ path('app_circulation_handover_cancel', {'id': handover.id}) }}">
+                    <form data-action="circulation-handover-cancel-submit" method="post" action="{{ path('app_circulation_handover_cancel', {'id': handover.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_handover_cancel' ~ handover.id) }}">
                         <button class="button is-light">{{ 'circulation.button_cancel_handover'|trans }}</button>
                     </form>

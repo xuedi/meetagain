@@ -7,7 +7,8 @@
     <h1 class="title">{{ 'books_book.page_title_add'|trans }}</h1>
     <p class="mb-5 has-text-grey">{{ 'books_book.add_intro'|trans }}</p>
 
-    {{ form_start(form) }}
+    {{ form_start(form, {attr: {'data-action': 'books-lookup-submit'}}) }}
+    {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="books-lookup-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
     {{ form_errors(form) }}
     <div class="field">
         {{ form_label(form.isbn) }}
@@ -22,7 +23,7 @@
     {% endif %}
     <div class="field mt-5">
         <button type="submit" class="button is-primary">{{ 'books_book.button_lookup'|trans }}</button>
-        <a href="{{ path('app_plugin_books_book_manual') }}" class="button ml-2">{{ 'books_book.link_manual_entry'|trans }}</a>
+        <a data-action="books-manual-click" data-action-place="lookup" href="{{ path('app_plugin_books_book_manual') }}" class="button ml-2">{{ 'books_book.link_manual_entry'|trans }}</a>
     </div>
     {{ form_end(form) }}
 </div>

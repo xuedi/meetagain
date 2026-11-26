@@ -20,7 +20,7 @@
                         <div class="message-body">
                             {{ 'ballot.tied'|trans }}
                             {% if is_granted('ROLE_ORGANIZER') %}
-                                <a href="{{ path('app_item_ballot_close', {id: ballot.id}) }}" class="button is-small is-warning ml-2">
+                                <a data-action="item-ballot-close-click" data-action-place="tie" href="{{ path('app_item_ballot_close', {id: ballot.id}) }}" class="button is-small is-warning ml-2">
                                     {{ 'item_ballot.button_break_tie'|trans }}
                                 </a>
                             {% endif %}
@@ -36,9 +36,9 @@
                 } only %}
 
                 <div class="buttons is-centered mt-5">
-                    <a class="button is-light" href="{{ path('app_ballot_index') }}">{{ 'ballot.back'|trans }}</a>
+                    <a data-action="item-ballot-back-click" class="button is-light" href="{{ path('app_ballot_index') }}">{{ 'ballot.back'|trans }}</a>
                     {% if is_granted('ROLE_ORGANIZER') and not ballot.status.isResolved %}
-                        <a class="button is-light" href="{{ path('app_item_ballot_close', {id: ballot.id}) }}">
+                        <a data-action="item-ballot-close-click" data-action-place="footer" class="button is-light" href="{{ path('app_item_ballot_close', {id: ballot.id}) }}">
                             {{ 'item_ballot.button_close'|trans }}
                         </a>
                     {% endif %}

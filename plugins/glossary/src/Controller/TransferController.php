@@ -100,6 +100,7 @@ final class TransferController extends AbstractGlossaryController
                     '%updated%' => $summary['updated'],
                     '%skipped%' => $summary['skipped'],
                 ]));
+                $this->addFlash('action', 'glossary-import-success');
                 if ($summary['unknownTags'] !== []) {
                     $this->addFlash('warning', $this->translator->trans('glossary_import.flash_unknown_tags', ['%tags%' => implode(
                         ', ',

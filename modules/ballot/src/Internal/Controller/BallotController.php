@@ -77,6 +77,7 @@ final class BallotController extends AbstractController
         try {
             $this->ballots->cast($id, $viewerId, $this->submittedKeys($request));
             $this->addFlash('success', 'ballot.flash_recorded');
+            $this->addFlash('action', 'ballot-vote-success');
         } catch (DomainException) {
             $this->addFlash('danger', 'ballot.flash_closed');
         }

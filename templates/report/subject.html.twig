@@ -13,7 +13,8 @@
                         <h1 class="title is-4">{{ 'report.page_title_subject'|trans }}</h1>
                         <p class="mb-4">{{ 'report.subject_intro'|trans }}</p>
 
-                        {{ form_start(form) }}
+                        {{ form_start(form, {attr: {'data-action': 'report-subject-submit'}}) }}
+                        {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="report-subject-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
                         {{ form_errors(form) }}
                         {{ form_row(form.reason) }}
                         {{ form_row(form.remarks) }}

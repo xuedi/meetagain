@@ -2,12 +2,14 @@
 
 namespace App\EventSubscriber;
 
+use App\Controller\SecurityController;
 use App\Entity\User;
 use App\Service\Config\LocaleCookieService;
 use App\Service\Member\ConsentService;
 use App\Service\Support\ThreadService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
@@ -35,6 +37,9 @@ readonly class LoginSubscriber implements EventSubscriberInterface
         $session = $request->getSession();
         $session->set('_locale', $user->getLocale());
         $this->forgetOwnThreadViews($session);
+        if ($session instanceof FlashBagAwareSessionInterface && $request->attributes->get('_route') === SecurityController::LOGIN_ROUTE) {
+            $session->getFlashBag()->add('action', 'login-form-success');
+        }
 
         $response = $event->getResponse();
         if ($response !== null && $this->localeCookieService->isConsentGranted($request)) {

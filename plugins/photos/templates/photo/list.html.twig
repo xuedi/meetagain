@@ -13,13 +13,13 @@
     </div>
     <div class="level-right">
         {% if contestEnabled %}
-            <a href="{{ path('app_plugin_photos_contest') }}" class="button mr-2">
+            <a data-action="photos-contest-click" href="{{ path('app_plugin_photos_contest') }}" class="button mr-2">
                 <span class="icon"><i class="fa-solid fa-trophy"></i></span>
                 <span>{{ 'photos_contest.button_contest'|trans }}</span>
             </a>
         {% endif %}
         {% if streamsEnabled %}
-            <a href="{{ path('app_plugin_photos_streams') }}" class="button">
+            <a data-action="photos-streams-click" data-action-place="list" href="{{ path('app_plugin_photos_streams') }}" class="button">
                 <span class="icon"><i class="fa fa-users"></i></span>
                 <span>{{ 'photos_stream.button_all_streams'|trans }}</span>
             </a>

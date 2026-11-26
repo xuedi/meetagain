@@ -16,6 +16,8 @@
         - csrfTokenId (string, required) — CSRF token intention string
         - noAjax      (any, optional)    — when defined, renders a plain POST form instead of AJAX
         - disabled    (bool, optional)   — renders both buttons disabled; default: false
+        - action      (string, optional) - the action name the yes/no buttons report, ending in -select; none when unset
+        - action_place (string, optional) - which setting the toggle stands for, a fixed word
     Depends on: assets/js/block-user.js (.triggerToggleBlock)
 #}
 {% if disabled|default(false) %}
@@ -27,12 +29,12 @@
     <div class="buttons has-addons is-right is-flex-wrap-nowrap">
         {% if status %}
             <span class="button is-small is-success">{{ "shared.toggle_yes"|trans }}</span>
-            <a href="{{ link }}"
+            <a {% if action is defined %}data-action="{{ action }}" data-action-value="no"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} {% endif %}href="{{ link }}"
                class="button is-small"
                data-post
                data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_no"|trans }}</a>
         {% else %}
-            <a href="{{ link }}"
+            <a {% if action is defined %}data-action="{{ action }}" data-action-value="yes"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} {% endif %}href="{{ link }}"
                class="button is-small"
                data-post
                data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_yes"|trans }}</a>
@@ -41,7 +43,7 @@
     </div>
 {% else %}
     <div class="buttons has-addons is-right is-flex-wrap-nowrap triggerToggleBlock">
-        <button type="button" class="button is-small {% if status %}is-success{% endif %}" data-type="yes" data-url="{{ link }}" data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_yes"|trans }}</button>
-        <button type="button" class="button is-small {% if not status %}is-danger{% endif %}" data-type="no" data-url="{{ link }}" data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_no"|trans }}</button>
+        <button {% if action is defined %}data-action="{{ action }}" data-action-value="yes"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} {% endif %}type="button" class="button is-small {% if status %}is-success{% endif %}" data-type="yes" data-url="{{ link }}" data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_yes"|trans }}</button>
+        <button {% if action is defined %}data-action="{{ action }}" data-action-value="no"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} {% endif %}type="button" class="button is-small {% if not status %}is-danger{% endif %}" data-type="no" data-url="{{ link }}" data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_no"|trans }}</button>
     </div>
 {% endif %}

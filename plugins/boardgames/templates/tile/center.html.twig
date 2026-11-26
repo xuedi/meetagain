@@ -64,7 +64,7 @@
                                     {% endif %}
                                 </div>
                                 {% if group.user.id == user.id %}
-                                    <a href="{{ path('app_plugin_boardgames_pledge_withdraw', {id: entry.pledge.id}) }}"
+                                    <a data-action="boardgames-pledge-withdraw-click" href="{{ path('app_plugin_boardgames_pledge_withdraw', {id: entry.pledge.id}) }}"
                                        class="button is-small is-light mt-1"
                                        data-post
                                        data-csrf-token="{{ csrf_token('app_plugin_boardgames_pledge_withdraw' ~ entry.pledge.id) }}">
@@ -90,13 +90,13 @@
                     {% if request.message %}<span class="has-text-grey is-size-7">- {{ request.message }}</span>{% endif %}
                 </span>
                 <span class="buttons is-flex-shrink-0 is-flex-wrap-nowrap ml-4 mb-0">
-                    <a href="{{ path('app_plugin_boardgames_request_accept', {id: request.id}) }}"
+                    <a data-action="boardgames-request-accept-click" href="{{ path('app_plugin_boardgames_request_accept', {id: request.id}) }}"
                        class="button is-small is-success"
                        data-post
                        data-csrf-token="{{ csrf_token('app_plugin_boardgames_request_accept' ~ request.id) }}">
                         {{ 'boardgames_tile.button_accept'|trans }}
                     </a>
-                    <a href="{{ path('app_plugin_boardgames_request_decline', {id: request.id}) }}"
+                    <a data-action="boardgames-request-decline-click" href="{{ path('app_plugin_boardgames_request_decline', {id: request.id}) }}"
                        class="button is-small"
                        data-post
                        data-csrf-token="{{ csrf_token('app_plugin_boardgames_request_decline' ~ request.id) }}">
@@ -117,7 +117,7 @@
 {% if hasRsvp %}
     <div class="is-flex is-flex-wrap-wrap is-align-items-flex-end" style="gap: 1rem;">
         {% if bringable is not empty %}
-            <form method="post" action="{{ path('app_plugin_boardgames_pledge_create', {eventId: event.id}) }}">
+            <form data-action="boardgames-pledge-submit" method="post" action="{{ path('app_plugin_boardgames_pledge_create', {eventId: event.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_pledge_create' ~ event.id) }}">
                 <div class="field has-addons mb-0">
                     <div class="control">
@@ -137,7 +137,7 @@
         {% else %}
             <p class="is-size-7 has-text-grey">{{ 'boardgames_tile.no_bringable'|trans }}</p>
         {% endif %}
-        <a class="button is-small" href="{{ path('app_plugin_boardgames_request_ask', {eventId: event.id}) }}">
+        <a data-action="boardgames-ask-click" class="button is-small" href="{{ path('app_plugin_boardgames_request_ask', {eventId: event.id}) }}">
             <span class="icon"><i class="fa-solid fa-hand"></i></span>
             <span>{{ 'boardgames_tile.button_ask'|trans }}</span>
         </a>

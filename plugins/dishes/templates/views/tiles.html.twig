@@ -3,7 +3,7 @@
     {% if is_granted('ROLE_STEWARD') %}
         <div class="column is-half-mobile is-narrow-tablet dish-item">
             <div style="width: 176px; max-width: 100%; margin: 0 auto; height: 100%;">
-                <a href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
+                <a data-action="dishes-add-click" data-action-place="tiles" href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
                     <div class="card has-background-link-light" style="height: 100%;">
                         <div class="card-content has-text-centered" style="padding-top: 2rem;">
                             <span class="icon is-large has-text-link"><i class="fa-solid fa-plus fa-2x"></i></span>

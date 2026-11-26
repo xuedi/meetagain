@@ -9,7 +9,8 @@
 
             <div class="columns">
                 <div class="column is-6">
-                    {{ form_start(form) }}
+                    {{ form_start(form, {attr: {'data-action': 'profile-form-submit'}}) }}
+                    {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="profile-form-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
                     <div class="box">
                         <div class="columns">
@@ -69,7 +70,7 @@
                     <div class="card is-fullwidth">
                         <header class="card-header">
                             <p class="card-header-title">{{ 'profile.section_past_events'|trans }}</p>
-                            <a class="card-header-icon card-toggle">
+                            <a data-action="profile-past-events-click" class="card-header-icon card-toggle">
                                 <i class="fa fa-angle-down"></i>
                             </a>
                         </header>

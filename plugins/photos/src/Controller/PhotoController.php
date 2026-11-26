@@ -143,6 +143,7 @@ final class PhotoController extends AbstractController
                 'photo_title' => $photo->getAnyTranslatedTitle(),
             ]);
             $this->addFlash('success', 'photos_photo.flash_added');
+            $this->addFlash('action', 'photos-upload-success');
 
             return $this->redirectToRoute('app_plugin_photos_photo_show', ['id' => $photo->getId()]);
         }
@@ -175,6 +176,9 @@ final class PhotoController extends AbstractController
                 ? $this->translator->trans('photos_event.flash_upload_failed')
                 : $this->translator->trans('photos_event.flash_uploaded', ['%count%' => $added]),
         );
+        if ($added > 0) {
+            $this->addFlash('action', 'photos-event-upload-success');
+        }
 
         return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }

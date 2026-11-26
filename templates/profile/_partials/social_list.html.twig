@@ -7,7 +7,7 @@
         {% if loop.index == 6 %}
             <tr>
                 <td class="has-text-centered" colspan="2">
-                    <a data-show-more href="#">{{ 'profile_social.list_show_more'|trans }}</a>
+                    <a data-show-more data-action="profile-social-more-open" data-action-place="{{ actionPlace }}" href="#">{{ 'profile_social.list_show_more'|trans }}</a>
                 </td>
             </tr>
         {% endif %}
@@ -19,7 +19,7 @@
                 <a href="{{ path('app_member_view', {'id': user.id}) }}" class="has-text-dark">{{ member_name(user) }}</a>
             </td>
             <td class="has-text-right">
-                <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"
+                <a data-action="profile-follow-click" data-action-place="{{ actionPlace }}" href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"
                    class="button is-small {{ buttonColor }}"
                    data-post
                    data-csrf-token="{{ csrf_token('app_profile_social_toggle_follow' ~ user.id) }}">

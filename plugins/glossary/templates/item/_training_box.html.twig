@@ -24,17 +24,17 @@
 
     <div class="buttons are-small">
         {% if summary is not null %}
-            <a href="{{ path('app_plugin_glossary_trainer', facetQuery) }}" class="button is-link is-fullwidth{{ count == 0 ? ' is-hidden' }}" rel="nofollow" data-glossary-train>
+            <a data-action="glossary-train-click" href="{{ path('app_plugin_glossary_trainer', facetQuery) }}" class="button is-link is-fullwidth{{ count == 0 ? ' is-hidden' }}" rel="nofollow" data-glossary-train>
                 <span class="icon"><i class="fa fa-graduation-cap"></i></span>
                 <span data-glossary-train-label>{{ 'glossary.button_train'|trans({'%count%': count}) }}</span>
             </a>
         {% endif %}
-        <a href="{{ path('app_plugin_glossary_export', facetQuery) }}" class="button is-light is-fullwidth{{ count == 0 ? ' is-hidden' }}" rel="nofollow" data-glossary-export>
+        <a data-action="glossary-export-click" href="{{ path('app_plugin_glossary_export', facetQuery) }}" class="button is-light is-fullwidth{{ count == 0 ? ' is-hidden' }}" rel="nofollow" data-glossary-export>
             <span class="icon"><i class="fa fa-download"></i></span>
             <span>{{ 'glossary.button_export'|trans }}</span>
         </a>
         {% if summary is not null %}
-            <a href="{{ path('app_plugin_glossary_trainer_progress') }}" class="button is-light is-fullwidth" data-glossary-progress>
+            <a data-action="glossary-trainer-progress-click" data-action-place="training" href="{{ path('app_plugin_glossary_trainer_progress') }}" class="button is-light is-fullwidth" data-glossary-progress>
                 <span class="icon"><i class="fa fa-chart-line"></i></span>
                 <span>{{ 'glossary_trainer.link_progress'|trans }}</span>
             </a>

@@ -5,7 +5,8 @@
 {% block books_body %}
 <h1 class="title">{{ 'books_book.page_title_manual'|trans }}</h1>
 
-{{ form_start(form) }}
+{{ form_start(form, {attr: {'data-action': 'books-manual-submit'}}) }}
+{% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="books-manual-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 {{ form_errors(form) }}
 {% for field in [form.isbn, form.title, form.author, form.description, form.pageCount, form.publishedYear] %}
 <div class="field">
@@ -19,7 +20,7 @@
 {% endif %}
 <div class="field mt-4">
     {{ form_widget(form.submit, {'attr': {'class': 'button is-primary'}}) }}
-    <a href="{{ path('app_books_booklist') }}" class="button ml-2">{{ 'books_book.button_cancel'|trans }}</a>
+    <a data-action="books-cancel-click" data-action-place="manual" href="{{ path('app_books_booklist') }}" class="button ml-2">{{ 'books_book.button_cancel'|trans }}</a>
 </div>
 {{ form_end(form) }}
 {% endblock %}

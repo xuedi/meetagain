@@ -113,6 +113,7 @@ final class SupportThreadController extends AbstractController
         }
 
         $this->threadService->postRequesterMessage($supportRequest, (string) $form->get('message')->getData(), $request->getClientIp());
+        $this->addFlash('action', 'support-reply-success');
 
         return $this->redirectToRoute('app_support_thread', ['token' => $token]);
     }
@@ -143,6 +144,7 @@ final class SupportThreadController extends AbstractController
         }
 
         $this->addFlash('success', 'support.flash_optin_sent');
+        $this->addFlash('action', 'support-optin-success');
 
         return $this->redirectToRoute('app_support_thread', ['token' => $token]);
     }

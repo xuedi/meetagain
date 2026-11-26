@@ -11,7 +11,7 @@
 {% if entries|length > 0 %}
     <div class="navbar-item dropdown is-hoverable pl-0">
         <div class="dropdown-trigger is-hoverable">
-            <button class="button" aria-haspopup="menu" aria-label="{{ 'chrome.aria_select_language'|trans }}">
+            <button data-action="nav-language-open" data-action-place="header" class="button" aria-haspopup="menu" aria-label="{{ 'chrome.aria_select_language'|trans }}">
                 <span class="icon">
                     <img class="is-flag" src="{{ asset('images/flags/' ~ app.request.locale ~ '.svg') }}" width="32" height="24"
                          alt=""/>
@@ -23,7 +23,7 @@
             <div class="dropdown-content">
                 {% for entry in entries %}
                     <nobr>
-                        <a class="navbar-item" href="{{ entry.href }}" role="menuitem" hreflang="{{ entry.code }}">
+                        <a data-action="nav-language-click" data-action-place="header" class="navbar-item" href="{{ entry.href }}" role="menuitem" hreflang="{{ entry.code }}">
                             <figure class="flag-icon">
                                 <img class="is-flag" src="{{ asset('images/flags/' ~ entry.code ~ '.svg') }}" width="32" height="24"
                                      alt=""/>

@@ -28,7 +28,7 @@
     {% if count is same as(0) and not active %}
         <span class="{{ classes }} has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">{{ label }}<span class="ml-1">0</span></span>
     {% else %}
-        <a href="{{ url }}" class="{{ classes }}" rel="nofollow" data-item-facet>{{ label }}{% if count is not null %}<span class="ml-1 {{ active ? '' : 'has-text-grey' }}">{{ count }}</span>{% endif %}</a>
+        <a data-action="item-filter-click" data-action-place="sidebar" href="{{ url }}" class="{{ classes }}" rel="nofollow" data-item-facet>{{ label }}{% if count is not null %}<span class="ml-1 {{ active ? '' : 'has-text-grey' }}">{{ count }}</span>{% endif %}</a>
     {% endif %}
 {% endmacro %}
 
@@ -44,7 +44,7 @@
             <p class="heading mb-0">{{ 'item.facet_heading'|trans }}</p>
             <span class="is-flex is-align-items-center" style="gap: 0.5rem;">
                 {% if activeCount > 0 %}
-                    <a href="{{ baseUrl }}" class="is-size-7" rel="nofollow" data-item-facet>{{ 'item.facet_clear'|trans }}</a>
+                    <a data-action="item-filter-clear-click" data-action-place="sidebar" href="{{ baseUrl }}" class="is-size-7" rel="nofollow" data-item-facet>{{ 'item.facet_clear'|trans }}</a>
                 {% endif %}
                 {% if is_granted('ROLE_USER') %}
                     {% set isSteward = is_granted('ROLE_STEWARD') %}
@@ -61,7 +61,7 @@
             </span>
         </div>
 
-        <button type="button" class="button is-small is-fullwidth mb-2 is-hidden-tablet is-hidden" data-item-facet-toggle>
+        <button data-action="item-filter-open" type="button" class="button is-small is-fullwidth mb-2 is-hidden-tablet is-hidden" data-item-facet-toggle>
             <span class="icon"><i class="fa-solid fa-filter"></i></span>
             <span>{{ 'item.facet_toggle'|trans({'%count%': activeCount}) }}</span>
         </button>
@@ -82,7 +82,7 @@
                     </div>
                 {% endfor %}
                 {% if rows|length > visibleChips %}
-                    <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': rows|length}) }}</button>
+                    <button data-action="item-filter-more-click" type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': rows|length}) }}</button>
                 {% endif %}
             </div>
         </div>

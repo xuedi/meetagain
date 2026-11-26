@@ -11,26 +11,26 @@
 
             <div class="columns">
                 <div class="column is-8">
-                    {{ form_start(form, {'attr': {'class': 'box'}}) }}
+                    {{ form_start(form, {'attr': {'class': 'box', 'data-action': 'cookie-settings-submit'}}) }}
                         <p class="mb-4">{{ "cookie.consent_text" | trans }}</p>
 
                         <div class="field">
                             <label class="checkbox">
-                                {{ form_widget(form.cookies) }}
+                                {{ form_widget(form.cookies, {'attr': {'data-action': 'cookie-cookies-toggle', 'data-action-place': 'page'}}) }}
                                 <p class="help has-text-grey">{{ "cookie.cookies_text" | trans }}</p>
                             </label>
                         </div>
 
                         <div class="field">
                             <label class="checkbox">
-                                {{ form_widget(form.osm) }}
+                                {{ form_widget(form.osm, {'attr': {'data-action': 'cookie-osm-toggle', 'data-action-place': 'page'}}) }}
                             </label>
                             <p class="help has-text-grey">{{ "cookie.option_osm_text" | trans }}</p>
                         </div>
 
                         <div class="field">
                             <label class="checkbox">
-                                {{ form_widget(form.external_media) }}
+                                {{ form_widget(form.external_media, {'attr': {'data-action': 'cookie-media-toggle', 'data-action-place': 'page'}}) }}
                             </label>
                             <p class="help has-text-grey">{{ "cookie.option_external_media_text" | trans }}</p>
                         </div>

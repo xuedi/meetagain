@@ -21,7 +21,7 @@
                             {{ 'glossary.label_created_at'|trans }}: <b>{{ editItem.createdAt | time_diff }}</b><br>
                         </p>
                         <div class="has-text-right">
-                            <a href="{{ path('app_plugin_glossary_delete', {id: editItem.id}) }}"
+                            <a data-action="glossary-delete-confirm-click" href="{{ path('app_plugin_glossary_delete', {id: editItem.id}) }}"
                                class="button is-danger"
                                data-post
                                data-csrf-token="{{ csrf_token('admin_glossary_delete' ~ editItem.id) }}">

@@ -88,6 +88,7 @@ final class SuggestionController extends AbstractController
         }
 
         $this->addFlash('success', 'review_suggestion.flash_approved');
+        $this->addFlash('action', 'proposal-suggestion-approve-success');
 
         return $this->redirectToRoute('app_profile_review');
     }

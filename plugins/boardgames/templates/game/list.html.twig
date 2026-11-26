@@ -14,23 +14,23 @@
     <div class="level-right">
         <div class="buttons">
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path('app_plugin_boardgames_shelf') }}" class="button">
+                <a data-action="boardgames-shelf-click" href="{{ path('app_plugin_boardgames_shelf') }}" class="button">
                     <span class="icon"><i class="fa fa-box-archive"></i></span>
                     <span>{{ 'boardgames_shelf.link_label'|trans }}</span>
                 </a>
             {% endif %}
             {% if circulation_dashboard_url('boardgame') %}
-                <a href="{{ circulation_dashboard_url('boardgame') }}" class="button">
+                <a data-action="boardgames-circulation-click" href="{{ circulation_dashboard_url('boardgame') }}" class="button">
                     <span class="icon"><i class="fa fa-right-left"></i></span>
                     <span>{{ 'circulation.link_label'|trans }}</span>
                 </a>
             {% endif %}
             {% if is_granted('ROLE_STEWARD') %}
-                <a href="{{ path('app_plugin_boardgames_game_lookup') }}" class="button is-link">
+                <a data-action="boardgames-lookup-click" href="{{ path('app_plugin_boardgames_game_lookup') }}" class="button is-link">
                     <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
                     <span>{{ 'boardgames_game.button_lookup'|trans }}</span>
                 </a>
-                <a href="{{ path('app_plugin_boardgames_game_manual') }}" class="button">
+                <a data-action="boardgames-manual-click" href="{{ path('app_plugin_boardgames_game_manual') }}" class="button">
                     <span class="icon"><i class="fa fa-plus"></i></span>
                     <span>{{ 'boardgames_game.button_manual'|trans }}</span>
                 </a>

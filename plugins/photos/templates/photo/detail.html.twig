@@ -29,7 +29,7 @@
             {% if photo.visibleImage %}
                 {% set reportCaption = 'photos_photo.report_caption'|trans({'%url%': path('app_report_image', {'id': photo.visibleImage.id})}) %}
                 <figure class="image mb-2">
-                    <a data-fancybox="photo-detail" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ photo.visibleImage.hash }}_w1600.webp">
+                    <a data-action="photos-image-open" data-action-place="detail" data-fancybox="photo-detail" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ photo.visibleImage.hash }}_w1600.webp">
                         {% include '_components/image.html.twig' with {'image': photo.visibleImage, 'size': '1024x768', 'alt': photoTitle} %}
                     </a>
                 </figure>
@@ -86,13 +86,13 @@
                 <h3 class="title is-5">{{ 'photos_contest.heading_photo'|trans }}</h3>
                 {% if photo.contestSubmitted %}
                     <p class="content is-size-7">{{ 'photos_contest.photo_submitted'|trans }}</p>
-                    <form method="post" action="{{ path('app_plugin_photos_contest_withdraw', {'id': photo.id}) }}">
+                    <form data-action="photos-contest-withdraw-submit" method="post" action="{{ path('app_plugin_photos_contest_withdraw', {'id': photo.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_photos_contest_withdraw' ~ photo.id) }}">
                         <button type="submit" class="button is-light is-fullwidth">{{ 'photos_contest.button_withdraw'|trans }}</button>
                     </form>
                 {% else %}
                     <p class="content is-size-7">{{ 'photos_contest.photo_remaining'|trans({'%count%': contest.remaining}) }}</p>
-                    <form method="post" action="{{ path('app_plugin_photos_contest_submit', {'id': photo.id}) }}">
+                    <form data-action="photos-contest-enter-submit" method="post" action="{{ path('app_plugin_photos_contest_submit', {'id': photo.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_photos_contest_submit' ~ photo.id) }}">
                         <button type="submit" class="button is-primary is-fullwidth" {{ contest.remaining == 0 ? 'disabled' : '' }}>
                             {{ 'photos_contest.button_submit'|trans }}
@@ -103,11 +103,11 @@
         {% endif %}
 
         {% if canManage %}
-            <a href="{{ path('app_plugin_photos_photo_edit', {'id': photo.id}) }}" class="button is-link is-light is-fullwidth mb-2">
+            <a data-action="photos-edit-click" href="{{ path('app_plugin_photos_photo_edit', {'id': photo.id}) }}" class="button is-link is-light is-fullwidth mb-2">
                 <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
                 <span>{{ 'photos_photo.button_edit'|trans }}</span>
             </a>
-            <a href="{{ path('app_plugin_photos_photo_delete', {'id': photo.id}) }}"
+            <a data-action="photos-delete-click" href="{{ path('app_plugin_photos_photo_delete', {'id': photo.id}) }}"
                class="button is-danger is-light is-fullwidth"
                data-post
                data-csrf-token="{{ csrf_token('app_plugin_photos_photo_delete' ~ photo.id) }}"

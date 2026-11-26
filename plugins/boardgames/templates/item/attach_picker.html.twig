@@ -2,7 +2,7 @@
 {% if games is empty %}
     <p class="has-text-grey is-size-7">{{ 'boardgames.attach_empty'|trans }}</p>
 {% else %}
-    <form method="post" action="{{ path('app_item_attach', {id: eventId}) }}">
+    <form data-action="boardgames-attach-submit" method="post" action="{{ path('app_item_attach', {id: eventId}) }}">
         <input type="hidden" name="_token" value="{{ csrf_token('app_item_attach' ~ eventId) }}">
         <input type="hidden" name="item_type" value="boardgame">
         <div class="field has-addons">

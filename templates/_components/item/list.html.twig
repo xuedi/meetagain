@@ -38,7 +38,7 @@
 {% import _self as itemList %}
 
 {% macro add_tile(addUrl, addLabel) %}
-    <a href="{{ addUrl }}"
+    <a data-action="item-add-click" data-action-place="tile" href="{{ addUrl }}"
        class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center has-background-link-light has-text-link item-add-tile"
        title="{{ addLabel|trans }}" style="height: 100%; min-height: 8rem; border-radius: 6px;">
         <span class="icon is-large"><i class="fa-solid fa-plus fa-2x"></i></span>
@@ -48,7 +48,7 @@
 
 {% macro add_tile_icon(addUrl, addLabel, ratio) %}
     {% set ratioClass = {'square': 'is-1by1', 'portrait': 'is-2by3'}[ratio|default('square')] %}
-    <a href="{{ addUrl }}" title="{{ addLabel|trans }}" class="is-block">
+    <a data-action="item-add-click" data-action-place="grid" href="{{ addUrl }}" title="{{ addLabel|trans }}" class="is-block">
         <figure class="image {{ ratioClass }}">
             <span class="item-add-thumb is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link">
                 <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
@@ -105,7 +105,7 @@
         {% embed '_components/item/gallery.html.twig' with {'empty': slides is empty and not showAdd} %}
             {% block slides %}
                 {% if showAdd %}
-                    <a href="{{ addUrl }}" class="item-gallery-add is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link" title="{{ addLabel|trans }}">
+                    <a data-action="item-add-click" data-action-place="gallery" href="{{ addUrl }}" class="item-gallery-add is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link" title="{{ addLabel|trans }}">
                         <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
                     </a>
                 {% endif %}

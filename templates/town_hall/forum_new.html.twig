@@ -10,7 +10,7 @@
             {% endif %}
         </h2>
 
-        <form method="post" action="{{ path('app_townhall_forum_new', { _locale: app.request.locale, parent: parent ? parent.id : null }) }}">
+        <form data-action="townhall-topic-submit" method="post" action="{{ path('app_townhall_forum_new', { _locale: app.request.locale, parent: parent ? parent.id : null }) }}">
             <input type="hidden" name="_token" value="{{ csrf_token('town_hall_topic_new') }}">
             <div class="field">
                 <label class="label" for="topic-title">{{ 'town_hall.forum_title_label'|trans }}</label>
@@ -23,7 +23,7 @@
                     <button type="submit" class="button is-link">{{ 'town_hall.forum_create_submit'|trans }}</button>
                 </div>
                 <div class="control">
-                    <a class="button is-light" href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">
+                    <a data-action="townhall-topic-cancel-click" class="button is-light" href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">
                         {{ 'global.button_cancel'|trans }}
                     </a>
                 </div>

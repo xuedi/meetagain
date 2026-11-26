@@ -15,6 +15,7 @@
         - rotate         (bool, optional)          — show rotate button; default: false
         - label          (string, optional)        — upload button label; default: 'Change Image'
         - removeImageUrl (string|null, optional)   — URL for the remove-image action; shows × button when set
+        - action_place (string, optional) - fixed word for the data-action-place of its tracked actions
     Depends on: _components/image.html.twig, assets/js/modal.js (.modalTrigger), assets/js/post-link.js (rotate)
 #}
 {% if image is not null or (showWhenEmpty is defined and showWhenEmpty) %}
@@ -29,14 +30,14 @@
             </figure>
         </div>
         <div class="card-content is-overlay">
-            <a href="#" class="button is-link modalTrigger" data-modal-url="{{ modalUrl }}">
+            <a data-action="image-upload-open"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} href="#" class="button is-link modalTrigger" data-modal-url="{{ modalUrl }}">
                 <span class="icon">
                     <i class="fa fa-images"></i>
                 </span>
                 <span>{{ label }}</span>
             </a>
             {% if rotate %}
-                <a class="button is-link"
+                <a data-action="image-rotate-click"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} class="button is-link"
                    href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}"
                    data-post
                    data-csrf-token="{{ csrf_token('app_image_rotate' ~ id) }}">
@@ -49,7 +50,7 @@
                 {% if removeImageCsrfToken is defined and removeImageCsrfToken is not null %}
                     <form method="post" action="{{ removeImageUrl }}" class="is-inline">
                         <input type="hidden" name="_token" value="{{ csrf_token(removeImageCsrfToken) }}">
-                        <button type="submit" class="button is-danger"
+                        <button data-action="image-remove-click"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} type="submit" class="button is-danger"
                                 title="{{ 'shared.image_upload_remove_title'|trans }}">
                             <span class="icon">
                                 <i class="fa fa-times"></i>
@@ -57,7 +58,7 @@
                         </button>
                     </form>
                 {% else %}
-                    <a class="button is-danger"
+                    <a data-action="image-remove-click"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} class="button is-danger"
                        href="{{ removeImageUrl }}"
                        title="{{ 'shared.image_upload_remove_title'|trans }}">
                         <span class="icon">

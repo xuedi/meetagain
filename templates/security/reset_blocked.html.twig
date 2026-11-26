@@ -4,6 +4,7 @@
 
 {% block body %}
 
+    <span hidden data-action="reset-blocked-error"></span>
     <section class="section">
         <div class="container">
             <div class="columns is-centered mt-6">
@@ -17,7 +18,7 @@
                         <p class="mt-3"><strong>{{ 'security.reset_blocked_reason_label'|trans }}:</strong> {{ reason }}</p>
                     {% endif %}
                     <div class="mt-5">
-                        <a href="{{ supportPath }}" class="button is-primary">
+                        <a data-action="reset-support-click" href="{{ supportPath }}" class="button is-primary">
                             <span class="icon"><i class="fas fa-life-ring"></i></span>
                             <span>{{ 'security.reset_blocked_cta'|trans }}</span>
                         </a>

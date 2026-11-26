@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\NonLocale;
 
 use App\AssetMapper\MediaMap;
+use App\Controller\AbstractController;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;

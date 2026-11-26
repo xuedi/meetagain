@@ -9,10 +9,10 @@
     </div>
     <div class="level-right">
         <div class="buttons are-small">
-            <a class="button {{ statusFilter is null ? 'is-link' : '' }}"
+            <a data-action="circulation-shelf-select" data-action-value="all" class="button {{ statusFilter is null ? 'is-link' : '' }}"
                href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': 'shelf'}) }}">{{ 'circulation.shelf_filter_all'|trans }}</a>
             {% for status in statuses %}
-                <a class="button {{ statusFilter == status ? 'is-link' : '' }}"
+                <a data-action="circulation-shelf-select" data-action-value="{{ status.value }}" class="button {{ statusFilter == status ? 'is-link' : '' }}"
                    href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': 'shelf', 'status': status.value}) }}">{{ status.label|trans }}</a>
             {% endfor %}
         </div>
@@ -50,7 +50,7 @@
                 <td><span class="tag {{ copy.status.tagVariant }} is-light">{{ copy.status.label|trans }}</span></td>
                 <td class="has-text-right">
                     {% if seesAll and copy.status.isCirculating %}
-                        <form method="post" action="{{ path('app_circulation_copy_retire', {'id': copy.id}) }}">
+                        <form data-action="circulation-retire-submit" method="post" action="{{ path('app_circulation_copy_retire', {'id': copy.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_copy_retire' ~ copy.id) }}">
                             <button class="button is-small is-light" title="{{ 'circulation.button_retire'|trans }}">
                                 <span class="icon"><i class="fa fa-box-archive"></i></span>

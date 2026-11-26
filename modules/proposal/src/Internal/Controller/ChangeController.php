@@ -77,6 +77,7 @@ final class ChangeController extends AbstractController
         try {
             $this->fieldBallots->open($targetType, $targetId, $request->request->getString('field'), $user, $request->request->all('ballot_terms'));
             $this->addFlash('success', 'review.flash_ballot_opened');
+            $this->addFlash('action', 'proposal-ballot-success');
         } catch (ChangeException $e) {
             $this->addFlash('error', $e->getMessage());
         }

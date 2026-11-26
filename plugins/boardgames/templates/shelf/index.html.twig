@@ -8,7 +8,7 @@
         <h1 class="title mb-0">{{ 'boardgames_shelf.page_title'|trans }}</h1>
     </div>
     <div class="level-right">
-        <a href="{{ path('app_boardgames_gamelist') }}" class="button">
+        <a data-action="boardgames-catalog-click" href="{{ path('app_boardgames_gamelist') }}" class="button">
             <span class="icon"><i class="fa fa-list"></i></span>
             <span>{{ 'boardgames_shelf.button_browse_catalog'|trans }}</span>
         </a>
@@ -29,7 +29,7 @@
                         <p class="has-text-weight-semibold">
                             <a href="{{ path('app_plugin_boardgames_game_show', {id: ownership.game.id}) }}">{{ ownership.game.name }}</a>
                         </p>
-                        <a href="{{ path('app_plugin_boardgames_shelf_remove', {id: ownership.id}) }}"
+                        <a data-action="boardgames-shelf-remove-click" data-action-place="list" href="{{ path('app_plugin_boardgames_shelf_remove', {id: ownership.id}) }}"
                            class="button is-small is-danger is-light"
                            data-post
                            data-csrf-token="{{ csrf_token('app_plugin_boardgames_shelf_remove' ~ ownership.id) }}"
@@ -39,7 +39,7 @@
                         </a>
                     </div>
 
-                    <form method="post" action="{{ path('app_plugin_boardgames_shelf_update', {id: ownership.id}) }}" class="mt-2">
+                    <form data-action="boardgames-shelf-update-submit" method="post" action="{{ path('app_plugin_boardgames_shelf_update', {id: ownership.id}) }}" class="mt-2">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_shelf_update' ~ ownership.id) }}">
                         <div class="field is-grouped is-grouped-multiline">
                             <div class="control">
@@ -50,10 +50,10 @@
                             <div class="control">
                                 <label class="label is-small" for="cond-{{ ownership.id }}">{{ 'boardgames_shelf.col_condition'|trans }}</label>
                                 <div class="select is-small">
-                                    <select id="cond-{{ ownership.id }}" name="condition">
-                                        <option value="">-</option>
+                                    <select data-action="boardgames-shelf-condition-select" id="cond-{{ ownership.id }}" name="condition">
+                                        <option value="" data-action-value="none">-</option>
                                         {% for case in conditions %}
-                                            <option value="{{ case.value }}" {{ ownership.copyCondition == case ? 'selected' : '' }}>{{ case.label()|trans }}</option>
+                                            <option value="{{ case.value }}" data-action-value="{{ case.value }}" {{ ownership.copyCondition == case ? 'selected' : '' }}>{{ case.label()|trans }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -66,19 +66,19 @@
                         <div class="field is-grouped is-grouped-multiline mt-2">
                             <div class="control">
                                 <label class="checkbox is-small">
-                                    <input type="checkbox" name="can_teach" value="1" {{ ownership.canTeach ? 'checked' : '' }}>
+                                    <input data-action="boardgames-shelf-teach-toggle" type="checkbox" name="can_teach" value="1" {{ ownership.canTeach ? 'checked' : '' }}>
                                     {{ 'boardgames_shelf.col_can_teach'|trans }}
                                 </label>
                             </div>
                             <div class="control">
                                 <label class="checkbox is-small">
-                                    <input type="checkbox" name="willing_to_bring" value="1" {{ ownership.willingToBring ? 'checked' : '' }}>
+                                    <input data-action="boardgames-shelf-bring-toggle" type="checkbox" name="willing_to_bring" value="1" {{ ownership.willingToBring ? 'checked' : '' }}>
                                     {{ 'boardgames_shelf.col_willing_to_bring'|trans }}
                                 </label>
                             </div>
                             <div class="control">
                                 <label class="checkbox is-small">
-                                    <input type="checkbox" name="is_public" value="1" {{ ownership.isPublic ? 'checked' : '' }}>
+                                    <input data-action="boardgames-shelf-public-toggle" type="checkbox" name="is_public" value="1" {{ ownership.isPublic ? 'checked' : '' }}>
                                     {{ 'boardgames_shelf.col_public'|trans }}
                                 </label>
                             </div>

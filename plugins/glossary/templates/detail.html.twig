@@ -51,24 +51,24 @@
 
                     <div class="mt-4 buttons">
                         {% if is_granted('ROLE_ORGANIZER') %}
-                            <a href="{{ path('app_plugin_glossary_edit', {id: entry.id}) }}" class="button is-small">
+                            <a data-action="glossary-edit-click" href="{{ path('app_plugin_glossary_edit', {id: entry.id}) }}" class="button is-small">
                                 <span class="icon"><i class="fa fa-edit"></i></span>
                                 <span>{{ 'glossary.button_edit'|trans }}</span>
                             </a>
                         {% elseif is_granted('ROLE_USER') %}
-                            <a href="{{ path('app_contribution_correct', {type: 'glossary', id: entry.id}) }}" class="button is-small">
+                            <a data-action="glossary-correct-click" href="{{ path('app_contribution_correct', {type: 'glossary', id: entry.id}) }}" class="button is-small">
                                 <span class="icon"><i class="fa fa-edit"></i></span>
                                 <span>{{ 'glossary.button_suggest_change'|trans }}</span>
                             </a>
                         {% endif %}
                         {% if is_granted('ROLE_ORGANIZER') %}
                             {% if pending_change_proposals('glossary', entry.id) > 0 %}
-                                <a href="{{ path('app_review_proposals', {targetType: 'glossary', targetId: entry.id}) }}" class="button is-small is-warning is-light">
+                                <a data-action="glossary-review-click" href="{{ path('app_review_proposals', {targetType: 'glossary', targetId: entry.id}) }}" class="button is-small is-warning is-light">
                                     <span class="icon"><i class="fa fa-edit"></i></span>
                                     <span>{{ 'glossary.button_review_suggestions'|trans }}</span>
                                 </a>
                             {% endif %}
-                            <a href="{{ path('app_plugin_glossary_delete_view', {id: entry.id}) }}" class="button is-small is-danger is-light">
+                            <a data-action="glossary-delete-click" href="{{ path('app_plugin_glossary_delete_view', {id: entry.id}) }}" class="button is-small is-danger is-light">
                                 <span class="icon"><i class="fa fa-trash"></i></span>
                                 <span>{{ 'global.button_delete'|trans }}</span>
                             </a>
@@ -104,14 +104,14 @@
                                 <p class="has-text-grey mb-3">{{ 'glossary_trainer.stats_unseen'|trans }}</p>
                             {% endif %}
                             <div class="buttons are-small">
-                                <a href="{{ path('app_plugin_glossary_trainer_mark', {id: entry.id}) }}"
+                                <a data-action="glossary-trainer-mark-click" data-action-place="detail" href="{{ path('app_plugin_glossary_trainer_mark', {id: entry.id}) }}"
                                    class="button{{ trainerStats.marked ? ' is-warning' : '' }}"
                                    data-post
                                    data-csrf-token="{{ csrf_token('glossary_trainer_mark' ~ entry.id) }}">
                                     <span class="icon"><i class="fa fa-star"></i></span>
                                     <span>{{ (trainerStats.marked ? 'glossary_trainer.button_unmark' : 'glossary_trainer.button_mark')|trans }}</span>
                                 </a>
-                                <a href="{{ path('app_plugin_glossary_trainer_suspend', {id: entry.id}) }}"
+                                <a data-action="glossary-trainer-suspend-click" href="{{ path('app_plugin_glossary_trainer_suspend', {id: entry.id}) }}"
                                    class="button{{ trainerStats.suspended ? ' is-dark' : '' }}"
                                    data-post
                                    data-csrf-token="{{ csrf_token('glossary_trainer_suspend' ~ entry.id) }}">

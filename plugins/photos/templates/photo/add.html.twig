@@ -7,7 +7,8 @@
 
 <div class="columns">
     <div class="column is-8">
-        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'data-action': 'photos-upload-submit'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="photos-upload-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
         <div class="field">
             {{ form_label(form.photoFile, null, {'label_attr': {'class': 'label'}}) }}
@@ -26,7 +27,7 @@
         <div class="field is-grouped mt-4">
             <div class="control">{{ form_widget(form.submit) }}</div>
             <div class="control">
-                <a href="{{ path('app_photos_photolist') }}" class="button">{{ 'photos_photo.button_cancel'|trans }}</a>
+                <a data-action="photos-cancel-click" data-action-place="add" href="{{ path('app_photos_photolist') }}" class="button">{{ 'photos_photo.button_cancel'|trans }}</a>
             </div>
         </div>
 

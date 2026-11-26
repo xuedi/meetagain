@@ -9,7 +9,8 @@
                 <div class="column is-7">
                     <h1 class="title is-4">{{ 'karaoke.button_new'|trans }}</h1>
                     <p class="mb-4">{{ 'karaoke_lookup.link_intro'|trans }}</p>
-                    <form method="get" action="{{ path('app_plugin_karaoke_find') }}" class="box">
+                    <form data-action="karaoke-find-submit" method="get" action="{{ path('app_plugin_karaoke_find') }}" class="box">
+                        {% if invalid %}<span hidden data-action="karaoke-find-error" data-action-field="link"></span>{% endif %}
                         <div class="field">
                             <label class="label" for="karaoke-link">{{ 'karaoke.field_media_link'|trans }}</label>
                             <div class="control">
@@ -23,7 +24,7 @@
                             {% endif %}
                         </div>
                         <div class="buttons is-right">
-                            <a href="{{ path('app_plugin_karaoke') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            <a data-action="karaoke-cancel-click" data-action-place="find" href="{{ path('app_plugin_karaoke') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                             <button type="submit" class="button is-link">
                                 <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
                                 <span>{{ 'karaoke_lookup.button_find'|trans }}</span>

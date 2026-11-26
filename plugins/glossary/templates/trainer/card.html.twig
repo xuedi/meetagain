@@ -20,7 +20,7 @@
                             </p>
                         </div>
                         <div class="level-right">
-                            <form method="post" action="{{ path('app_plugin_glossary_trainer_stop') }}">
+                            <form data-action="glossary-trainer-stop-submit" method="post" action="{{ path('app_plugin_glossary_trainer_stop') }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('glossary_trainer_stop') }}">
                                 <button type="submit" class="button is-small is-light">
                                     <span class="icon"><i class="fa fa-arrow-left"></i></span>
@@ -39,7 +39,7 @@
 
                         {% if session.answerMode.value == 'flip' %}
                             {% if not revealed %}
-                                <a href="{{ path('app_plugin_glossary_trainer_card', {reveal: 1}) }}" class="button is-link" rel="nofollow" data-trainer-reveal>
+                                <a data-action="glossary-trainer-reveal-click" href="{{ path('app_plugin_glossary_trainer_card', {reveal: 1}) }}" class="button is-link" rel="nofollow" data-trainer-reveal>
                                     {{ 'glossary_trainer.button_reveal'|trans }}
                                 </a>
                             {% endif %}
@@ -47,12 +47,12 @@
                                 <hr>
                                 <p class="is-size-4"{% if question.answerLanguage %} lang="{{ question.answerLanguage }}"{% endif %}>{{ question.answer|nl2br }}</p>
                                 {% if question.secondary %}<p class="has-text-grey">{{ question.secondary }}</p>{% endif %}
-                                <form method="post" action="{{ path('app_plugin_glossary_trainer_answer') }}" class="mt-5">
+                                <form data-action="glossary-trainer-answer-submit" data-action-place="flip" method="post" action="{{ path('app_plugin_glossary_trainer_answer') }}" class="mt-5">
                                     <input type="hidden" name="_token" value="{{ csrf_token('glossary_trainer_answer') }}">
                                     <input type="hidden" name="entry" value="{{ question.entry.id }}">
                                     <div class="buttons is-centered">
                                         {% for grade in grades %}
-                                            <button type="submit" name="grade" value="{{ grade.value }}" class="button is-light {{ gradeClass[grade.value] }}" data-trainer-key="{{ grade.value }}">
+                                            <button data-action="glossary-trainer-grade-select" data-action-value="{{ grade.value }}" type="submit" name="grade" value="{{ grade.value }}" class="button is-light {{ gradeClass[grade.value] }}" data-trainer-key="{{ grade.value }}">
                                                 {{ grade.label()|trans }}
                                                 <span class="tag is-white ml-2">{{ grade.value }}</span>
                                             </button>
@@ -61,7 +61,7 @@
                                 </form>
                             </div>
                         {% elseif session.answerMode.value == 'choice' %}
-                            <form method="post" action="{{ path('app_plugin_glossary_trainer_answer') }}">
+                            <form data-action="glossary-trainer-answer-submit" data-action-place="choice" method="post" action="{{ path('app_plugin_glossary_trainer_answer') }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('glossary_trainer_answer') }}">
                                 <input type="hidden" name="entry" value="{{ question.entry.id }}">
                                 {% for choice in question.choices %}
@@ -72,7 +72,7 @@
                                 {% endfor %}
                             </form>
                         {% else %}
-                            <form method="post" action="{{ path('app_plugin_glossary_trainer_answer') }}">
+                            <form data-action="glossary-trainer-answer-submit" data-action-place="typing" method="post" action="{{ path('app_plugin_glossary_trainer_answer') }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('glossary_trainer_answer') }}">
                                 <input type="hidden" name="entry" value="{{ question.entry.id }}">
                                 <div class="field has-addons has-addons-centered">
@@ -90,7 +90,7 @@
                     </div>
 
                     <div class="buttons is-centered are-small">
-                        <a href="{{ path('app_plugin_glossary_trainer_mark', {id: question.entry.id, return: 'card'}) }}"
+                        <a data-action="glossary-trainer-mark-click" data-action-place="card" href="{{ path('app_plugin_glossary_trainer_mark', {id: question.entry.id, return: 'card'}) }}"
                            class="button{{ question.marked ? ' is-warning' : ' is-light' }}"
                            data-post
                            data-csrf-token="{{ csrf_token('glossary_trainer_mark' ~ question.entry.id) }}">

@@ -1,7 +1,8 @@
 <h1 class="title is-4">{{ 'contribution.suggest_page_title'|trans({'%type%': typeLabelKey|trans}) }}</h1>
 <p class="subtitle is-6">{{ 'contribution.suggest_intro'|trans }}</p>
 
-{{ form_start(form) }}
+{{ form_start(form, {attr: {'data-action': 'contribute-suggest-submit'}}) }}
+{% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="contribute-suggest-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 <div class="box">
     {{ form_widget(form) }}
     <div class="field mt-5">
@@ -30,7 +31,7 @@
                 </tbody>
             </table>
             <div class="has-text-right">
-                <a href="{{ path('app_review_suggestion_withdraw', {id: card.id}) }}"
+                <a data-action="contribute-withdraw-click" href="{{ path('app_review_suggestion_withdraw', {id: card.id}) }}"
                    class="button is-small"
                    data-post
                    data-csrf-token="{{ csrf_token('suggestion' ~ card.id) }}">

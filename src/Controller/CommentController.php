@@ -46,6 +46,7 @@ final class CommentController extends AbstractController
         }
 
         $this->addFlash('success', 'comment.flash_created');
+        $this->addFlash('action', 'comment-form-success');
 
         return $this->redirect($returnUrl);
     }

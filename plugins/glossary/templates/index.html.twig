@@ -17,18 +17,18 @@
                 </div>
                 {% if is_granted('ROLE_ORGANIZER') %}
                     <div class="level-right buttons">
-                        <a href="{{ path('app_plugin_glossary_import') }}" class="button">
+                        <a data-action="glossary-import-click" href="{{ path('app_plugin_glossary_import') }}" class="button">
                             <span class="icon"><i class="fa fa-upload"></i></span>
                             <span>{{ 'glossary.button_import'|trans }}</span>
                         </a>
-                        <a href="{{ path('app_plugin_glossary_new') }}" class="button is-link">
+                        <a data-action="glossary-new-click" href="{{ path('app_plugin_glossary_new') }}" class="button is-link">
                             <span class="icon"><i class="fa fa-plus"></i></span>
                             <span>{{ 'glossary.button_new'|trans }}</span>
                         </a>
                     </div>
                 {% elseif is_granted('ROLE_USER') %}
                     <div class="level-right">
-                        <a href="{{ path('app_contribution_suggest', {type: 'glossary'}) }}" class="button is-link">
+                        <a data-action="glossary-suggest-click" href="{{ path('app_contribution_suggest', {type: 'glossary'}) }}" class="button is-link">
                             <span class="icon"><i class="fa fa-plus"></i></span>
                             <span>{{ 'glossary.button_suggest_new'|trans }}</span>
                         </a>

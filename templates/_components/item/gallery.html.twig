@@ -19,13 +19,13 @@
         <p class="has-text-grey">{{ 'item.gallery_empty'|trans }}</p>
     {% else %}
         <div class="item-gallery-stage is-hidden" data-item-gallery-stage>
-            <button type="button" class="button item-gallery-nav" data-item-gallery-prev title="{{ 'item.gallery_prev'|trans }}">
+            <button data-action="item-gallery-prev-click" type="button" class="button item-gallery-nav" data-item-gallery-prev title="{{ 'item.gallery_prev'|trans }}">
                 <span class="icon"><i class="fa-solid fa-chevron-left fa-lg"></i></span>
             </button>
-            <a class="item-gallery-frame" data-item-gallery-open>
+            <a data-action="item-gallery-open" class="item-gallery-frame" data-item-gallery-open>
                 <img src="" alt="" data-item-gallery-image>
             </a>
-            <button type="button" class="button item-gallery-nav" data-item-gallery-next title="{{ 'item.gallery_next'|trans }}">
+            <button data-action="item-gallery-next-click" type="button" class="button item-gallery-nav" data-item-gallery-next title="{{ 'item.gallery_next'|trans }}">
                 <span class="icon"><i class="fa-solid fa-chevron-right fa-lg"></i></span>
             </button>
         </div>

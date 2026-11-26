@@ -26,7 +26,7 @@
                 </td>
                 <td class="has-text-grey">{{ handover.openedAt|time_diff }}</td>
                 <td class="has-text-right">
-                    <a class="button is-small is-link is-light" href="{{ path('app_circulation_handover', {'id': handover.id}) }}">
+                    <a data-action="circulation-handover-click" data-action-place="list" class="button is-small is-link is-light" href="{{ path('app_circulation_handover', {'id': handover.id}) }}">
                         {{ 'circulation.button_open_handover'|trans }}
                     </a>
                 </td>

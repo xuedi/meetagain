@@ -9,7 +9,7 @@
 {% else %}
     {% set partner = conversations|filter(conversation => conversation.user.id == conversationsId)|first %}
     <div class="is-flex is-align-items-center mb-3">
-        <a class="button is-white" href="{{ path('app_profile_messages') }}"
+        <a data-action="messages-back-click" class="button is-white" href="{{ path('app_profile_messages') }}"
            title="{{ 'profile_messages.back_to_conversations'|trans }}"
            aria-label="{{ 'profile_messages.back_to_conversations'|trans }}">
             <span class="icon"><i class="fa fa-chevron-left" aria-hidden="true"></i></span>

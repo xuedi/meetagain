@@ -4,6 +4,7 @@
 
 {% block body %}
 
+    <span hidden data-action="reset-link-error"></span>
     <section class="section">
         <div class="container">
             <div class="columns is-centered mt-6">
@@ -14,7 +15,7 @@
                     <h1 class="title is-3 mt-5">{{ 'security.reset_error_heading'|trans }}</h1>
                     <p class="subtitle is-5 mt-3">{{ 'security.reset_error_description'|trans }}</p>
                     <div class="mt-5">
-                        <a href="{{ path('app_reset') }}" class="button is-primary">
+                        <a data-action="reset-retry-click" href="{{ path('app_reset') }}" class="button is-primary">
                             <span class="icon"><i class="fas fa-sync-alt"></i></span>
                             <span>{{ 'security.reset_error_cta'|trans }}</span>
                         </a>

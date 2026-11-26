@@ -80,6 +80,7 @@ final class SongController extends AbstractController
                 'song_title' => $song->getTitle(),
             ]);
             $this->addFlash('success', 'karaoke.flash_added');
+            $this->addFlash('action', 'karaoke-add-success');
 
             return $this->redirectToRoute('app_plugin_karaoke_show', ['id' => $song->getId()]);
         }
@@ -165,6 +166,7 @@ final class SongController extends AbstractController
             $starts = array_map(fn(mixed $value): ?int => $this->lyricsText->parseTimestamp((string) $value), array_values($request->request->all('start')));
             $this->songService->saveTiming($song, $starts, $request->request->getInt('offset'));
             $this->addFlash('success', 'karaoke.flash_timing_saved');
+            $this->addFlash('action', 'karaoke-timing-success');
 
             return $this->redirectToRoute('app_plugin_karaoke_show', ['id' => $id]);
         }

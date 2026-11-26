@@ -62,6 +62,7 @@ final class BookController extends AbstractController
                     'book_title' => $book->getTitle(),
                 ]);
                 $this->addFlash('success', 'books_book.flash_added');
+                $this->addFlash('action', 'books-lookup-success');
 
                 return $this->redirectToRoute('app_plugin_books_book_show', ['id' => $book->getId()]);
             } catch (RuntimeException $e) {
@@ -103,6 +104,7 @@ final class BookController extends AbstractController
                     'book_title' => $book->getTitle(),
                 ]);
                 $this->addFlash('success', 'books_book.flash_added');
+                $this->addFlash('action', 'books-manual-success');
 
                 return $this->redirectToRoute('app_books_booklist');
             } catch (RuntimeException $e) {

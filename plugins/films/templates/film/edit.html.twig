@@ -11,7 +11,8 @@
 
 <h1 class="title">{{ 'films_film.page_title_edit'|trans({'%title%': film.title}) }}</h1>
 
-{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'data-action': 'films-edit-submit'}}) }}
+{% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="films-edit-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
 <div class="columns">
     <div class="column is-3-tablet is-12-mobile">
@@ -73,7 +74,7 @@
         <div class="field is-grouped mt-4">
             <div class="control">{{ form_widget(form.submit) }}</div>
             <div class="control">
-                <a href="{{ path('app_plugin_films_film_show', {id: film.id}) }}" class="button">
+                <a data-action="films-cancel-click" data-action-place="edit" href="{{ path('app_plugin_films_film_show', {id: film.id}) }}" class="button">
                     {{ 'films_film.button_cancel'|trans }}
                 </a>
             </div>

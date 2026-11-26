@@ -113,6 +113,9 @@
         {{ message|trans }}
     </div>
 {% endfor %}
+{% for action in app.flashes('action') %}
+    <span hidden data-action="{{ action }}"></span>
+{% endfor %}
 {% include 'base_footer.html.twig' %}
 <div id="globalImageModal" class="modal">    <div class="modal-background"></div>
     <div class="modal-content"><div class="box" id="globalImageModalContent"></div></div>

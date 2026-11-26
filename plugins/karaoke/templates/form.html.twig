@@ -13,7 +13,7 @@
                 </div>
                 {% if song and lookupEnabled|default(false) %}
                     <div class="level-right">
-                        <a href="{{ path('app_plugin_karaoke_lookup', {id: song.id}) }}" class="button">
+                        <a data-action="karaoke-lookup-click" href="{{ path('app_plugin_karaoke_lookup', {id: song.id}) }}" class="button">
                             <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
                             <span>{{ 'karaoke_lookup.button_find_for_song'|trans }}</span>
                         </a>
@@ -21,7 +21,8 @@
                 {% endif %}
             </div>
 
-            {{ form_start(form) }}
+            {{ form_start(form, {attr: {'data-action': 'karaoke-song-submit', 'data-action-place': song ? 'edit' : 'new'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="karaoke-song-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
             {{ form_errors(form) }}
             <div class="columns">
                 <div class="column is-5">
@@ -55,14 +56,14 @@
                 </div>
             </div>
             <div class="buttons is-right">
-                <a href="{{ song ? path('app_plugin_karaoke_show', {id: song.id}) : path('app_plugin_karaoke') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                <a data-action="karaoke-cancel-click" data-action-place="form" href="{{ song ? path('app_plugin_karaoke_show', {id: song.id}) : path('app_plugin_karaoke') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                 {{ form_widget(form.submit) }}
             </div>
             {{ form_end(form) }}
 
             {% if song %}
                 <hr>
-                <a href="{{ path('app_plugin_karaoke_delete', {id: song.id}) }}"
+                <a data-action="karaoke-delete-click" href="{{ path('app_plugin_karaoke_delete', {id: song.id}) }}"
                    class="button is-danger is-light"
                    data-post
                    data-csrf-token="{{ csrf_token('app_plugin_karaoke_delete' ~ song.id) }}"

@@ -86,6 +86,7 @@ final class LookupController extends AbstractController
 
         $this->songService->saveTiming($song, $starts, 0);
         $this->addFlash('success', 'karaoke_lookup.flash_timings_applied');
+        $this->addFlash('action', 'karaoke-timings-apply-success');
 
         return $this->redirectToRoute('app_plugin_karaoke_show', ['id' => $id]);
     }
