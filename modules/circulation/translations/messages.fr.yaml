@@ -139,4 +139,4 @@ circulation:
     trust_action_handover: 'Terminer une remise'
     trust_action_donation: 'Apporter un exemplaire'
     flash_trust_minimum: 'Il vous faut %required% points de réputation ici pour rejoindre une liste d''attente ; vous en avez %current%.'
-    deletion_blocked_holds_copy: 'Vous détenez encore un exemplaire partagé ou une remise est en cours. Transmettez lexemplaire ou terminez la remise avant de supprimer votre compte.'
+    deletion_blocked_holds_copy: 'Vous détenez encore un exemplaire partagé ou une remise est en cours. Transmettez l''exemplaire ou terminez la remise avant de supprimer votre compte.'
