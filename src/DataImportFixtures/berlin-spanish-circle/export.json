@@ -47,6 +47,9 @@
                 ],
                 "defaultAnswerMode": "choice",
                 "leaderboardEnabled": false
+            },
+            "wishlist": {
+                "navLink": true
             }
         },
         "logo_file": "images/230ac60ae6d3031a2b5b8abf3686236c42db4389.png"
