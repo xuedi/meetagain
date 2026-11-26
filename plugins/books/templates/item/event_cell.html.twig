@@ -11,7 +11,7 @@
         </p>
         {% if book.author %}<p class="subtitle is-7 has-text-grey">{{ book.author }}</p>{% endif %}
         {% if is_granted('ROLE_ORGANIZER') %}
-            <form method="post" action="{{ path('app_item_detach', {id: association.event.id}) }}" class="mt-2">
+            <form data-action="books-detach-submit" method="post" action="{{ path('app_item_detach', {id: association.event.id}) }}" class="mt-2">
                 <input type="hidden" name="_token" value="{{ csrf_token('app_item_detach' ~ association.event.id) }}">
                 <input type="hidden" name="item_type" value="book">
                 <input type="hidden" name="item_id" value="{{ book.id }}">

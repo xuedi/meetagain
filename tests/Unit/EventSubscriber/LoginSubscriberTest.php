@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\EventSubscriber;
 
+use App\Controller\SecurityController;
 use App\Entity\Session\Consent;
 use App\Entity\User;
 use App\Enum\ConsentType;
@@ -9,6 +10,7 @@ use App\EventSubscriber\LoginSubscriber;
 use App\Service\Config\LocaleCookieService;
 use App\Service\Member\ConsentService;
 use App\Service\Support\ThreadService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -188,5 +190,28 @@ class LoginSubscriberTest extends TestCase
 
         // Assert
         static::assertSame(ConsentType::Granted, Consent::getBySession($session)->getOsm());
+    }
+
+    #[DataProvider('provideLoginRoutes')]
+    public function testOnlyTheLoginFormNamesTheCompletedAction(?string $route, array $expected): void
+    {
+        // Arrange
+        $session = $this->createSession();
+        $request = $this->createRequest($session);
+        $request->attributes->set('_route', $route);
+        $event = $this->createLoginEvent($this->createUser('en', false), $request, new Response());
+
+        // Act
+        $this->createSubscriber($request)->onLoginSuccess($event);
+
+        // Assert
+        static::assertSame($expected, $session->getFlashBag()->get('action'));
+    }
+
+    public static function provideLoginRoutes(): iterable
+    {
+        yield 'the login form' => [SecurityController::LOGIN_ROUTE, ['login-form-success']];
+        yield 'any other login path' => ['app_jump_landing', []];
+        yield 'no route' => [null, []];
     }
 }

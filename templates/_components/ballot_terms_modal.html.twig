@@ -20,6 +20,7 @@
         - value     (string, optional) - the select value that opens it
         - title     (string, required) - modal heading, translated
         - notice    (string, optional) - an info line above the fields, translated
+        - action_place (string, optional) - fixed word for the data-action-place of its tracked actions
     Depends on: assets/js/ballot-terms.js
 #}
 <div class="modal"
@@ -43,7 +44,7 @@
 
         </section>
         <footer class="modal-card-foot">
-            <button class="button is-primary" type="button" data-ballot-terms-confirm>
+            <button data-action="ballot-terms-confirm-click"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} class="button is-primary" type="button" data-ballot-terms-confirm>
                 {{ 'ballot_terms.button_apply'|trans }}
             </button>
             <button class="button ml-3" type="button" data-ballot-terms-cancel>

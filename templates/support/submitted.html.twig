@@ -11,9 +11,10 @@
                 <div class="column is-6-tablet is-5-desktop">
 
                     <h1 class="title is-5">{{ 'support.confirm_title'|trans }}</h1>
+                    <span hidden data-action="support-form-success" data-action-place="inbox"></span>
 
                     <p>{{ 'support.confirm_member_body'|trans }}</p>
-                    <a class="button is-primary mt-4" href="{{ path('app_profile_messages') }}">{{ 'support.confirm_member_inbox'|trans }}</a>
+                    <a data-action="support-inbox-click" class="button is-primary mt-4" href="{{ path('app_profile_messages') }}">{{ 'support.confirm_member_inbox'|trans }}</a>
 
                     <p class="is-size-7 has-text-grey mt-4">{{ 'support.response_time'|trans }}</p>
                     <p class="mt-4"><a href="{{ path('app_frontpage') }}">{{ 'support.confirm_back'|trans }}</a></p>

@@ -5,7 +5,8 @@
 {% block dishes_body %}
 <h1 class="title">{{ 'dishes_dish.page_title_edit'|trans({'%name%': dish.getTranslatedName(app.locale)}) }}</h1>
 
-{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'data-action': 'dishes-edit-submit'}}) }}
+{% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="dishes-edit-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
 <div class="columns">
     <div class="column is-3-tablet is-12-mobile">
@@ -42,7 +43,7 @@
         <div class="field is-grouped mt-4">
             <div class="control">{{ form_widget(form.submit) }}</div>
             <div class="control">
-                <a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="button">{{ 'dishes_dish.button_cancel'|trans }}</a>
+                <a data-action="dishes-cancel-click" data-action-place="edit" href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="button">{{ 'dishes_dish.button_cancel'|trans }}</a>
             </div>
         </div>
     </div>

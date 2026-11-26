@@ -8,7 +8,7 @@
         <h1 class="title mb-0">{{ 'photos_stream.page_title_index'|trans }}</h1>
     </div>
     <div class="level-right">
-        <a href="{{ path('app_photos_photolist') }}" class="button">
+        <a data-action="photos-all-click" data-action-place="streams" href="{{ path('app_photos_photolist') }}" class="button">
             <span class="icon"><i class="fa fa-images"></i></span>
             <span>{{ 'photos_stream.button_all_photos'|trans }}</span>
         </a>

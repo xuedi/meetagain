@@ -69,6 +69,7 @@ final class ContributionController extends AbstractController
             $error = $this->suggestions->propose($type, (int) $user->getId(), $form->getData());
             if ($error === null) {
                 $this->addFlash('success', 'contribution.flash_suggested');
+                $this->addFlash('action', 'contribute-suggest-success');
 
                 return $this->redirectToRoute('app_contribution_suggest', ['type' => $type]);
             }
@@ -116,6 +117,7 @@ final class ContributionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $proposal = $this->changeProposalService->propose($provider->getTargetType(), (int) $id, (int) $user->getId(), $provider->changesFrom($id, $form));
             $this->addFlash('success', $proposal === null ? 'contribution.flash_unchanged' : 'contribution.flash_proposed');
+            $this->addFlash('action', 'contribute-correct-success');
 
             return $this->redirectToRoute('app_contribution_correct', ['type' => $provider->getType(), 'id' => $id]);
         }
@@ -145,6 +147,7 @@ final class ContributionController extends AbstractController
                 $proposed += $this->changeProposalService->propose($targetType, $targetId, (int) $user->getId(), $changes) === null ? 0 : 1;
             }
             $this->addFlash($proposed === 0 ? 'info' : 'success', $proposed === 0 ? 'item.tag_flash_unchanged' : 'item.tag_flash_suggested');
+            $this->addFlash('action', 'contribute-tags-success');
 
             return $this->redirectToRoute('app_contribution_correct', ['type' => TagSection::TYPE, 'id' => $itemType]);
         }

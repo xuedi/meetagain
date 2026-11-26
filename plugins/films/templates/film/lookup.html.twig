@@ -6,7 +6,7 @@
 <h1 class="title">{{ 'films_film.page_title_lookup'|trans }}</h1>
 
 <div class="box">
-    {{ form_start(form, {'method': 'GET', 'action': path('app_plugin_films_film_lookup')}) }}
+    {{ form_start(form, {'method': 'GET', 'action': path('app_plugin_films_film_lookup'), 'attr': {'data-action': 'films-lookup-submit'}}) }}
     <div class="field is-grouped">
         <div class="control is-expanded">
             {{ form_widget(form.query, {'attr': {'class': 'input'}}) }}
@@ -39,7 +39,7 @@
                     {% if film.year %}<p class="is-size-7">{{ film.year }}</p>{% endif %}
                     {% if film.runtime %}<p class="is-size-7">{{ film.runtime }} min</p>{% endif %}
 
-                    <form method="POST" action="{{ path('app_plugin_films_film_import') }}" class="mt-2">
+                    <form data-action="films-import-submit" method="POST" action="{{ path('app_plugin_films_film_import') }}" class="mt-2">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_films_film_import') }}">
                         <input type="hidden" name="externalId" value="{{ film.externalId }}">
                         <input type="hidden" name="source" value="{{ film.source.value }}">

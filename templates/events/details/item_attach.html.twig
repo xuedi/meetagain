@@ -38,7 +38,7 @@
             {% if type.slots is not empty %}
                 <div class="buttons mt-3">
                     {% for slot in type.slots %}
-                        <a href="{{ slot.url }}" class="button is-small">
+                        <a data-action="event-attach-click" href="{{ slot.url }}" class="button is-small">
                             {% if slot.icon %}<span class="icon"><i class="fas fa-{{ slot.icon }}"></i></span>{% endif %}
                             <span>{{ slot.labelKey|trans }}</span>
                         </a>

@@ -16,7 +16,8 @@
                         {% endif %}
                     </p>
 
-                    {{ form_start(form) }}
+                    {{ form_start(form, {attr: {'data-action': 'report-item-submit'}}) }}
+                    {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="report-item-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
                     {{ form_errors(form) }}
                     {{ form_row(form.reason) }}
                     {{ form_row(form.relationship) }}

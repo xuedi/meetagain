@@ -13,7 +13,7 @@
                 <p class="mb-4 has-text-grey">{{ 'item_ballot.close_intro'|trans }}</p>
             {% endif %}
 
-            <form method="post" action="{{ path('app_item_ballot_close', {id: ballot.id}) }}">
+            <form data-action="item-ballot-close-submit" method="post" action="{{ path('app_item_ballot_close', {id: ballot.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('item_ballot_close' ~ ballot.id) }}">
 
                 <div class="mb-4">
@@ -33,7 +33,7 @@
                 </div>
 
                 <button type="submit" class="button is-primary">{{ 'item_ballot.button_settle'|trans }}</button>
-                <a href="{{ path('app_item_ballot_show', {id: ballot.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+                <a data-action="item-ballot-cancel-click" data-action-place="close" href="{{ path('app_item_ballot_show', {id: ballot.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
             </form>
         </div>
     </section>

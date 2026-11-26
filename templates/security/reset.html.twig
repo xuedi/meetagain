@@ -12,7 +12,8 @@
 
                     <h1 class="title is-5">{{ "security.page_title_reset"|trans }}</h1>
 
-                    {{ form_start(form) }}
+                    {{ form_start(form, {attr: {'data-action': 'reset-form-submit'}}) }}
+                    {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="reset-form-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
                     {{ form_row(form.email) }}
 

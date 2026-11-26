@@ -3,9 +3,7 @@ controllers:
     prefix: /{_locale}
     requirements:
         _locale: '[a-z]{2}'
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+    resource: ../src/Controller/
     exclude: ../src/Controller/NonLocale/
 
 frontpage:

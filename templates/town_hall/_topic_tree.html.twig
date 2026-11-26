@@ -9,7 +9,7 @@
                 <span class="tag is-light is-rounded">{{ commentCounts[node.id] }}</span>
             {% endif %}
             {% if depth < maxDepth %}
-                <a class="is-size-7 has-text-grey"
+                <a data-action="townhall-topic-new-click" data-action-place="tree" class="is-size-7 has-text-grey"
                    title="{{ 'town_hall.forum_new_subtopic'|trans({'%topic%': node.title}) }}"
                    href="{{ path('app_townhall_forum_new', { _locale: app.request.locale, parent: node.id }) }}">+</a>
             {% endif %}

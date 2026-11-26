@@ -62,7 +62,7 @@
                                 {{ (handover.hasConfirmed(viewer) ? 'circulation.about_you_confirmed' : 'circulation.about_awaiting_you')|trans }}
                             </td>
                             <td class="has-text-right">
-                                <a class="button is-small" href="{{ path('app_circulation_handover', {'id': handover.id}) }}">
+                                <a data-action="circulation-handover-click" data-action-place="about" class="button is-small" href="{{ path('app_circulation_handover', {'id': handover.id}) }}">
                                     {{ 'circulation.button_open_handover'|trans }}
                                 </a>
                             </td>
@@ -88,7 +88,7 @@
                                 {% if copy.finishedAt %}
                                     <span class="tag is-light">{{ 'circulation.about_marked_finished'|trans }}</span>
                                 {% elseif copy.status.isHeld %}
-                                    <form method="post" action="{{ path('app_circulation_copy_finished', {'id': copy.id}) }}">
+                                    <form data-action="circulation-finished-submit" data-action-place="about" method="post" action="{{ path('app_circulation_copy_finished', {'id': copy.id}) }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_copy_finished' ~ copy.id) }}">
                                         <button class="button is-small is-link is-light">{{ 'circulation.button_finished'|trans }}</button>
                                     </form>

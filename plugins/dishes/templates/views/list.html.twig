@@ -8,7 +8,7 @@
             <th>{{ 'dishes_views.col_description'|trans }}</th>
             <th class="has-text-right">
                 {% if is_granted('ROLE_STEWARD') %}
-                    <a href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
+                    <a data-action="dishes-add-click" data-action-place="list" href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                     </a>
                 {% endif %}

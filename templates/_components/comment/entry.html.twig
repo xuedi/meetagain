@@ -36,7 +36,7 @@
                     {% if is_granted('ROLE_USER') %}
                         <div class="level-right">
                             {% if comment.user and app.user and comment.user.id != app.user.id %}
-                                <a class="level-item replyButton" data-comment="{{ comment.content }}"
+                                <a data-action="comment-reply-click" class="level-item replyButton" data-comment="{{ comment.content }}"
                                    title="{{ 'comment.action_reply'|trans }}">
                                     <span class="icon is-small">
                                         <i class="fas fa-reply" aria-hidden="true"></i>
@@ -50,7 +50,7 @@
                                 </a>
                             {% endif %}
                             {% if (comment.user and app.user and comment.user.id == app.user.id) or is_granted('ROLE_ADMIN') %}
-                                <a href="{{ path('app_comment_delete', {'targetType': targetType, 'targetId': targetId, 'id': comment.id}) }}"
+                                <a data-action="comment-delete-click" href="{{ path('app_comment_delete', {'targetType': targetType, 'targetId': targetId, 'id': comment.id}) }}"
                                    class="level-item button is-ghost p-0"
                                    title="{{ 'comment.action_delete'|trans }}"
                                    data-post

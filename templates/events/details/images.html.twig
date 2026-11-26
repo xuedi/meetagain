@@ -6,7 +6,7 @@
     </div>
     <div class="level-right">
         {% if is_granted('ROLE_USER') %}
-            <a href="#"
+            <a data-action="event-photo-upload-open" href="#"
                class="button is-success is-small ml-4 modalTrigger"
                data-modal-url="{{ path('app_image_modal', {'entity': 'event', 'id': event.id}) }}">
                 <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'events.button_upload_photo'|trans }}</span>
@@ -21,7 +21,7 @@
             {% set href = '/images/thumbnails/' ~ image.hash ~ '_1024x768.webp' %}
             {% set Caption = 'events.image_report_caption'|trans({'%url%': path('app_report_image', {'id': image.id})}) %}
             <div class="column is-6-mobile is-4-tablet is-2-desktop">
-                <a data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
+                <a data-action="event-photo-open" data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
                     {% include '_components/image.html.twig' with {'image': image, 'size': '210x140'} %}
                 </a>
             </div>

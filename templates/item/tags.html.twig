@@ -28,11 +28,12 @@
                     <p class="subtitle is-6 has-text-grey">{{ 'item.tag_page_intro'|trans }}</p>
 
                     <div class="box">
-                        {{ form_start(form) }}
+                        {{ form_start(form, {attr: {'data-action': 'item-tags-submit'}}) }}
+                        {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="item-tags-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
                         <p class="help mb-2">{{ 'item.tag_tree_help'|trans }}</p>
                         {{ form_widget(form) }}
                         <div class="has-text-right">
-                            <a href="{{ item_list_url(itemType) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            <a data-action="item-tags-cancel-click" href="{{ item_list_url(itemType) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                             <button type="submit" class="button is-link">{{ 'global.button_save'|trans }}</button>
                         </div>
                         {{ form_end(form) }}

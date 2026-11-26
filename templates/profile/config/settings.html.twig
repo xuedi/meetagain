@@ -13,6 +13,8 @@
             </div>
             <div class="control">
                 {% include '_components/toggle.html.twig' with {
+                    'action': 'profile-notification-select',
+                    'action_place': 'master',
                     'link': path('app_profile_config_toggle', {'type': 'notification'}),
                     'status': user.isNotification,
                     'csrfTokenId': 'app_profile_config_togglenotification',
@@ -26,6 +28,8 @@
                     <div class="control is-expanded">{{ notification.label|trans }}</div>
                     <div class="control">
                         {% include '_components/toggle.html.twig' with {
+                            'action': 'profile-notification-select',
+                            'action_place': 'type',
                             'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
                             'status': notification.value,
                             'csrfTokenId': 'app_profile_config_toggle_notification' ~ notification.key,
@@ -42,6 +46,8 @@
             <div class="control is-expanded">{{ 'profile_config.toggle_public_profile'|trans }}</div>
             <div class="control">
                 {% include '_components/toggle.html.twig' with {
+                    'action': 'profile-privacy-select',
+                    'action_place': 'public',
                     'link': path('app_profile_config_toggle', {'type': 'public'}),
                     'status': user.isPublic,
                     'csrfTokenId': 'app_profile_config_togglepublic',
@@ -52,6 +58,8 @@
             <div class="control is-expanded">{{ 'profile_config.toggle_tagging'|trans }}</div>
             <div class="control">
                 {% include '_components/toggle.html.twig' with {
+                    'action': 'profile-privacy-select',
+                    'action_place': 'tagging',
                     'link': path('app_profile_config_toggle', {'type': 'tagging'}),
                     'status': user.isTagging,
                     'csrfTokenId': 'app_profile_config_toggletagging',
@@ -62,6 +70,8 @@
             <div class="control is-expanded">{{ 'profile_config.toggle_osm'|trans }}</div>
             <div class="control">
                 {% include '_components/toggle.html.twig' with {
+                    'action': 'profile-privacy-select',
+                    'action_place': 'osm',
                     'link': path('app_profile_config_toggle', {'type': 'osm'}),
                     'status': user.isOsmConsent,
                     'csrfTokenId': 'app_profile_config_toggleosm',
@@ -73,6 +83,8 @@
                 <div class="control is-expanded">{{ toggle.labelKey|trans }}</div>
                 <div class="control">
                     {% include '_components/toggle.html.twig' with {
+                        'action': 'profile-privacy-select',
+                        'action_place': 'plugin',
                         'link': toggle.toggleUrl,
                         'status': toggle.currentState,
                         'csrfTokenId': toggle.csrfTokenId,

@@ -80,6 +80,7 @@ final class DishController extends AbstractController
                     'dish_name' => $dish->getAnyTranslatedName(),
                 ]);
                 $this->addFlash('success', 'dishes_dish.flash_added');
+                $this->addFlash('action', 'dishes-add-success');
 
                 return $this->redirectToRoute('app_plugin_dishes_dish_show', ['id' => $dish->getId()]);
             } catch (RuntimeException $e) {

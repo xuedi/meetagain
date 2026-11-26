@@ -17,9 +17,10 @@
 
             {% if candidateItemIds is empty %}
                 <div class="notification is-warning">{{ 'item_ballot.no_candidates'|trans }}</div>
-                <a href="{{ path('app_event_details', {id: event.id}) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                <a data-action="item-ballot-cancel-click" data-action-place="empty" href="{{ path('app_event_details', {id: event.id}) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
             {% else %}
-                {{ form_start(form) }}
+                {{ form_start(form, {attr: {'data-action': 'item-ballot-create-submit'}}) }}
+                {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="item-ballot-create-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
                 <p class="mb-3 has-text-grey">{{ 'item_ballot.create_intro'|trans }}</p>
 
                 <div class="mb-5">
@@ -38,7 +39,7 @@
 
                 <div class="field mt-5">
                     <button type="submit" class="button is-primary">{{ 'item_ballot.button_create'|trans }}</button>
-                    <a href="{{ path('app_event_details', {id: event.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+                    <a data-action="item-ballot-cancel-click" data-action-place="create" href="{{ path('app_event_details', {id: event.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
                 </div>
                 {{ form_end(form) }}
             {% endif %}

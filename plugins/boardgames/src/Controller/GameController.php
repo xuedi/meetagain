@@ -107,6 +107,7 @@ final class GameController extends AbstractController
                 'game_name' => $game->getName(),
             ]);
             $this->addFlash('success', 'boardgames_game.flash_added');
+            $this->addFlash('action', 'boardgames-import-success');
 
             return $this->redirectToRoute('app_plugin_boardgames_game_show', ['id' => $game->getId()]);
         } catch (RuntimeException $exception) {
@@ -146,6 +147,7 @@ final class GameController extends AbstractController
                 'game_name' => $game->getName(),
             ]);
             $this->addFlash('success', 'boardgames_game.flash_added');
+            $this->addFlash('action', 'boardgames-manual-success');
 
             return $this->redirectToRoute('app_boardgames_gamelist');
         }

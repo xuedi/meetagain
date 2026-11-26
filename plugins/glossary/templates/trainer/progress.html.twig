@@ -17,7 +17,7 @@
                 </div>
                 <div class="level-right buttons">
                     <a href="{{ path('app_plugin_glossary') }}" class="button is-small">{{ 'glossary_trainer.link_back_to_glossary'|trans }}</a>
-                    <a href="{{ path('app_plugin_glossary_trainer') }}" class="button is-small is-link">
+                    <a data-action="glossary-trainer-open-click" href="{{ path('app_plugin_glossary_trainer') }}" class="button is-small is-link">
                         <span class="icon"><i class="fa fa-graduation-cap"></i></span>
                         <span>{{ 'glossary_trainer.page_title'|trans }}</span>
                     </a>

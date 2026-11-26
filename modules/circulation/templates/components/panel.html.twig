@@ -48,7 +48,7 @@
                     </td>
                     <td class="has-text-right">
                         {% if viewer and copy.isHeldBy(viewer) and copy.status.isHeld %}
-                            <form method="post" action="{{ path('app_circulation_copy_finished', {'id': copy.id}) }}">
+                            <form data-action="circulation-finished-submit" data-action-place="panel" method="post" action="{{ path('app_circulation_copy_finished', {'id': copy.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_copy_finished' ~ copy.id) }}">
                                 <button class="button is-small is-link is-light">{{ 'circulation.button_finished'|trans }}</button>
                             </form>
@@ -71,7 +71,7 @@
 
     <div class="buttons">
         {% if ownRequest %}
-            <form method="post" action="{{ path('app_circulation_request_cancel', {'id': ownRequest.id}) }}">
+            <form data-action="circulation-request-cancel-submit" method="post" action="{{ path('app_circulation_request_cancel', {'id': ownRequest.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_request_cancel' ~ ownRequest.id) }}">
                 <button class="button is-small">{{ 'circulation.button_cancel_request'|trans }}</button>
             </form>
@@ -80,7 +80,7 @@
                 {{ verdict.reasonKey|trans(verdict.reasonParams) }}
             </div>
         {% elseif viewer and not summary.viewerHolds %}
-            <form method="post" action="{{ path('app_circulation_request', {'itemType': itemType, 'itemId': itemId}) }}">
+            <form data-action="circulation-request-submit" method="post" action="{{ path('app_circulation_request', {'itemType': itemType, 'itemId': itemId}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_request' ~ itemType ~ itemId) }}">
                 <button class="button is-small is-link">{{ 'circulation.button_request'|trans }}</button>
             </form>
@@ -88,7 +88,7 @@
     </div>
 
     {% if viewer %}
-        <form method="post" action="{{ path('app_circulation_donate', {'itemType': itemType, 'itemId': itemId}) }}" class="mt-4">
+        <form data-action="circulation-donate-submit" method="post" action="{{ path('app_circulation_donate', {'itemType': itemType, 'itemId': itemId}) }}" class="mt-4">
             <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_donate' ~ itemType ~ itemId) }}">
             <div class="field has-addons">
                 <div class="control is-expanded">

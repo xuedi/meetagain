@@ -12,7 +12,7 @@
 
 {% if candidates is empty %}
 <div class="notification is-warning">{{ 'wishlist_pick.empty'|trans }}</div>
-<a href="{{ path('app_wishlist_group') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+<a data-action="wishlist-cancel-click" data-action-place="pick" href="{{ path('app_wishlist_group') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
 {% else %}
 <p class="mb-3 has-text-grey">{{ 'wishlist_pick.intro'|trans }}</p>
 <table class="table is-fullwidth is-striped">
@@ -37,7 +37,7 @@
                 {% endif %}
             </td>
             <td>
-                <form method="POST" action="{{ path('app_item_attach', {id: event.id}) }}">
+                <form data-action="wishlist-pick-submit" method="POST" action="{{ path('app_item_attach', {id: event.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('app_item_attach' ~ event.id) }}">
                     <input type="hidden" name="item_type" value="{{ itemType }}">
                     <input type="hidden" name="item_id" value="{{ candidate.itemId }}">

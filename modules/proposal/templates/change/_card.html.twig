@@ -42,14 +42,14 @@
                             {% endif %}
                         </a>
                         {% if canReview %}
-                            <a href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id}) }}"
+                            <a data-action="proposal-ballot-confirm-click" data-action-place="all" href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id}) }}"
                                class="button is-small is-success"
                                data-post
                                data-csrf-token="{{ ballotToken }}">
                                 {{ 'review.button_ballot_confirm'|trans }}
                             </a>
                             {% if applyScope %}
-                                <a href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id, scope: applyScope.key}) }}"
+                                <a data-action="proposal-ballot-confirm-click" data-action-place="scope" href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id, scope: applyScope.key}) }}"
                                    class="button is-small is-success is-light"
                                    title="{{ applyScope.label }}"
                                    data-post
@@ -66,7 +66,7 @@
                                     {{ 'review.ballot_tied'|trans }}
                                 </a>
                             {% else %}
-                                <button type="button"
+                                <button data-action="proposal-ballot-open" type="button"
                                         class="button is-small mr-2"
                                         data-ballot-terms-open="field-ballot-modal"
                                         data-ballot-field="{{ row.field }}"
@@ -75,7 +75,7 @@
                                 </button>
                             {% endif %}
                             {% if applyScope %}
-                                <a href="{{ path('app_review_proposal_apply', {id: proposal.id, field: row.field, scope: applyScope.key}) }}"
+                                <a data-action="proposal-approve-click" data-action-place="scope" href="{{ path('app_review_proposal_apply', {id: proposal.id, field: row.field, scope: applyScope.key}) }}"
                                    class="button is-small is-success is-light mr-2"
                                    title="{{ applyScope.label }}"
                                    data-post
@@ -89,7 +89,8 @@
                                 denyUrl: path('app_review_proposal_deny', {id: proposal.id, field: row.field}),
                                 csrfToken: csrfToken,
                                 approveTitle: 'review.button_apply'|trans,
-                                denyTitle: 'review.button_deny'|trans
+                                denyTitle: 'review.button_deny'|trans,
+                                action_place: 'field'
                             } only %}
                         </div>
                     {% endif %}
@@ -100,7 +101,7 @@
     </table>
     {% if card.isProposer %}
         <div class="has-text-right">
-            <a href="{{ path('app_review_proposal_withdraw', {id: proposal.id}) }}"
+            <a data-action="proposal-withdraw-click" href="{{ path('app_review_proposal_withdraw', {id: proposal.id}) }}"
                class="button is-small"
                data-post
                data-csrf-token="{{ csrfToken }}">

@@ -39,6 +39,7 @@ final class VenueBallotController extends AbstractController
             try {
                 $this->ballots->settle($id, (string) $request->request->get('winner'), (int) $this->getAuthedUser()->getId());
                 $this->addFlash('success', 'venue_ballot.flash_settled');
+                $this->addFlash('action', 'venue-settle-success');
 
                 return $this->redirectToRoute('app_ballot_show', ['id' => $id]);
             } catch (InvalidArgumentException) {

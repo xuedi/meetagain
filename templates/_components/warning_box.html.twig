@@ -16,6 +16,7 @@
         - buttonLabel (string, optional)        -- label for the confirmation button
         - csrfToken   (string, optional)        -- when set, the button POSTs via data-post with this token ID
         - showButton  (bool, optional)          -- override button visibility; default true when buttonUrl set
+        - action_place (string, optional) - fixed word for the data-action-place of its tracked actions
     Depends on: assets/js/toggles.js (.toggleTrigger), assets/js/post-link.js (a[data-post])
 #}
 <article class="message is-{{ type|default('danger') }} is-hidden" id="{{ id }}">
@@ -28,7 +29,7 @@
         {% if content is defined %}{{ content|raw }}{% endif %}
         {% if (showButton is not defined and buttonUrl is defined) or (showButton is defined and showButton) %}
             <div class="has-text-right mt-3">
-                <a class="button"
+                <a data-action="confirm-destructive-click"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} class="button"
                    href="{{ buttonUrl }}"
                    data-post
                    {%- if csrfToken is defined and csrfToken is not null %} data-csrf-token="{{ csrf_token(csrfToken) }}"{% endif %}>

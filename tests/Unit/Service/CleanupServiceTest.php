@@ -10,6 +10,7 @@ use App\Entity\Image;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use App\Portability\ExportAction;
 use App\Repository\AccessDeniedLogRepository;
 use App\Repository\ActivityRepository;
@@ -319,6 +320,41 @@ class CleanupServiceTest extends TestCase
         static::assertSame(1, $count);
     }
 
+    public function testDeleteResolvedSupportRequestsDeletesAfterSixtyDaysAndTellsThePlugins(): void
+    {
+        // Arrange
+        $supportRepoMock = $this->createMock(SupportRequestRepository::class);
+        $supportRepoMock
+            ->expects($this->once())
+            ->method('deleteResolvedBefore')
+            ->with(new DateTimeImmutable('2026-06-20 12:00:00', new DateTimeZone('UTC')))
+            ->willReturn([11, 12]);
+
+        $dispatched = [];
+        $dispatcherMock = $this->createMock(EntityActionDispatcher::class);
+        $dispatcherMock
+            ->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(static function (EntityAction $action, int $id) use (&$dispatched): void {
+                $dispatched[] = [$action, $id];
+            });
+
+        $subject = $this->createService(entityActionDispatcher: $dispatcherMock, supportRequestRepo: $supportRepoMock);
+
+        // Act
+        $count = $subject->deleteResolvedSupportRequests();
+
+        // Assert
+        static::assertSame(2, $count);
+        static::assertSame(
+            [
+                [EntityAction::DeleteSupportRequest, 11],
+                [EntityAction::DeleteSupportRequest, 12],
+            ],
+            $dispatched,
+        );
+    }
+
     public function testExpireSupportEmailVerificationsClearsTokensPastTheirExpiry(): void
     {
         // Arrange
@@ -372,6 +408,7 @@ class CleanupServiceTest extends TestCase
         $supportRepo = $this->createStub(SupportRequestRepository::class);
         $supportRepo->method('findStaleUnresolved')->willReturn([new SupportRequest(), new SupportRequest(), new SupportRequest()]);
         $supportRepo->method('findExpiredEmailVerifications')->willReturn([]);
+        $supportRepo->method('deleteResolvedBefore')->willReturn([5]);
         $measureLogger = $this->createStub(MeasureLogger::class);
         $measureLogger->method('purgeOlderThan')->willReturn(5);
         $incidentRepo = $this->createStub(IncidentRepository::class);
@@ -400,7 +437,7 @@ class CleanupServiceTest extends TestCase
         // Assert
         static::assertSame(Status::ok, $result->status);
         static::assertSame(
-            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, export_archives: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0, registration_meta_blanked: 2, logins: 9, login_measure_ips_blanked: 2, reports_anonymised: 4',
+            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_requests_deleted: 1, support_email_verifications_expired: 0, import_archives: 0, export_archives: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0, registration_meta_blanked: 2, logins: 9, login_measure_ips_blanked: 2, reports_anonymised: 4',
             $result->message,
         );
     }

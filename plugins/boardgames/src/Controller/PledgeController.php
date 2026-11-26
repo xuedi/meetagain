@@ -56,6 +56,7 @@ final class PledgeController extends AbstractController
                 'game_name' => $game->getName(),
             ]);
             $this->addFlash('success', 'boardgames_tile.flash_pledged');
+            $this->addFlash('action', 'boardgames-pledge-success');
         } catch (RuntimeException $exception) {
             $this->addFlash('error', $exception->getMessage());
         }

@@ -41,6 +41,7 @@ final class CirculationController extends AbstractController
         try {
             $this->circulation->donate($itemType, $itemId, $this->getAuthedUser(), $request->request->getString('label'));
             $this->addFlash('success', 'circulation.flash_donated');
+            $this->addFlash('action', 'circulation-donate-success');
         } catch (RuntimeException $exception) {
             $this->addFlash('warning', $exception->getMessage());
         }
@@ -57,6 +58,7 @@ final class CirculationController extends AbstractController
         try {
             $this->circulation->request($itemType, $itemId, $this->getAuthedUser());
             $this->addFlash('success', 'circulation.flash_requested');
+            $this->addFlash('action', 'circulation-request-success');
         } catch (RuntimeException $exception) {
             $this->addFlash('warning', $exception->getMessage());
         }
@@ -157,6 +159,7 @@ final class CirculationController extends AbstractController
         try {
             $this->handovers->confirm($handover, $this->getAuthedUser());
             $this->addFlash('success', 'circulation.flash_confirmed');
+            $this->addFlash('action', 'circulation-handover-success');
         } catch (RuntimeException $exception) {
             $this->addFlash('warning', $exception->getMessage());
         }

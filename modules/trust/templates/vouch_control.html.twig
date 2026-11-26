@@ -3,10 +3,10 @@
     <input type="hidden" name="context" value="{{ context }}">
     <input type="hidden" name="user" value="{{ userId }}">
     <div class="select is-small">
-        <select name="level" onchange="this.form.submit()" aria-label="{{ 'trust.vouch_label'|trans }}">
-            <option value="">{{ 'trust.vouch_none'|trans }}</option>
+        <select data-action="trust-vouch-select" name="level" onchange="this.form.submit()" aria-label="{{ 'trust.vouch_label'|trans }}">
+            <option data-action-value="none" value="">{{ 'trust.vouch_none'|trans }}</option>
             {% for level in levels %}
-                <option value="{{ level.value }}"{{ current is not null and current.value == level.value ? ' selected' : '' }}>
+                <option data-action-value="{{ level.value }}" value="{{ level.value }}"{{ current is not null and current.value == level.value ? ' selected' : '' }}>
                     {{ level.label()|trans }}
                 </option>
             {% endfor %}

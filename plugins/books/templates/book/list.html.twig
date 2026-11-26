@@ -14,17 +14,17 @@
     <div class="level-right">
         <div class="buttons">
             {% if circulation_dashboard_url('book') %}
-                <a href="{{ circulation_dashboard_url('book') }}" class="button">
+                <a data-action="books-circulation-click" href="{{ circulation_dashboard_url('book') }}" class="button">
                     <span class="icon"><i class="fa fa-right-left"></i></span>
                     <span>{{ 'circulation.link_label'|trans }}</span>
                 </a>
             {% endif %}
             {% if is_granted('ROLE_STEWARD') %}
-                <a href="{{ path('app_plugin_books_book_add') }}" class="button is-link">
+                <a data-action="books-lookup-click" href="{{ path('app_plugin_books_book_add') }}" class="button is-link">
                     <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
                     <span>{{ 'books_book.button_lookup'|trans }}</span>
                 </a>
-                <a href="{{ path('app_plugin_books_book_manual') }}" class="button">
+                <a data-action="books-manual-click" data-action-place="header" href="{{ path('app_plugin_books_book_manual') }}" class="button">
                     <span class="icon"><i class="fa fa-plus"></i></span>
                     <span>{{ 'books_book.button_manual'|trans }}</span>
                 </a>

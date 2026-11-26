@@ -22,7 +22,7 @@
                             <div class="level-right">
                                 <div class="buttons are-small mb-0">
                                     {% if not isBlocked %}
-                                        <a href="{{ path('app_member_toggle_follow', {'id': userDetails.id}) }}"
+                                        <a {% if isFollow %}data-action="member-unfollow-click"{% else %}data-action="member-follow-click"{% endif %} href="{{ path('app_member_toggle_follow', {'id': userDetails.id}) }}"
                                            class="button is-light is-small"
                                            data-post
                                            data-csrf-token="{{ csrf_token('app_member_toggle_follow' ~ userDetails.id) }}">
@@ -32,7 +32,7 @@
                                     {% endif %}
 
                                     {% if isBlocked %}
-                                        <a href="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}"
+                                        <a data-action="member-unblock-click" href="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}"
                                            class="button is-light is-small"
                                            data-post
                                            data-csrf-token="{{ csrf_token('app_profile_unblock_user' ~ userDetails.id) }}">
@@ -40,7 +40,7 @@
                                             <span>{{ 'member.button_unblock'|trans }}</span>
                                         </a>
                                     {% else %}
-                                        <a href="{{ path('app_profile_block_user', {'id': userDetails.id}) }}"
+                                        <a data-action="member-block-click" href="{{ path('app_profile_block_user', {'id': userDetails.id}) }}"
                                            class="button is-light is-small"
                                            data-post
                                            data-csrf-token="{{ csrf_token('app_profile_block_user' ~ userDetails.id) }}"
@@ -51,7 +51,7 @@
                                     {% endif %}
 
                                     {% if not isBlocked %}
-                                        <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-light is-small">
+                                        <a data-action="member-message-click" href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-light is-small">
                                             <span class="icon"><i class="fa fa-envelope"></i></span>
                                             <span>{{ 'member.button_message'|trans }}</span>
                                         </a>
@@ -59,7 +59,7 @@
 
                                     {{ get_member_view_actions(currentUser, userDetails) }}
 
-                                    <a href="{{ path('app_report_subject', {'type': 'user', 'id': userDetails.id}) }}"
+                                    <a data-action="member-report-click" href="{{ path('app_report_subject', {'type': 'user', 'id': userDetails.id}) }}"
                                        class="button is-light is-small">
                                         <span class="icon"><i class="fa fa-flag"></i></span>
                                         <span>{{ 'member.button_report'|trans }}</span>
@@ -86,21 +86,21 @@
                 <div class="box mt-5 member-admin-bar">
                     <p class="heading mb-3">{{ 'member.admin_panel_heading'|trans }}</p>
                     <div class="buttons">
-                        <a href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}"
+                        <a data-action="member-moderate-click" data-action-place="rotate" href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}"
                            class="button is-small"
                            data-post
                            data-csrf-token="{{ csrf_token('app_member_rotate_avatar' ~ userDetails.id) }}">
                             <span class="icon"><i class="fas fa-rotate-right"></i></span>
                             <span>{{ 'member.admin_action_rotate_avatar'|trans }}</span>
                         </a>
-                        <a href="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}"
+                        <a data-action="member-moderate-click" data-action-place="remove" href="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}"
                            class="button is-small"
                            data-post
                            data-csrf-token="{{ csrf_token('app_member_remove_avatar' ~ userDetails.id) }}">
                             <span class="icon"><i class="fas fa-trash"></i></span>
                             <span>{{ 'member.admin_action_remove_avatar'|trans }}</span>
                         </a>
-                        <a href="{{ path('app_member_restrict', {'id': userDetails.id}) }}"
+                        <a data-action="member-moderate-click" data-action-place="restrict" href="{{ path('app_member_restrict', {'id': userDetails.id}) }}"
                            class="button is-small"
                            data-post
                            data-csrf-token="{{ csrf_token('app_member_restrict' ~ userDetails.id) }}">
@@ -110,7 +110,7 @@
                                 <span class="icon"><i class="fas fa-check"></i></span>
                             {% endif %}
                         </a>
-                        <a href="{{ path('app_member_verify', {'id': userDetails.id}) }}"
+                        <a data-action="member-moderate-click" data-action-place="verify" href="{{ path('app_member_verify', {'id': userDetails.id}) }}"
                            class="button is-small"
                            data-post
                            data-csrf-token="{{ csrf_token('app_member_verify' ~ userDetails.id) }}">

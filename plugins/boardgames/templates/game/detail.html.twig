@@ -81,19 +81,19 @@
         {% if is_granted('ROLE_USER') %}
             <div class="mt-4">
                 {% if ownership %}
-                    <a href="{{ path('app_plugin_boardgames_shelf_remove', {id: ownership.id}) }}"
+                    <a data-action="boardgames-shelf-remove-click" data-action-place="detail" href="{{ path('app_plugin_boardgames_shelf_remove', {id: ownership.id}) }}"
                        class="button is-small"
                        data-post
                        data-csrf-token="{{ csrf_token('app_plugin_boardgames_shelf_remove' ~ ownership.id) }}">
                         <span class="icon"><i class="fa fa-box-open"></i></span>
                         <span>{{ 'boardgames_shelf.button_remove'|trans }}</span>
                     </a>
-                    <a href="{{ path('app_plugin_boardgames_shelf') }}" class="button is-small ml-2">
+                    <a data-action="boardgames-shelf-edit-click" href="{{ path('app_plugin_boardgames_shelf') }}" class="button is-small ml-2">
                         <span class="icon"><i class="fa fa-sliders"></i></span>
                         <span>{{ 'boardgames_shelf.button_edit_row'|trans }}</span>
                     </a>
                 {% else %}
-                    <a href="{{ path('app_plugin_boardgames_shelf_add', {id: game.id}) }}"
+                    <a data-action="boardgames-shelf-add-click" href="{{ path('app_plugin_boardgames_shelf_add', {id: game.id}) }}"
                        class="button is-small is-link"
                        data-post
                        data-csrf-token="{{ csrf_token('app_plugin_boardgames_shelf_add' ~ game.id) }}">
@@ -108,11 +108,11 @@
 
         {% if is_granted('ROLE_STEWARD') %}
         <div class="mt-4 buttons">
-            <a href="{{ path('app_plugin_boardgames_game_edit', {id: game.id}) }}" class="button is-small">
+            <a data-action="boardgames-edit-click" href="{{ path('app_plugin_boardgames_game_edit', {id: game.id}) }}" class="button is-small">
                 <span class="icon"><i class="fa fa-edit"></i></span>
                 <span>{{ 'boardgames_game.button_edit'|trans }}</span>
             </a>
-            <a href="{{ path('app_plugin_boardgames_game_delete', {id: game.id}) }}"
+            <a data-action="boardgames-delete-click" href="{{ path('app_plugin_boardgames_game_delete', {id: game.id}) }}"
                class="button is-small is-danger is-light"
                data-post
                data-csrf-token="{{ csrf_token('app_plugin_boardgames_game_delete' ~ game.id) }}"

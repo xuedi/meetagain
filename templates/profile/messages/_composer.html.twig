@@ -1,5 +1,6 @@
 {{ form_start(form, {'attr': {
     'class': 'message-form',
+    'data-action': 'messages-form-submit',
     'data-edit-url-template': path('app_profile_messages_edit', {'id': '__ID__'}),
     'data-csrf-token': csrf_token('message_edit'),
     'data-label-send': 'profile_messages.button_send'|trans,
@@ -30,7 +31,7 @@
                   placeholder="{{ 'profile_messages.input_placeholder'|trans }}">{{ field_value(form.comment) }}</textarea>
     </div>
     <div class="control">
-        <button type="button" class="button is-light is-hidden cancel-edit">{{ 'profile_messages.cancel_edit'|trans }}</button>
+        <button data-action="messages-edit-cancel-click" type="button" class="button is-light is-hidden cancel-edit">{{ 'profile_messages.cancel_edit'|trans }}</button>
     </div>
     <div class="control">
         <button type="submit" class="button is-link submit-button">{{ 'profile_messages.button_send'|trans }}</button>

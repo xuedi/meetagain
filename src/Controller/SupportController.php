@@ -90,6 +90,7 @@ final class SupportController extends AbstractController
             }
 
             $this->addFlash('success', 'support.flash_request_received');
+            $this->addFlash('action', 'support-form-success');
 
             return $this->redirectToRoute('app_support_thread', ['token' => $token]);
         }

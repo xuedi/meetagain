@@ -100,6 +100,7 @@ final class ItemBallotController extends AbstractController
         try {
             $this->ballots->cast($id, (int) $this->getAuthedUser()->getId(), $this->submittedKeys($request));
             $this->addFlash('success', 'item_ballot.flash_recorded');
+            $this->addFlash('action', 'ballot-vote-success');
         } catch (DomainException) {
             $this->addFlash('danger', 'item_ballot.flash_closed');
         }
@@ -124,6 +125,7 @@ final class ItemBallotController extends AbstractController
             try {
                 $this->ballots->settle($id, (string) $request->request->get('winner'), (int) $this->getAuthedUser()->getId());
                 $this->addFlash('success', 'item_ballot.flash_settled');
+                $this->addFlash('action', 'ballot-settle-success');
 
                 return $this->redirectToRoute('app_item_ballot_show', ['id' => $id]);
             } catch (InvalidArgumentException) {

@@ -3,7 +3,7 @@
     <h1 class="title is-4">{{ 'shared.image_modal_choose_existing_heading'|trans }}</h1>
     <div class="mb-5">
         {% for galleryItem in selectableGallery %}
-            <a href="{{ galleryItem.link }}"
+            <a data-action="image-choose-click" href="{{ galleryItem.link }}"
                class="image-item"
                data-post
                data-csrf-token="{{ csrf_token('app_replace_image_select' ~ id) }}">
@@ -15,14 +15,14 @@
 
 <div class="title is-4">{{ 'shared.image_modal_upload_heading'|trans }}</div>
 {% if uploadForm is defined %}
-    {{ form_start(uploadForm) }}
+    {{ form_start(uploadForm, {attr: {'data-action': 'image-upload-submit'}}) }}
     {{ form_row(uploadForm.files) }}
     <div class="field">
         <button type="submit" class="button is-link">{{ 'shared.image_modal_upload_button'|trans }}</button>
     </div>
     {{ form_end(uploadForm) }}
 {% else %}
-    {{ form_start(replaceForm, {attr: {'data-submit-on-change': ''}}) }}
+    {{ form_start(replaceForm, {attr: {'data-submit-on-change': '', 'data-action': 'image-replace-submit'}}) }}
     <div class="file is-link">
         <label class="file-label">
             <input

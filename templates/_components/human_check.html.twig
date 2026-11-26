@@ -59,7 +59,7 @@
                         {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ form.vars.refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ form.vars.refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
                     </p>
                 </div>
-                <button type="submit"
+                <button data-action="captcha-refresh-click" type="submit"
                         form="captchaRefresh"
                         class="button is-small is-info is-light is-flex-shrink-0"
                         data-captcha-refresh>

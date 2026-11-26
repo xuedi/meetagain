@@ -18,7 +18,7 @@
     <p class="is-size-7 has-text-grey">{{ 'support.optin_already_verified'|trans }}</p>
 {% else %}
     <p class="has-text-grey is-size-7 mb-3">{{ 'support.optin_intro'|trans }}</p>
-    <form method="post" action="{{ path('app_support_thread_subscribe', {'token': token}) }}">
+    <form data-action="support-optin-submit" method="post" action="{{ path('app_support_thread_subscribe', {'token': token}) }}">
         <input type="hidden" name="_token" value="{{ csrf_token('app_support_thread_subscribe' ~ token) }}">
         <div class="field">
             <div class="control">

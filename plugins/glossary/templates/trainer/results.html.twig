@@ -41,10 +41,10 @@
 
                     <div class="buttons">
                         {% if not session.finished %}
-                            <a href="{{ path('app_plugin_glossary_trainer_card') }}" class="button is-link">{{ 'glossary_trainer.link_resume'|trans }}</a>
+                            <a data-action="glossary-trainer-resume-click" href="{{ path('app_plugin_glossary_trainer_card') }}" class="button is-link">{{ 'glossary_trainer.link_resume'|trans }}</a>
                         {% endif %}
-                        <a href="{{ path('app_plugin_glossary_trainer') }}" class="button">{{ 'glossary_trainer.button_again'|trans }}</a>
-                        <a href="{{ path('app_plugin_glossary_trainer_progress') }}" class="button">{{ 'glossary_trainer.link_progress'|trans }}</a>
+                        <a data-action="glossary-trainer-again-click" href="{{ path('app_plugin_glossary_trainer') }}" class="button">{{ 'glossary_trainer.button_again'|trans }}</a>
+                        <a data-action="glossary-trainer-progress-click" data-action-place="results" href="{{ path('app_plugin_glossary_trainer_progress') }}" class="button">{{ 'glossary_trainer.link_progress'|trans }}</a>
                         <a href="{{ path('app_plugin_glossary', session.tagIds is empty ? {} : {tag: session.tagIds}) }}" class="button">{{ 'glossary_trainer.link_back_to_glossary'|trans }}</a>
                     </div>
 

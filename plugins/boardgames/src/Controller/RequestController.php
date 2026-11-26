@@ -81,6 +81,7 @@ final class RequestController extends AbstractController
         try {
             $this->requestService->ask($event, $game, $this->getAuthedUser(), $owner, $message === '' ? null : $message);
             $this->addFlash('success', 'boardgames_tile.flash_request_sent');
+            $this->addFlash('action', 'boardgames-ask-success');
         } catch (RuntimeException $exception) {
             $this->addFlash('error', $exception->getMessage());
         }

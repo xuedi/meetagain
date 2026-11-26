@@ -18,7 +18,7 @@
 <div class="mb-4" data-translation-group>
     <div class="buttons has-addons mb-2">
         {% for locale in get_admin_language_codes() %}
-            <button type="button"
+            <button data-action="item-translation-click" type="button"
                     class="button is-small translation-toggle-button{{ loop.first ? ' is-active' }}"
                     data-translation-target="{{ locale }}">{{ locale }}</button>
         {% endfor %}

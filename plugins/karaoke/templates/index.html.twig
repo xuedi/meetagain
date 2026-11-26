@@ -11,7 +11,7 @@
                 </div>
                 {% if is_granted('ROLE_ORGANIZER') %}
                     <div class="level-right">
-                        <a href="{{ path('app_plugin_karaoke_new') }}" class="button is-link">
+                        <a data-action="karaoke-new-click" href="{{ path('app_plugin_karaoke_new') }}" class="button is-link">
                             <span class="icon"><i class="fa fa-plus"></i></span>
                             <span>{{ 'karaoke.button_new'|trans }}</span>
                         </a>

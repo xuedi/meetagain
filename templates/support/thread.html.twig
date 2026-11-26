@@ -36,14 +36,14 @@
 
                     {% if canReply %}
                         <h2 class="title is-6 mt-5">{{ 'support.thread_reply_heading'|trans }}</h2>
-                        {{ form_start(replyForm, {'action': path('app_support_thread_reply', {'token': token})}) }}
+                        {{ form_start(replyForm, {'action': path('app_support_thread_reply', {'token': token}), 'attr': {'data-action': 'support-reply-submit'}}) }}
                         {{ form_row(replyForm.message) }}
                         <button class="button is-primary mt-2">{{ 'support.thread_reply_button'|trans }}</button>
                         {{ form_end(replyForm) }}
                     {% else %}
                         <div class="notification mt-5">
                             <p>{{ 'support.thread_closed_notice'|trans }}</p>
-                            <a class="button is-primary mt-3" href="{{ path('app_contact') }}">{{ 'support.thread_closed_new_request'|trans }}</a>
+                            <a data-action="support-new-click" class="button is-primary mt-3" href="{{ path('app_contact') }}">{{ 'support.thread_closed_new_request'|trans }}</a>
                         </div>
                     {% endif %}
 
@@ -63,7 +63,7 @@
                                        value="{{ url('app_support_thread', {'token': token}) }}" data-thread-link>
                             </div>
                         </div>
-                        <button class="button is-small" type="button"
+                        <button data-action="support-link-copy-click" class="button is-small" type="button"
                                 data-thread-copy data-copied-label="{{ 'support.thread_link_copied'|trans }}">
                             <span class="icon"><i class="fa fa-copy"></i></span>
                             <span>{{ 'support.thread_link_copy'|trans }}</span>

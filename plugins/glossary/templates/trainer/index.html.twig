@@ -40,7 +40,7 @@
                         {% endif %}
                         <p class="mb-4">{{ 'glossary_trainer.scope_count'|trans({'%count%': scopeCount}) }}</p>
 
-                        {{ form_start(form) }}
+                        {{ form_start(form, {attr: {'data-action': 'glossary-trainer-start-submit'}}) }}
                         {{ form_row(form.scope) }}
                         {{ form_row(form.mode) }}
                         {{ form_row(form.direction) }}
@@ -63,7 +63,7 @@
                     <div class="box">
                         <p class="heading">{{ 'glossary_trainer.streak'|trans }}</p>
                         <p class="title is-4">{{ 'glossary_trainer.streak_days'|trans({'%count%': streak}) }}</p>
-                        <a href="{{ path('app_plugin_glossary_trainer_progress') }}" class="button is-small is-fullwidth">
+                        <a data-action="glossary-trainer-progress-click" data-action-place="sidebar" href="{{ path('app_plugin_glossary_trainer_progress') }}" class="button is-small is-fullwidth">
                             <span class="icon"><i class="fa fa-chart-line"></i></span>
                             <span>{{ 'glossary_trainer.link_progress'|trans }}</span>
                         </a>

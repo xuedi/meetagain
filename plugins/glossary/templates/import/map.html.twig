@@ -14,6 +14,7 @@
 
                     <div class="box">
                         {{ form_start(form) }}
+                        {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="glossary-import-map-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
                         {{ form_errors(form) }}
                         <div class="columns is-multiline">
                             <div class="column is-half">{{ form_row(form.termColumn) }}</div>
@@ -26,9 +27,9 @@
                             <div class="column is-full">{{ form_row(form.duplicatePolicy) }}</div>
                         </div>
                         <div class="buttons is-right mt-4">
-                            <a href="{{ path('app_plugin_glossary_import') }}" class="button is-text">{{ 'global.button_cancel'|trans }}</a>
-                            {{ form_widget(form.preview) }}
-                            {{ form_widget(form.import) }}
+                            <a data-action="glossary-cancel-click" data-action-place="map" href="{{ path('app_plugin_glossary_import') }}" class="button is-text">{{ 'global.button_cancel'|trans }}</a>
+                            {{ form_widget(form.preview, {attr: {'class': 'button', 'data-action': 'glossary-import-preview-click'}}) }}
+                            {{ form_widget(form.import, {attr: {'class': 'button is-primary', 'data-action': 'glossary-import-confirm-click'}}) }}
                         </div>
                         {{ form_end(form) }}
                     </div>

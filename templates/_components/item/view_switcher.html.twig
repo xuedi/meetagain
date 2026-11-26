@@ -23,7 +23,7 @@
 <div class="buttons has-addons mb-0">
     {% for view in item_view_types() %}
         {% if allowedModes is empty or view.value in allowedModes %}
-            <a href="{{ path('app_item_set_view', {'itemType': itemType, 'mode': view.value}) }}"
+            <a data-action="item-view-select" data-action-value="{{ view.value }}" href="{{ path('app_item_set_view', {'itemType': itemType, 'mode': view.value}) }}"
                class="button is-expanded{% if currentValue == view.value %} is-link{% endif %}"
                data-item-facet
                data-item-mode="{{ view.value }}"

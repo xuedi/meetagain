@@ -50,6 +50,7 @@ final class ProfileController extends AbstractController
                 (string) $form->get('languages')->getData(),
                 (bool) $form->get('public')->getData(),
             );
+            $this->addFlash('action', 'profile-form-success');
 
             return $this->redirectToRoute('app_profile');
         }

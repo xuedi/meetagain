@@ -13,10 +13,11 @@
         - itemType (string, required) - item type whose cell renders each candidate key
         - voteUrl  (string, required) - POST target for casting a vote
         - tokenId  (string, required) - CSRF token id that POST expects
+        - action_place (string, optional) - fixed word for the data-action-place of its tracked actions
     Depends on: item_list_cell() (ItemViewExtension); .ballot-option* in assets/styles/custom.scss
 #}
 {% if ballot.viewerMayVote %}
-    <form method="post" action="{{ voteUrl }}">
+    <form data-action="ballot-vote-submit"{% if action_place is defined %} data-action-place="{{ action_place }}"{% endif %} method="post" action="{{ voteUrl }}">
         <input type="hidden" name="_token" value="{{ csrf_token(tokenId) }}">
 
         <div class="ballot-options">

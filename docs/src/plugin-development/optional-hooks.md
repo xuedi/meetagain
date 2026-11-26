@@ -464,6 +464,38 @@ final readonly class MyHeadProvider implements HeadHtmlProviderInterface
 
 ---
 
+### User action markers in templates
+
+**Purpose:** Frontend templates name the user actions their elements stand for, so a plugin can listen to them - to
+count how often a form is submitted or a call to action is used, for example - without the core knowing who
+listens. The markers are plain data attributes and do nothing on their own.
+
+- An element carries `data-action="{area}-{object}-{verb}"`: `event-rsvp-click`, `register-form-submit`,
+  `profile-privacy-toggle`. The verb is one of `click`, `submit`, `toggle`, `select`, `open`, `error` and
+  `success`.
+- Optional properties sit beside it as `data-action-place` (which instance of a repeated element: `hero`,
+  `sidebar`), `data-action-value` (a fixed option key on a tab, radio or `<option>`) and `data-action-field` (the
+  names of the form fields that failed validation). They never carry ids, names or anything a visitor typed.
+- `error` and `success` markers are hidden `<span>` elements present on page load: a form re-rendered with errors, or
+  the page that confirms an outcome.
+- An outcome behind a redirect is a flash of type `action` whose message is the action name; `base.html.twig`
+  renders it as a hidden marker on the next page.
+
+```twig
+<form method="post" data-action="login-form-submit">
+<a href="..." class="button" data-action="event-share-click" data-action-place="sidebar">
+```
+
+```php
+$this->addFlash('action', 'support-form-success');
+```
+
+A listener is one script, delivered through `getJavascripts()` or a `HeadHtmlProviderInterface`, that binds
+delegated `click`, `change` and `submit` handlers on the document and reads the attributes. Admin templates carry no
+markers. Your own plugin's templates can carry them too; name the area after your plugin key.
+
+---
+
 ### Footer\BarProviderInterface
 
 **Purpose:** Contribute markup to a full-width bar under the footer columns, on every page that renders the footer -

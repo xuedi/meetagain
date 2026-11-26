@@ -85,6 +85,7 @@ final class WishlistController extends AbstractController
             'item_id' => $itemId,
         ]);
         $this->addFlash('success', 'wishlist_entry.flash_added');
+        $this->addFlash('action', 'wishlist-add-success');
 
         return $this->backTo($request);
     }

@@ -31,6 +31,7 @@ enum EntityAction: string
     case CreateGlossary = 'create_glossary';
     case DeleteGlossary = 'delete_glossary';
     case CreateSupportRequest = 'create_support_request';
+    case DeleteSupportRequest = 'delete_support_request';
     case CreateEventItemAssociation = 'create_event_item_association';
     case DeleteEventItemAssociation = 'delete_event_item_association';
 }

@@ -12,7 +12,7 @@
                 <p class="mb-3">{{ 'karaoke_lookup.video_title'|trans({'%title%': lookup.videoTitle}) }}</p>
             {% endif %}
 
-            <form method="get" action="{{ song ? path('app_plugin_karaoke_lookup', {id: song.id}) : path('app_plugin_karaoke_find') }}" class="box">
+            <form data-action="karaoke-lookup-submit" method="get" action="{{ song ? path('app_plugin_karaoke_lookup', {id: song.id}) : path('app_plugin_karaoke_find') }}" class="box">
                 {% if link %}<input type="hidden" name="link" value="{{ link }}">{% endif %}
                 <div class="columns is-align-items-flex-end">
                     <div class="column">
@@ -69,7 +69,7 @@
                         <div class="buttons are-small">
                             {% if song %}
                                 {% if row.timingsOnly %}
-                                    <form method="post" action="{{ path('app_plugin_karaoke_lookup_timings', {id: song.id}) }}">
+                                    <form data-action="karaoke-timings-apply-submit" method="post" action="{{ path('app_plugin_karaoke_lookup_timings', {id: song.id}) }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_karaoke_lookup_timings' ~ song.id) }}">
                                         <input type="hidden" name="pick" value="{{ candidate.key }}">
                                         <button type="submit" class="button is-link mb-0">
@@ -78,11 +78,11 @@
                                         </button>
                                     </form>
                                 {% endif %}
-                                <a href="{{ path('app_plugin_karaoke_edit', {id: song.id, pick: candidate.key}) }}" class="button">
+                                <a data-action="karaoke-pick-replace-click" href="{{ path('app_plugin_karaoke_edit', {id: song.id, pick: candidate.key}) }}" class="button">
                                     {{ 'karaoke_lookup.button_replace'|trans }}
                                 </a>
                             {% else %}
-                                <a href="{{ path('app_plugin_karaoke_new', {link: link, pick: candidate.key}) }}" class="button is-link">
+                                <a data-action="karaoke-pick-use-click" href="{{ path('app_plugin_karaoke_new', {link: link, pick: candidate.key}) }}" class="button is-link">
                                     {{ 'karaoke_lookup.button_use'|trans }}
                                 </a>
                             {% endif %}
@@ -95,7 +95,7 @@
                 {% if song %}
                     <a href="{{ path('app_plugin_karaoke_edit', {id: song.id}) }}" class="button">{{ 'karaoke_lookup.button_back_to_edit'|trans }}</a>
                 {% else %}
-                    <a href="{{ path('app_plugin_karaoke_new', {link: link}) }}" class="button">{{ 'karaoke_lookup.button_none_fits'|trans }}</a>
+                    <a data-action="karaoke-pick-none-click" href="{{ path('app_plugin_karaoke_new', {link: link}) }}" class="button">{{ 'karaoke_lookup.button_none_fits'|trans }}</a>
                 {% endif %}
             </div>
             <p class="is-size-7 has-text-grey">{{ 'karaoke_lookup.attribution'|trans }}</p>

@@ -19,7 +19,7 @@
                             {% include 'profile/_partials/activity.html.twig' with { 'activity': activity} %}
                         {% endfor %}
                         {% if activities|length > initialActivityCount %}
-                            <details class="activities-load-more">
+                            <details data-action="profile-activity-more-open" class="activities-load-more">
                                 <summary class="button is-fullwidth mt-3">
                                     {{ 'profile_social.button_load_all'|trans }}
                                 </summary>
@@ -39,6 +39,7 @@
                         include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': friends,
+                            'actionPlace': 'friends',
                             'title': 'profile_social.list_friends_title'|trans,
                             'buttonTitle': 'profile_social.button_unfollow'|trans,
                             'buttonColor': 'is-danger'
@@ -49,6 +50,7 @@
                         include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': following,
+                            'actionPlace': 'following',
                             'title': 'profile_social.list_following_title'|trans,
                             'buttonTitle': 'profile_social.button_unfollow'|trans,
                             'buttonColor': 'is-danger'
@@ -59,6 +61,7 @@
                         include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': followers,
+                            'actionPlace': 'followers',
                             'title': 'profile_social.list_followers_title'|trans,
                             'buttonTitle': 'profile_social.button_follow_back'|trans,
                             'buttonColor': 'is-success'

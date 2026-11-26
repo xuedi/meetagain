@@ -15,7 +15,7 @@
         {% endfor %}
 
         <div class="navbar-item">
-            <details class="navbar-burger-submenu">
+            <details data-action="nav-more-open" class="navbar-burger-submenu">
                 <summary>{{ 'chrome.menu_more'|trans }}</summary>
                 <aside class="menu pl-3 mt-2">
                     <p class="menu-label">{{ get_footer_column_title('col2') ?: ('chrome.footer_col_platform' | trans) }}</p>
@@ -63,14 +63,14 @@
         {% if is_granted('ROLE_USER') %}
             <form action="{{ path('app_security_logout') }}" method="post" class="is-contents">
                 <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
-                <button type="submit" class="navbar-item LinkLikeButton is-column-fill">
+                <button data-action="nav-logout-click" data-action-place="burger" type="submit" class="navbar-item LinkLikeButton is-column-fill">
                     <span class="icon mr-2"><i class="fa fa-sign-out"></i></span>
                     {{ "chrome.menu_profile_logout" | trans }}
                 </button>
             </form>
         {% else %}
             {% set loginTarget = app.request.method == 'GET' and (app.request.attributes.get('_route') ?? '') not in ['app_login', 'app_register', 'app_reset', 'app_reset_password', 'app_register_confirm_email'] ? {'redirect': app.request.requestUri} : {} %}
-            <a class="navbar-item" href="{{ path('app_login', loginTarget) }}">
+            <a data-action="nav-login-click" data-action-place="burger" class="navbar-item" href="{{ path('app_login', loginTarget) }}">
                 <span class="icon mr-2"><i class="fa fa-sign-in"></i></span>
                 {{ "chrome.menu_login" | trans }}
             </a>
@@ -85,7 +85,7 @@
         {% if altLanguages|length > 0 %}
             <hr class="dropdown-divider"/>
             <div class="navbar-item">
-                <details class="navbar-burger-submenu" data-language-switcher>
+                <details data-action="nav-language-open" data-action-place="burger" class="navbar-burger-submenu" data-language-switcher>
                     <summary aria-label="{{ 'chrome.aria_select_language'|trans }}">
                         <span class="is-inline-flex is-align-items-center">
                             <figure class="flag-icon mr-3">
@@ -98,7 +98,7 @@
                         <ul class="menu-list">
                             {% for code, link in altLanguages %}
                                 <li>
-                                    <a class="is-flex is-align-items-center" href="{{ link }}" hreflang="{{ code }}">
+                                    <a data-action="nav-language-click" data-action-place="burger" class="is-flex is-align-items-center" href="{{ link }}" hreflang="{{ code }}">
                                         <figure class="flag-icon mr-3">
                                             <img class="is-flag" src="{{ asset('images/flags/' ~ code ~ '.svg') }}" width="32" height="24" alt=""/>
                                         </figure>

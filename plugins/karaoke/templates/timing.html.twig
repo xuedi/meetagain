@@ -28,11 +28,11 @@
                             'loadUrl': path('app_plugin_karaoke_timing', {id: song.id})
                         } only %}
                         <div class="buttons mt-3 is-hidden" data-karaoke-timing-controls>
-                            <button type="button" class="button is-link is-medium" data-karaoke-stamp>
+                            <button data-action="karaoke-timing-stamp-click" type="button" class="button is-link is-medium" data-karaoke-stamp>
                                 <span class="icon"><i class="fa fa-stopwatch"></i></span>
                                 <span>{{ 'karaoke.button_stamp'|trans }}</span>
                             </button>
-                            <button type="button" class="button is-medium" data-karaoke-undo>
+                            <button data-action="karaoke-timing-undo-click" type="button" class="button is-medium" data-karaoke-undo>
                                 <span class="icon"><i class="fa fa-rotate-left"></i></span>
                                 <span>{{ 'karaoke.button_undo'|trans }}</span>
                             </button>
@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <div class="column is-6">
-                    <form method="post" action="{{ path('app_plugin_karaoke_timing', {id: song.id}) }}">
+                    <form data-action="karaoke-timing-submit" method="post" action="{{ path('app_plugin_karaoke_timing', {id: song.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_karaoke_timing' ~ song.id) }}">
                         <div class="field">
                             <label class="label" for="karaoke-offset">{{ 'karaoke.field_offset'|trans }}</label>
@@ -71,7 +71,7 @@
                             </tbody>
                         </table>
                         <div class="buttons is-right">
-                            <a href="{{ path('app_plugin_karaoke_show', {id: song.id}) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            <a data-action="karaoke-cancel-click" data-action-place="timing" href="{{ path('app_plugin_karaoke_show', {id: song.id}) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                             <button type="submit" class="button is-link">{{ 'karaoke.button_save_timing'|trans }}</button>
                         </div>
                     </form>

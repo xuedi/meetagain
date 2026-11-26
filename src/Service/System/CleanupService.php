@@ -39,6 +39,7 @@ use Throwable;
 readonly class CleanupService implements TaskInterface
 {
     public const int SUPPORT_THREAD_STALE_DAYS = 180;
+    public const int RESOLVED_SUPPORT_REQUEST_RETENTION_DAYS = 60;
     public const int GHOSTED_REGISTRATION_DAYS = 10;
     public const int PENDING_IMPORT_MAX_HOURS = 24;
     public const int EXPORT_MAX_HOURS = 24;
@@ -85,10 +86,11 @@ readonly class CleanupService implements TaskInterface
     public function getDescription(): string
     {
         return sprintf(
-            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than %d days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours and every export archive older than %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. It blanks the IP address and user agent recorded with a registration after %d days and the IP address of a login-measures activity once the security measure log retention has passed, deletes login activities older than %d days, and removes the reporter, the reporter contact and the free text from moderation, item and image reports resolved more than %d days ago, keeping the reported author, the reason, the status and the dates. The run message counts each step.',
+            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than %d days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, deletes support requests resolved more than %d days ago with their messages, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours and every export archive older than %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. It blanks the IP address and user agent recorded with a registration after %d days and the IP address of a login-measures activity once the security measure log retention has passed, deletes login activities older than %d days, and removes the reporter, the reporter contact and the free text from moderation, item and image reports resolved more than %d days ago, keeping the reported author, the reason, the status and the dates. The run message counts each step.',
             self::IMAGE_CACHE_BUST_DAYS,
             self::GHOSTED_REGISTRATION_DAYS,
             self::SUPPORT_THREAD_STALE_DAYS,
+            self::RESOLVED_SUPPORT_REQUEST_RETENTION_DAYS,
             self::PENDING_IMPORT_MAX_HOURS,
             self::EXPORT_MAX_HOURS,
             self::INCIDENT_RETENTION_DAYS,
@@ -110,6 +112,9 @@ readonly class CleanupService implements TaskInterface
 
             $autoResolvedCount = $this->autoResolveStaleSupportThreads();
             $this->logger->info('Stale support threads auto-resolved', ['count' => $autoResolvedCount]);
+
+            $supportDeletedCount = $this->deleteResolvedSupportRequests();
+            $this->logger->info('Resolved support requests deleted', ['count' => $supportDeletedCount]);
 
             $verifyCount = $this->expireSupportEmailVerifications();
             $this->logger->info('Expired support email verifications cleared', ['count' => $verifyCount]);
@@ -136,10 +141,11 @@ readonly class CleanupService implements TaskInterface
             $this->logger->info('Resolved reports anonymised', ['count' => $reportCount]);
 
             $message = sprintf(
-                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, export_archives: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d, registration_meta_blanked: %d, logins: %d, login_measure_ips_blanked: %d, reports_anonymised: %d',
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_requests_deleted: %d, support_email_verifications_expired: %d, import_archives: %d, export_archives: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d, registration_meta_blanked: %d, logins: %d, login_measure_ips_blanked: %d, reports_anonymised: %d',
                 $imageCount,
                 $regCount,
                 $autoResolvedCount,
+                $supportDeletedCount,
                 $verifyCount,
                 $importCount,
                 $exportCount,
@@ -292,6 +298,18 @@ readonly class CleanupService implements TaskInterface
         }
 
         return $count;
+    }
+
+    public function deleteResolvedSupportRequests(): int
+    {
+        $cutoff = $this->clock->now()->modify(sprintf('-%d days', self::RESOLVED_SUPPORT_REQUEST_RETENTION_DAYS));
+
+        $deletedIds = $this->supportRequestRepo->deleteResolvedBefore($cutoff);
+        foreach ($deletedIds as $id) {
+            $this->entityActionDispatcher->dispatch(EntityAction::DeleteSupportRequest, $id);
+        }
+
+        return count($deletedIds);
     }
 
     public function removeGhostedRegistrations(): int

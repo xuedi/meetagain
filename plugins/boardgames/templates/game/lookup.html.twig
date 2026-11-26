@@ -6,7 +6,7 @@
 <h1 class="title">{{ 'boardgames_game.page_title_lookup'|trans }}</h1>
 
 <div class="box">
-    {{ form_start(form, {'method': 'GET', 'action': path('app_plugin_boardgames_game_lookup')}) }}
+    {{ form_start(form, {'method': 'GET', 'action': path('app_plugin_boardgames_game_lookup'), 'attr': {'data-action': 'boardgames-lookup-submit'}}) }}
     <div class="field is-grouped">
         <div class="control is-expanded">
             {{ form_widget(form.query, {'attr': {'class': 'input'}}) }}
@@ -33,7 +33,7 @@
                     {% if result.yearPublished %}<p class="is-size-7">{{ result.yearPublished }}</p>{% endif %}
                     {% if result.playerRange %}<p class="is-size-7">{{ 'boardgames_game.players_short'|trans({'%range%': result.playerRange}) }}</p>{% endif %}
 
-                    <form method="POST" action="{{ path('app_plugin_boardgames_game_import') }}" class="mt-2">
+                    <form data-action="boardgames-import-submit" method="POST" action="{{ path('app_plugin_boardgames_game_import') }}" class="mt-2">
                         <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_game_import') }}">
                         <input type="hidden" name="externalId" value="{{ result.externalId }}">
                         <input type="hidden" name="source" value="{{ result.source.value }}">

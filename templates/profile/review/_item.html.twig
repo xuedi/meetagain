@@ -36,18 +36,18 @@
         <div class="column is-narrow">
             <div class="buttons are-small">
                 {% if item.detailUrl is not null %}
-                <a href="{{ item.detailUrl }}" class="button is-link is-outlined">
+                <a data-action="profile-review-details-click" href="{{ item.detailUrl }}" class="button is-link is-outlined">
                     {{ 'profile_review.link_details'|trans }}
                 </a>
                 {% endif %}
-                <a href="{{ path('app_profile_review_approve', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
+                <a data-action="profile-review-approve-click" href="{{ path('app_profile_review_approve', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
                    class="button is-success"
                    data-post
                    data-csrf-token="{{ csrfToken }}">
                     {{ (item.approveLabelKey ?? 'profile_review.button_approve')|trans }}
                 </a>
                 {% if item.canDeny %}
-                <a href="{{ path('app_profile_review_deny', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
+                <a data-action="profile-review-deny-click" href="{{ path('app_profile_review_deny', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
                    class="button is-danger is-outlined"
                    data-post
                    data-csrf-token="{{ csrfToken }}">

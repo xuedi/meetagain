@@ -61,11 +61,11 @@
 
         {% if is_granted('ROLE_STEWARD') %}
         <div class="mt-4 buttons">
-            <a href="{{ path('app_plugin_films_film_edit', {id: film.id}) }}" class="button is-small">
+            <a data-action="films-edit-click" href="{{ path('app_plugin_films_film_edit', {id: film.id}) }}" class="button is-small">
                 <span class="icon"><i class="fa fa-edit"></i></span>
                 <span>{{ 'films_film.button_edit'|trans }}</span>
             </a>
-            <a href="{{ path('app_plugin_films_film_delete', {id: film.id}) }}"
+            <a data-action="films-delete-click" href="{{ path('app_plugin_films_film_delete', {id: film.id}) }}"
                class="button is-small is-danger is-light"
                data-post
                data-csrf-token="{{ csrf_token('app_plugin_films_film_delete' ~ film.id) }}"

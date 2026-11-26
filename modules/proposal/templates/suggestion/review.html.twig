@@ -27,7 +27,7 @@
                     {% if canReview and suggestion.pending %}
                         <p class="has-text-grey mb-4">{{ 'review_suggestion.intro'|trans }}</p>
 
-                        {{ form_start(form, {action: path('app_review_suggestion_approve', {id: suggestion.id})}) }}
+                        {{ form_start(form, {action: path('app_review_suggestion_approve', {id: suggestion.id}), attr: {'data-action': 'proposal-suggestion-approve-submit'}}) }}
                         <div class="box">
                             {{ form_widget(form) }}
                             <div class="field mt-5">
@@ -41,7 +41,7 @@
                         {{ form_end(form) }}
 
                         <div class="box">
-                            <a href="{{ path('app_review_suggestion_reject', {id: suggestion.id}) }}"
+                            <a data-action="proposal-suggestion-reject-click" href="{{ path('app_review_suggestion_reject', {id: suggestion.id}) }}"
                                class="button is-danger is-outlined"
                                data-post
                                data-csrf-token="{{ csrf_token('suggestion' ~ suggestion.id) }}">
@@ -62,7 +62,7 @@
                             </table>
                             {% if isProposer and suggestion.pending %}
                                 <div class="has-text-right">
-                                    <a href="{{ path('app_review_suggestion_withdraw', {id: suggestion.id}) }}"
+                                    <a data-action="proposal-suggestion-withdraw-click" href="{{ path('app_review_suggestion_withdraw', {id: suggestion.id}) }}"
                                        class="button is-small"
                                        data-post
                                        data-csrf-token="{{ csrf_token('suggestion' ~ suggestion.id) }}">

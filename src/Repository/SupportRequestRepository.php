@@ -134,6 +134,34 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return list<int> */
+    public function deleteResolvedBefore(DateTimeImmutable $before): array
+    {
+        $ids = $this
+            ->createQueryBuilder('sr')
+            ->select('sr.id')
+            ->where('sr.status = :resolved')
+            ->andWhere('COALESCE(sr.resolvedAt, sr.lastActivityAt, sr.createdAt) < :before')
+            ->setParameter('resolved', SupportRequestStatus::Resolved)
+            ->setParameter('before', $before)
+            ->getQuery()
+            ->getSingleColumnResult();
+        $ids = array_map(static fn(mixed $id): int => (int) $id, $ids);
+        if ($ids === []) {
+            return [];
+        }
+
+        $this
+            ->createQueryBuilder('sr')
+            ->delete()
+            ->where('sr.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return $ids;
+    }
+
     /** @return SupportRequest[] */
     public function findExpiredEmailVerifications(DateTimeImmutable $now): array
     {

@@ -11,7 +11,7 @@
     </div>
     {% if canEditExternalRsvp %}
         <div class="level-item">
-            <form method="post" action="{{ path('app_event_external_rsvp', {'event': event.id}) }}">
+            <form data-action="event-external-submit" method="post" action="{{ path('app_event_external_rsvp', {'event': event.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('app_event_external_rsvp' ~ event.id) }}">
                 <div class="field has-addons mb-0">
                     <p class="control">
@@ -35,14 +35,14 @@
             <span class="tag is-danger is-light">{{ "events.tag_event_canceled"|trans }}</span>
         {% elseif is_granted('ROLE_USER') %}
             {% if event.rsvp.contains(app.user) %}
-                <a href="{{ path('app_event_toggle_rsvp', {'event': event.id}) }}"
+                <a data-action="event-rsvp-leave-click" href="{{ path('app_event_toggle_rsvp', {'event': event.id}) }}"
                    class="button is-danger is-small ml-4"
                    data-post
                    data-csrf-token="{{ csrf_token('app_event_toggle_rsvp' ~ event.id) }}">
                     <span class="icon"><i class="fa fa-minus"></i></span><span>{{ 'events.button_rsvp_remove'|trans }}</span>
                 </a>
             {% else %}
-                <a href="{{ path('app_event_toggle_rsvp', {'event': event.id}) }}"
+                <a data-action="event-rsvp-join-click" href="{{ path('app_event_toggle_rsvp', {'event': event.id}) }}"
                    class="button is-success is-small ml-4"
                    data-post
                    data-csrf-token="{{ csrf_token('app_event_toggle_rsvp' ~ event.id) }}">
@@ -64,7 +64,7 @@
                     {% if showControls or guests > 0 %}
                         <footer class="card-footer rsvp-guest-footer">
                             {% if showControls %}
-                                <a href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'remove'}) }}"
+                                <a data-action="event-guest-remove-click" href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'remove'}) }}"
                                    class="card-footer-item rsvp-guest-btn{% if guests == 0 %} is-disabled{% endif %}"
                                    data-post
                                    data-csrf-token="{{ csrf_token('app_event_rsvp_guests' ~ event.id) }}"
@@ -78,7 +78,7 @@
                             <span class="card-footer-item rsvp-guest-count"
                                   title="{{ 'events.rsvp_guests_badge'|trans({'%count%': guests}) }}">+{{ guests }}</span>
                             {% if showControls %}
-                                <a href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'add'}) }}"
+                                <a data-action="event-guest-add-click" href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'add'}) }}"
                                    class="card-footer-item rsvp-guest-btn"
                                    data-post
                                    data-csrf-token="{{ csrf_token('app_event_rsvp_guests' ~ event.id) }}"

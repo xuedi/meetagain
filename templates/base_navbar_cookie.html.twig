@@ -1,6 +1,6 @@
 <div class="navbar-item dropdown is-hoverable is-right" id="cookie-consent-dropdown" role="region" aria-label="{{ "cookie.consent_headline" | trans }}">
     <div class="dropdown-trigger">
-        <button
+        <button data-action="cookie-consent-open" data-action-place="navbar"
             class="button cookie-button"
             aria-haspopup="dialog"
             aria-expanded="false"
@@ -25,7 +25,7 @@
                             <div class="list-item-content">
                                 <div class="list-item-title">
                                     <label class="checkbox" for="osm_consent_checkbox">
-                                        <input
+                                        <input data-action="cookie-osm-toggle" data-action-place="navbar"
                                             type="checkbox"
                                             name="osm_consent_checkbox"
                                             {% if show_osm() %}checked{% endif %}
@@ -44,7 +44,7 @@
                             <div class="list-item-content">
                                 <div class="list-item-title">
                                     <label class="checkbox" for="external_media_consent_checkbox">
-                                        <input
+                                        <input data-action="cookie-media-toggle" data-action-place="navbar"
                                             type="checkbox"
                                             name="external_media_consent_checkbox"
                                             {% if show_external_media() %}checked{% endif %}
@@ -62,21 +62,21 @@
                     </div>
                 </div>
                 <div class="navbar-item">
-                    <button
+                    <button data-action="cookie-accept-click" data-action-place="navbar"
                         type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_accept') }}"
                         data-token="{{ csrf_token('cookie_accept') }}"
                         aria-label="{{ "cookie.button_accept" | trans }}"
                     >{{ "cookie.button_accept" | trans }}</button>
-                    <button
+                    <button data-action="cookie-deny-click" data-action-place="navbar"
                         type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_deny') }}"
                         data-token="{{ csrf_token('cookie_deny') }}"
                         aria-label="{{ "cookie.button_deny" | trans }}"
                     >{{ "cookie.button_deny" | trans }}</button>
-                    <a
+                    <a data-action="cookie-status-click" data-action-place="navbar"
                         href="{{ path('app_cookie') }}"
                         class="button"
                         aria-label="{{ "cookie.button_status" | trans }}"

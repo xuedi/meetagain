@@ -14,7 +14,7 @@
                 <p class="mb-4 has-text-grey">{{ 'venue_ballot.close_intro'|trans }}</p>
             {% endif %}
 
-            <form method="post" action="{{ path('app_venue_ballot_close', {id: ballot.id}) }}">
+            <form data-action="venue-settle-submit" method="post" action="{{ path('app_venue_ballot_close', {id: ballot.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('venue_ballot_close' ~ ballot.id) }}">
 
                 <div class="mb-4">
@@ -34,7 +34,7 @@
                 </div>
 
                 <button type="submit" class="button is-primary">{{ 'venue_ballot.button_settle'|trans }}</button>
-                <a href="{{ path('app_ballot_show', {id: ballot.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+                <a data-action="venue-settle-cancel-click" href="{{ path('app_ballot_show', {id: ballot.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
             </form>
         </div>
     </section>

@@ -23,7 +23,7 @@
     {% include '_components/comment/entry.html.twig' with {'comment': comment, 'targetType': targetType, 'targetId': targetId} %}
 {% endfor %}
 {% if canComment and is_granted('ROLE_USER') %}
-    <form method="post" action="{{ path('app_comment_create', {'targetType': targetType, 'targetId': targetId}) }}">
+    <form data-action="comment-form-submit" method="post" action="{{ path('app_comment_create', {'targetType': targetType, 'targetId': targetId}) }}">
         <input type="hidden" name="_token" value="{{ csrf_token('app_comment_create' ~ targetType ~ targetId) }}">
         <div class="field">
             <div class="control">

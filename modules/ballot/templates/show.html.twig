@@ -15,7 +15,7 @@
             </p>
 
             {% if ballot.viewerMayVote %}
-                <form method="post" action="{{ path('app_ballot_vote', {'id': ballot.id}) }}">
+                <form data-action="ballot-vote-submit" data-action-place="page" method="post" action="{{ path('app_ballot_vote', {'id': ballot.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('ballot_vote' ~ ballot.id) }}">
                     {% for candidate in ballot.candidates %}
                         <label class="panel-block">

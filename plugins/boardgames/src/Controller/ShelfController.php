@@ -45,6 +45,7 @@ final class ShelfController extends AbstractController
 
         $this->shelfService->add($this->getAuthedUser(), $game);
         $this->addFlash('success', 'boardgames_shelf.flash_added');
+        $this->addFlash('action', 'boardgames-shelf-add-success');
 
         return $this->redirectToRoute('app_plugin_boardgames_game_show', ['id' => $id]);
     }

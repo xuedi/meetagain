@@ -7,6 +7,7 @@
     {# Both layouts are in the page; a Symfony form renders its CSRF token only once, so the composer is captured once and printed in each. #}
     {% set composer %}{% if form %}{% include 'profile/messages/_composer.html.twig' %}{% endif %}{% endset %}
     {% set groupWindowSeconds = 300 %}
+    {% if form and form.vars.submitted and not form.vars.valid %}<span hidden data-action="messages-form-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
     <section class="section is-hidden-touch">
         {% include 'profile/messages/chat_desktop.html.twig' %}

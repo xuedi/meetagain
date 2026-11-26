@@ -13,14 +13,14 @@
     <ul>
         {% for key in coreTabs %}
             <li class="{{ tab == key ? 'is-active' : '' }}">
-                <a href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': key}) }}">
+                <a data-action="circulation-tab-select" data-action-value="{{ key }}" href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': key}) }}">
                     <span>{{ ('circulation.tab_' ~ key)|trans }}</span>
                 </a>
             </li>
         {% endfor %}
         {% for extra in extraTabs %}
             <li class="{{ tab == extra.key ? 'is-active' : '' }}">
-                <a href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': extra.key}) }}">
+                <a data-action="circulation-tab-select" data-action-value="{{ extra.key }}" href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': extra.key}) }}">
                     <span class="icon is-small"><i class="fa {{ extra.icon }}" aria-hidden="true"></i></span>
                     <span>{{ extra.labelKey|trans }}</span>
                 </a>

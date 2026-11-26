@@ -54,7 +54,7 @@
                 {% if share.mapLinks is not empty %}
                     <div class="buttons are-small mt-3 event-share-actions">
                         {% for link in share.mapLinks %}
-                            <a class="button is-light" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+                            <a data-action="event-share-map-click" class="button is-light" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
                                 <span class="icon"><i class="{{ link.icon }}"></i></span>
                                 <span>{{ link.label|trans }}</span>
                             </a>
@@ -89,7 +89,7 @@
                    aria-label="{{ 'events.share_link_aria'|trans }}">
         </div>
         <div class="control">
-            <button class="button is-link" type="button"
+            <button data-action="event-share-copy-click" class="button is-link" type="button"
                     data-share-copy
                     data-copied-label="{{ 'events.share_copy_done'|trans }}">
                 <span class="icon"><i class="fa-solid fa-copy"></i></span>
@@ -99,7 +99,7 @@
     </div>
 
     <div class="buttons are-small event-share-actions">
-        <button class="button is-link is-light" type="button" hidden
+        <button data-action="event-share-native-click" class="button is-link is-light" type="button" hidden
                 data-share-native
                 data-share-title="{{ share.title }}"
                 data-share-text="{{ share.teaser }}"
@@ -108,7 +108,7 @@
             <span>{{ 'events.share_native'|trans }}</span>
         </button>
         {% for target in share.shareTargets %}
-            <a class="button is-light" href="{{ target.url }}" target="_blank" rel="noopener noreferrer">
+            <a data-action="event-share-target-click" class="button is-light" href="{{ target.url }}" target="_blank" rel="noopener noreferrer">
                 {% if target.icon %}<span class="icon"><i class="{{ target.icon }}"></i></span>{% endif %}
                 <span>{{ target.label|trans }}</span>
             </a>
@@ -117,17 +117,17 @@
 
     <div class="buttons are-small event-share-actions">
         {% if inModal %}
-            <a class="button is-light" href="{{ path('app_event_share', {'id': event.id}) }}" target="_blank" rel="noopener">
+            <a data-action="event-share-print-click" data-action-place="modal" class="button is-light" href="{{ path('app_event_share', {'id': event.id}) }}" target="_blank" rel="noopener">
                 <span class="icon"><i class="fa-solid fa-print"></i></span>
                 <span>{{ 'events.share_printable'|trans }}</span>
             </a>
         {% else %}
-            <button class="button is-light" type="button" hidden data-share-print>
+            <button data-action="event-share-print-click" data-action-place="page" class="button is-light" type="button" hidden data-share-print>
                 <span class="icon"><i class="fa-solid fa-print"></i></span>
                 <span>{{ 'events.share_print'|trans }}</span>
             </button>
         {% endif %}
-        <a class="button is-light" href="{{ share.qrPngUrl }}">
+        <a data-action="event-share-qr-click" class="button is-light" href="{{ share.qrPngUrl }}">
             <span class="icon"><i class="fa-solid fa-qrcode"></i></span>
             <span>{{ 'events.share_download_qr'|trans }}</span>
         </a>

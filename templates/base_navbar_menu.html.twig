@@ -2,7 +2,7 @@
 {{ get_plugin_navbar_pills_html() }}
 <div class="navbar-item dropdown is-hoverable">
     <div class="dropdown-trigger">
-        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+        <button data-action="nav-account-open" class="button" aria-haspopup="true" aria-controls="dropdown-menu">
             <span>{{ app.user.name }}</span>
             <span class="icon is-small">
                 <i class="fas fa-angle-down" aria-hidden="true"></i>
@@ -24,7 +24,7 @@
             <hr class="dropdown-divider"/>
             <form action="{{ path('app_security_logout') }}" method="post" class="is-contents">
                 <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
-                <button type="submit" class="navbar-item LinkLikeButton">{{ "chrome.menu_profile_logout" | trans }}</button>
+                <button data-action="nav-logout-click" data-action-place="menu" type="submit" class="navbar-item LinkLikeButton">{{ "chrome.menu_profile_logout" | trans }}</button>
             </form>
         </div>
     </div>

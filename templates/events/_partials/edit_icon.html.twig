@@ -4,12 +4,12 @@
         {% for name, value in link.entry.fields %}
             <input type="hidden" name="{{ name }}" value="{{ value }}">
         {% endfor %}
-        <button type="submit" class="button-as-icon icon has-text-grey {{ sizeClass }}" title="{{ label }}" aria-label="{{ label }}">
+        <button data-action="event-edit-click" type="submit" class="button-as-icon icon has-text-grey {{ sizeClass }}" title="{{ label }}" aria-label="{{ label }}">
             <i class="fas fa-pen" aria-hidden="true"></i>
         </button>
     </form>
 {% else %}
-    <a href="{{ link.url }}" class="icon has-text-grey {{ sizeClass }}" title="{{ label }}" aria-label="{{ label }}">
+    <a data-action="event-edit-click" href="{{ link.url }}" class="icon has-text-grey {{ sizeClass }}" title="{{ label }}" aria-label="{{ label }}">
         <i class="fas fa-pen" aria-hidden="true"></i>
     </a>
 {% endif %}

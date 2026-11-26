@@ -7,7 +7,7 @@
 <p class="subtitle is-6 has-text-grey">{{ event.title(app.locale) }}</p>
 
 <div class="box">
-    <form method="get" action="{{ path('app_plugin_boardgames_request_ask', {eventId: event.id}) }}">
+    <form data-action="boardgames-ask-search-submit" method="get" action="{{ path('app_plugin_boardgames_request_ask', {eventId: event.id}) }}">
         <div class="field is-grouped">
             <div class="control is-expanded">
                 <input type="search" name="q" value="{{ term }}" class="input"
@@ -34,7 +34,7 @@
                         <a href="{{ path('app_plugin_boardgames_game_show', {id: candidate.game.id}) }}">{{ candidate.game.name }}</a>
                     </p>
                     {% for ownership in candidate.owners %}
-                        <form method="post" action="{{ path('app_plugin_boardgames_request_create', {eventId: event.id}) }}" class="mt-2">
+                        <form data-action="boardgames-ask-submit" method="post" action="{{ path('app_plugin_boardgames_request_create', {eventId: event.id}) }}" class="mt-2">
                             <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_request_create' ~ event.id) }}">
                             <input type="hidden" name="game_id" value="{{ candidate.game.id }}">
                             <input type="hidden" name="owner_id" value="{{ ownership.user.id }}">

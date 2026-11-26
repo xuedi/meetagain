@@ -77,6 +77,7 @@ final class ConfigController extends AbstractController
             $this->passwordService->changePassword($user, $form->get('newPassword')->getData());
             $this->tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
             $this->addFlash('success', 'profile_config.flash_password_changed');
+            $this->addFlash('action', 'profile-password-success');
 
             return $this->redirectToRoute('app_profile_config_password');
         }
@@ -142,6 +143,7 @@ final class ConfigController extends AbstractController
         $this->accountDeletionEmail->send(['user' => $user]);
         $this->security->logout(false);
         $this->addFlash('success', 'profile_config.flash_deleted');
+        $this->addFlash('action', 'profile-delete-success');
 
         return $this->redirectToRoute('app_login');
     }

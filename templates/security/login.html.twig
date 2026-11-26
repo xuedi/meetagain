@@ -13,11 +13,12 @@
                     <h1 class="title is-5">{{ "security.headline_login"|trans }}</h1>
                     {% set registerPath = path('app_register', registerRedirect ? {'redirect': registerRedirect} : {}) %}
 
-                    <form method="post">
+                    <form method="post" data-action="login-form-submit">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                         <input type="hidden" name="_target_path" value="{{ redirectPath }}"/>
                         <input type="hidden" name="_failure_path" value="{{ path('app_login', {'redirect': redirectPath}) }}"/>
                         {% if error %}
+                            <span hidden data-action="login-form-error"></span>
                             <div class="notification is-danger is-light mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}
                                 {% if badCredentials %}
                                     <a href="{{ path('app_reset') }}"><strong>{{ 'security.login_error_reset_link'|trans }}</strong></a>

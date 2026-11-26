@@ -19,7 +19,7 @@
     {{ menu_macros.entries(menu) }}
 </nav>
 
-<details class="box p-0 is-hidden-desktop is-menu-dropdown">
+<details data-action="profile-settings-menu-open" class="box p-0 is-hidden-desktop is-menu-dropdown">
     <summary class="px-4 py-3 has-text-weight-semibold">
         {{ activeEntry ? activeEntry.label|trans : 'profile_config.menu_settings'|trans }}
     </summary>

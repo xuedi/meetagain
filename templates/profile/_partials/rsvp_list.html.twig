@@ -16,6 +16,8 @@
                 {% endif %}
             {% else %}
                 {% include '_components/toggle.html.twig' with {
+                    'action': 'profile-rsvp-select',
+                    'action_place': 'list',
                     'link': path('app_profile_toggle_rsvp', {event: event.id}),
                     'status': event.rsvp.contains(user),
                     'csrfTokenId': 'app_profile_toggle_rsvp' ~ event.id,

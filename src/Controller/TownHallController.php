@@ -77,6 +77,7 @@ final class TownHallController extends AbstractController
             }
 
             $this->addFlash('success', 'town_hall.flash_topic_created');
+            $this->addFlash('action', 'townhall-topic-success');
 
             return $this->redirectToRoute('app_townhall_forum_topic', $this->localeWith($request, ['topicId' => $topic->getId()]));
         }
@@ -117,6 +118,7 @@ final class TownHallController extends AbstractController
         try {
             $this->topicService->rename($topic, $this->getAuthedUser(), (string) $request->request->get('title', ''));
             $this->addFlash('success', 'town_hall.flash_topic_renamed');
+            $this->addFlash('action', 'townhall-rename-success');
         } catch (InvalidTopicException $exception) {
             $this->addFlash('error', $this->reasonFlashKey($exception));
         }
@@ -136,6 +138,7 @@ final class TownHallController extends AbstractController
 
         $this->topicService->delete($topic, $this->getAuthedUser());
         $this->addFlash('success', 'town_hall.flash_topic_deleted');
+        $this->addFlash('action', 'townhall-delete-success');
 
         if ($parent instanceof Topic) {
             return $this->redirectToRoute('app_townhall_forum_topic', $this->localeWith($request, ['topicId' => $parent->getId()]));
