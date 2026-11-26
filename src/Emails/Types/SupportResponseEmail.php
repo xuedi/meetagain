@@ -9,6 +9,7 @@ use App\Emails\MockSampleFactory;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use App\Service\Security\ContentSanitizer;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -23,6 +24,7 @@ readonly class SupportResponseEmail extends EmailAbstract
         private ConfigService $config,
         #[Autowire('%kernel.default_locale%')]
         private string $defaultLocale,
+        private ContentSanitizer $sanitizer,
     ) {
         parent::__construct($blocklist, $samples, $mailer);
     }
@@ -67,7 +69,6 @@ readonly class SupportResponseEmail extends EmailAbstract
     {
         /** @var SupportRequest $request */
         $request = $context['request'];
-        $response = (string) $context['response'];
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
@@ -78,8 +79,8 @@ readonly class SupportResponseEmail extends EmailAbstract
             'lang' => $locale,
             'token' => (string) $request->getToken(),
             'name' => $request->getRequesterLabel(),
-            'originalMessage' => $request->getMessage(),
-            'response' => $response,
+            'originalMessage' => $this->sanitizer->toPlainText($request->getMessage()),
+            'response' => $this->sanitizer->toPlainText((string) $context['response']),
             'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
         ]);
 

@@ -4,7 +4,10 @@ namespace Tests\Unit\Emails;
 
 use App\Emails\MockSampleFactory;
 use App\Service\Http\RequestHostResolver;
+use App\Service\Security\ContentSanitizer;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 trait SampleFactoryTrait
@@ -19,5 +22,17 @@ trait SampleFactoryTrait
         $translator->method('trans')->willReturnArgument(0);
 
         return new MockSampleFactory($resolver, $translator, new MockClock());
+    }
+
+    private function contentSanitizer(): ContentSanitizer
+    {
+        $basic = new HtmlSanitizerConfig()
+            ->allowElement('strong')
+            ->allowElement('b')
+            ->allowElement('em')
+            ->allowElement('i')
+            ->allowElement('br');
+
+        return new ContentSanitizer(new HtmlSanitizer($basic), new HtmlSanitizer(new HtmlSanitizerConfig()->allowSafeElements()));
     }
 }

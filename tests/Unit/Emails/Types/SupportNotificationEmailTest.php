@@ -49,6 +49,7 @@ class SupportNotificationEmailTest extends TestCase
             $resolver,
             $this->createStub(LoggerInterface::class),
             $translator,
+            $this->contentSanitizer(),
         );
 
         // Act
@@ -59,6 +60,34 @@ class SupportNotificationEmailTest extends TestCase
         static::assertSame('admin1@example.com', $messages[0]->getTo()[0]->getAddress());
         static::assertSame('admin2@example.com', $messages[1]->getTo()[0]->getAddress());
         static::assertSame('The organizers', $messages[0]->getContext()['audience']);
+    }
+
+    public function testTheStoredRequestReachesTheMailAsPlainTextSoTheEngineEscapesItOnce(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
+        $admin = $this->createStub(User::class);
+        $admin->method('getEmail')->willReturn('admin@example.com');
+        $resolver = $this->createStub(RecipientResolver::class);
+        $resolver->method('resolve')->willReturn([$admin]);
+        $sanitizer = $this->contentSanitizer();
+        $emailType = new SupportNotificationEmail(
+            $this->createStub(BlocklistInterface::class),
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $config,
+            $resolver,
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            $sanitizer,
+        );
+
+        // Act
+        $messages = $emailType->compose(['request' => $this->makeRequest($sanitizer->escape("It's <b> & co\nline two"))]);
+
+        // Assert
+        static::assertSame("It's <b> & co\nline two", $messages[0]->getContext()['message']);
     }
 
     public function testNobodyResolvedLogsAWarningAndComposesNothing(): void
@@ -83,6 +112,7 @@ class SupportNotificationEmailTest extends TestCase
             $resolver,
             $logger,
             $this->createStub(TranslatorInterface::class),
+            $this->contentSanitizer(),
         );
 
         // Act
@@ -128,6 +158,7 @@ class SupportNotificationEmailTest extends TestCase
             $resolver,
             $this->createStub(LoggerInterface::class),
             $translator,
+            $this->contentSanitizer(),
         );
 
         // Act
@@ -139,14 +170,14 @@ class SupportNotificationEmailTest extends TestCase
         static::assertSame('-', $messages[0]->getContext()['email']);
     }
 
-    private function makeRequest(): SupportRequest
+    private function makeRequest(string $message = 'Help!'): SupportRequest
     {
         $request = $this->createStub(SupportRequest::class);
         $request->method('getId')->willReturn(42);
         $request->method('getAudience')->willReturn(SupportAudience::Organizer);
         $request->method('getRequesterLabel')->willReturn('John');
         $request->method('getEmail')->willReturn('john@example.com');
-        $request->method('getMessage')->willReturn('Help!');
+        $request->method('getMessage')->willReturn($message);
         $request->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-01-01'));
 
         return $request;

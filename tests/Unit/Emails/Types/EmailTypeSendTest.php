@@ -227,6 +227,7 @@ class EmailTypeSendTest extends TestCase
             $resolver,
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
+            $this->contentSanitizer(),
         );
         $context = [
             'request' => $request,
