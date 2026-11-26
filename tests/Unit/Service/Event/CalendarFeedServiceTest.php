@@ -6,6 +6,7 @@ use App\Calendar\Writer;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Location;
+use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
@@ -58,6 +59,38 @@ class CalendarFeedServiceTest extends TestCase
         // Assert
         self::assertStringNotContainsString('UID:event-7@example.org', $document);
         self::assertStringContainsString('UID:event-8@example.org', $document);
+    }
+
+    public function testAChangedFilterResultRebuildsTheCachedFeed(): void
+    {
+        // Arrange
+        $filter = $this->createStub(EventFilterService::class);
+        $filter->method('getEventIdFilter')->willReturnOnConsecutiveCalls(new EventFilterResult([7, 8], true), new EventFilterResult([8], true));
+        $service = $this->serviceWith([$this->event(7), $this->event(8)], $filter, new MockClock());
+        $service->renderFeed('example.org', 'en');
+
+        // Act
+        $document = $service->renderFeed('example.org', 'en');
+
+        // Assert
+        self::assertStringNotContainsString('UID:event-7@example.org', $document);
+        self::assertStringContainsString('UID:event-8@example.org', $document);
+    }
+
+    public function testAnUnchangedFilterResultServesTheCachedFeed(): void
+    {
+        // Arrange
+        $filter = $this->createStub(EventFilterService::class);
+        $filter->method('getEventIdFilter')->willReturn(EventFilterResult::noFilter());
+        $cache = new ArrayAdapter();
+        $clock = new MockClock();
+        $this->serviceWith([$this->event(7)], $filter, $clock, $cache)->renderFeed('example.org', 'en');
+
+        // Act
+        $document = $this->serviceWith([], $filter, $clock, $cache)->renderFeed('example.org', 'en');
+
+        // Assert
+        self::assertStringContainsString('UID:event-7@example.org', $document);
     }
 
     public function testFallsBackToATwoHourDurationWhenTheEventHasNoStop(): void
@@ -158,13 +191,24 @@ class CalendarFeedServiceTest extends TestCase
      */
     private function service(array $events, ?array $accessibleIds = null, ?MockClock $clock = null): CalendarFeedService
     {
-        $repository = $this->createStub(EventRepository::class);
-        $repository->method('findForCalendarFeed')->willReturn($events);
-
         $filter = $this->createStub(EventFilterService::class);
-        $filter->method('getAccessibleEventIds')->willReturnCallback(static fn(array $ids): array => $accessibleIds === null
-            ? $ids
-            : array_values(array_intersect($ids, $accessibleIds)));
+        $filter->method('getEventIdFilter')->willReturn($accessibleIds === null ? EventFilterResult::noFilter() : new EventFilterResult($accessibleIds, true));
+
+        return $this->serviceWith($events, $filter, $clock);
+    }
+
+    /** @param list<Event> $events */
+    private function serviceWith(array $events, EventFilterService $filter, ?MockClock $clock = null, ?ArrayAdapter $cache = null): CalendarFeedService
+    {
+        $repository = $this->createStub(EventRepository::class);
+        $repository->method('findForCalendarFeed')->willReturnCallback(static fn(
+            DateTimeInterface $from,
+            DateTimeInterface $until,
+            int $limit,
+            ?array $restrictTo,
+        ): array => $restrictTo === null
+            ? $events
+            : array_values(array_filter($events, static fn(Event $event): bool => in_array($event->getId(), $restrictTo, true))));
 
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $urlGenerator
@@ -185,7 +229,7 @@ class CalendarFeedServiceTest extends TestCase
             $config,
             $translator,
             $clock ?? new MockClock('2026-08-03 10:17:33'),
-            new ArrayAdapter(),
+            $cache ?? new ArrayAdapter(),
         );
     }
 

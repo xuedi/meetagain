@@ -926,14 +926,16 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds
      * @return Event[]
      */
-    /**
-     * @return Event[]
-     */
-    public function findForCalendarFeed(DateTimeInterface $from, DateTimeInterface $until, int $limit): array
+    public function findForCalendarFeed(DateTimeInterface $from, DateTimeInterface $until, int $limit, ?array $restrictToEventIds = null): array
     {
-        $ids = $this
+        if ($restrictToEventIds === []) {
+            return [];
+        }
+
+        $query = $this
             ->createQueryBuilder('e')
             ->select('e.id')
             ->where('e.status IN (:statuses)')
@@ -943,9 +945,12 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->setParameter('from', $from)
             ->setParameter('until', $until)
             ->orderBy('e.start', SortDirection::Ascending)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getSingleColumnResult();
+            ->setMaxResults($limit);
+        if ($restrictToEventIds !== null) {
+            $query->andWhere('e.id IN (:allowed)')->setParameter('allowed', $restrictToEventIds);
+        }
+
+        $ids = $query->getQuery()->getSingleColumnResult();
 
         if ($ids === []) {
             return [];
