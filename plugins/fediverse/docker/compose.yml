@@ -75,7 +75,7 @@ services:
       - fediverse
 
   fedi-mobilizon:
-    image: kaihuri/mobilizon:5.2.4@sha256:95c201b39d7041678273ff6c4049deaec10c5a66824885b654a2662a4d4a52fa
+    image: kaihuri/mobilizon:5.3.0@sha256:50ed30702ed8c83ac747b81fe9b64012ff1d528338c5bb1bf3b7d5f0c3214e43
     container_name: ma-fedi-mobilizon
     restart: unless-stopped
     volumes:
