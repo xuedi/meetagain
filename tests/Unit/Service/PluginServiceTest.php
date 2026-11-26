@@ -119,6 +119,23 @@ class PluginServiceTest extends TestCase
         static::assertSame([], $list);
     }
 
+    public function testTheAlwaysOnListHoldsTheSwitchedOnPluginsAGroupCannotToggle(): void
+    {
+        // Arrange
+        $subject = $this->service([
+            'wishlist' => $this->plugin(groupActivatable: false),
+            'notes' => $this->plugin(groupActivatable: false),
+            'host' => $this->plugin(system: true, groupActivatable: false),
+            'books' => $this->plugin(),
+        ], ['wishlist' => true, 'books' => true]);
+
+        // Act
+        $keys = array_column($subject->getAlwaysOnForGroupList(), 'key');
+
+        // Assert
+        static::assertSame(['wishlist'], $keys);
+    }
+
     public function testTheAdminListCarriesTheManifestAndTheState(): void
     {
         // Arrange

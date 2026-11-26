@@ -7,7 +7,9 @@ use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Item\TypeRegistry;
 use App\Plugin;
+use App\Publisher\PluginSettings\Resolver;
 use App\ValueObject\LinkCollection;
+use Plugin\Wishlist\ValueObject\Config;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Kernel implements Plugin
@@ -15,6 +17,7 @@ class Kernel implements Plugin
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly TypeRegistry $typeRegistry,
+        private readonly Resolver $resolver,
     ) {}
 
     public function getPluginKey(): string
@@ -25,6 +28,12 @@ class Kernel implements Plugin
     public function getLinkCollection(): LinkCollection
     {
         if ($this->typeRegistry->all() === []) {
+            return LinkCollection::empty();
+        }
+
+        $config = $this->resolver->resolve('wishlist');
+        \assert($config instanceof Config);
+        if (!$config->isNavLink()) {
             return LinkCollection::empty();
         }
 
