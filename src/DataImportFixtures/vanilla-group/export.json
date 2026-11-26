@@ -30,7 +30,11 @@
             "send_upcoming_digest": true,
             "show_town_hall": false
         },
-        "plugin_settings": [],
+        "plugin_settings": {
+            "wishlist": {
+                "navLink": true
+            }
+        },
         "logo_file": null
     },
     "locations": [],

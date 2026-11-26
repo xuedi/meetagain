@@ -34,6 +34,9 @@
             "karaoke": {
                 "lookupEnabled": true,
                 "lrclibEnabled": true
+            },
+            "wishlist": {
+                "navLink": true
             }
         },
         "logo_file": "images/fffdc1ec31587a16ea78f39b26775a88511f7775.png"

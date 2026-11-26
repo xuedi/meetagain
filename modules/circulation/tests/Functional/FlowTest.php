@@ -5,6 +5,7 @@ namespace Module\Circulation\Tests\Functional;
 use App\Comment\CommentService;
 use App\Entity\User;
 use App\Enum\ItemAction;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Circulation\Contract\CirculationInterface;
 use Module\Circulation\Contract\CopyStatus;
@@ -215,6 +216,23 @@ final class FlowTest extends WebTestCase
         self::assertSame(403, $memberStatus);
         self::assertSame(CopyStatus::Available, $statusAfterMember);
         self::assertSame(CopyStatus::Retired, $this->copy()->status);
+    }
+
+    public function testAStewardCannotRetireACopyOfAnotherContext(): void
+    {
+        // Arrange
+        $this->donate();
+        $copy = $this->copy();
+        $connection = self::getContainer()->get(Connection::class);
+        $connection->update('mod_circulation_copy', ['context' => 'another-group'], ['id' => $copy->ref]);
+        $steward = new Members(self::getContainer()->get(EntityManagerInterface::class))->admin('Steward');
+
+        // Act
+        $this->as($steward)->post('/en/circulation/copy/' . $copy->ref . '/retire', 'app_circulation_copy_retire' . $copy->ref);
+
+        // Assert
+        self::assertResponseStatusCodeSame(404);
+        self::assertSame(CopyStatus::Available->value, $connection->fetchOne('SELECT status FROM mod_circulation_copy WHERE id = ?', [$copy->ref]));
     }
 
     public function testAStrangerCannotOpenTheHandoverPage(): void

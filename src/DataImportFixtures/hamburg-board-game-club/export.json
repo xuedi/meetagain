@@ -35,6 +35,9 @@
                 "adapter": null,
                 "circulation": false,
                 "trustSystem": false
+            },
+            "wishlist": {
+                "navLink": true
             }
         },
         "logo_file": "images/2d8518626c3c71ebec0bc188f847b9b7c4fc516c.png"

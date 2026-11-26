@@ -1,6 +1,11 @@
 wishlist:
     menu_main: 'Wishlist'
 
+wishlist_config:
+    page_title: 'Wishlist'
+    field_nav_link: 'Show the wishlist in the navigation'
+    help_nav_link: 'Adds the wishlist link to the top menu. The wishlist pages stay reachable either way.'
+
 wishlist_attach:
     pick_from_wishlist: 'Pick from wishlist'
 

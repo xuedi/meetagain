@@ -34,6 +34,9 @@
             "dishes": {
                 "footerText": [],
                 "phoneticInList": false
+            },
+            "wishlist": {
+                "navLink": true
             }
         },
         "logo_file": "images/84b747966d39924acfc290cb056719d95c292b28.png"

@@ -201,6 +201,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
+            $this->contentSanitizer(),
         );
 
         static::assertFalse($email->guardCheck([

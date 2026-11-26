@@ -36,7 +36,8 @@ non-participant. A handover whose giver is `null` - the account was deleted - co
 The chat on the handover page is the application's comment section under the target type
 `CirculationInterface::COMMENT_TARGET`, made a **private** target by `Internal\Comment\HandoverTargetProvider`:
 only the two participants may comment, and only while the handover is `Open`; the page itself is gated to
-participants plus stewards. Handover chat never reaches the activity log, and the bell entry for an unread message
+participants plus stewards whose scope holds the copy. `Internal\DashboardService::isInScope()` - the copy's context
+and the item filter - is that scope, and it gates retiring a copy too. Handover chat never reaches the activity log, and the bell entry for an unread message
 is derived on read through `CommentService::isUnreadBy()`.
 
 ## The ledger is the truth; the holder is a cache of it

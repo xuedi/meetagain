@@ -116,10 +116,26 @@ class PluginService implements ResetInterface
      */
     public function getActivatableByGroupList(): array
     {
+        return $this->listGloballyActive(groupActivatable: true);
+    }
+
+    /**
+     * @return array<array{key: string, name: string, description: string, icon: string}>
+     */
+    public function getAlwaysOnForGroupList(): array
+    {
+        return $this->listGloballyActive(groupActivatable: false);
+    }
+
+    /**
+     * @return array<array{key: string, name: string, description: string, icon: string}>
+     */
+    private function listGloballyActive(bool $groupActivatable): array
+    {
         $globallyActive = $this->getGloballyActiveList();
         $result = [];
         foreach ($this->plugins as $key => $plugin) {
-            if (!$plugin['group_activatable'] || !in_array($key, $globallyActive, true)) {
+            if ($plugin['system'] || $plugin['group_activatable'] !== $groupActivatable || !in_array($key, $globallyActive, true)) {
                 continue;
             }
 

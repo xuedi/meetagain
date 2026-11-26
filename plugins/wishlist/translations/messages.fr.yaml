@@ -1,6 +1,11 @@
 wishlist:
     menu_main: 'Liste de souhaits'
 
+wishlist_config:
+    page_title: 'Liste de souhaits'
+    field_nav_link: 'Afficher la liste de souhaits dans la navigation'
+    help_nav_link: 'Ajoute le lien vers la liste de souhaits au menu du haut. Les pages de la liste de souhaits restent accessibles dans tous les cas.'
+
 wishlist_attach:
     pick_from_wishlist: 'Choisir dans la liste de souhaits'
 

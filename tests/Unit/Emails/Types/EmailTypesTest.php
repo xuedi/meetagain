@@ -123,6 +123,7 @@ class EmailTypesTest extends TestCase
                 $this->createStub(RecipientResolver::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(TranslatorInterface::class),
+                $this->contentSanitizer(),
             ),
             'UpcomingDigest' => new UpcomingDigestEmail(
                 $this->blocklist,
@@ -283,6 +284,7 @@ class EmailTypesTest extends TestCase
             $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
+            $this->contentSanitizer(),
         )->guardCheck([]);
     }
 

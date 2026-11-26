@@ -38,6 +38,9 @@
                 "eventBox": true,
                 "contest": true,
                 "contestSubmissionsPerMember": 2
+            },
+            "wishlist": {
+                "navLink": true
             }
         },
         "logo_file": "images/7158a15c8f0a36d8e74467f680bc23abfdc1b24e.png"

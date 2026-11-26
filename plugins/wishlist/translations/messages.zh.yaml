@@ -1,6 +1,11 @@
 wishlist:
     menu_main: '愿望清单'
 
+wishlist_config:
+    page_title: '愿望清单'
+    field_nav_link: '在导航栏中显示愿望清单'
+    help_nav_link: '在顶部菜单中添加愿望清单链接。无论是否显示，愿望清单页面都可以访问。'
+
 wishlist_attach:
     pick_from_wishlist: '从愿望清单中选择'
 

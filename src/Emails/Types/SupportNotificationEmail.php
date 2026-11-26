@@ -10,6 +10,7 @@ use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
+use App\Service\Security\ContentSanitizer;
 use App\Service\Support\RecipientResolver;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\MailerInterface;
@@ -27,6 +28,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
         private RecipientResolver $recipientResolver,
         private LoggerInterface $logger,
         private TranslatorInterface $translator,
+        private ContentSanitizer $sanitizer,
     ) {
         parent::__construct($blocklist, $samples, $mailer);
     }
@@ -89,7 +91,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
                 'audience' => $this->translator->trans($request->getAudience()->label(), [], null, $recipient->getLocale()),
                 'name' => $request->getRequesterLabel() ?? $this->translator->trans('admin_support.requester_guest', [], null, $recipient->getLocale()),
                 'email' => $request->getEmail() ?? '-',
-                'message' => $request->getMessage(),
+                'message' => $this->sanitizer->toPlainText($request->getMessage()),
                 'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
             ]);
 

@@ -27,7 +27,14 @@ class SupportResponseEmailTest extends TestCase
         $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $config, 'en');
+        $emailType = new SupportResponseEmail(
+            $blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $config,
+            'en',
+            $this->contentSanitizer(),
+        );
 
         // Act
         $messages = $emailType->compose(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -42,6 +49,31 @@ class SupportResponseEmailTest extends TestCase
         static::assertArrayHasKey('createdAt', $context);
     }
 
+    public function testStoredTextReachesTheMailAsPlainTextSoTheEngineEscapesItOnce(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
+        $sanitizer = $this->contentSanitizer();
+        $request = $this->makeRequest(message: $sanitizer->escape("It's <b> & co\nline two"));
+        $emailType = new SupportResponseEmail(
+            $this->createStub(BlocklistInterface::class),
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $config,
+            'en',
+            $sanitizer,
+        );
+
+        // Act
+        $messages = $emailType->compose(['request' => $request, 'response' => $sanitizer->basic("See you tomorrow's <b>evening</b> & bring tea\nBye")]);
+
+        // Assert
+        $context = $messages[0]->getContext();
+        static::assertSame("It's <b> & co\nline two", $context['originalMessage']);
+        static::assertSame("See you tomorrow's evening & bring tea\nBye", $context['response']);
+    }
+
     public function testARequestWithNoLanguageAndNoRequesterFallsBackToTheInstallationDefault(): void
     {
         // Arrange
@@ -50,7 +82,14 @@ class SupportResponseEmailTest extends TestCase
         $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $config, 'fr');
+        $emailType = new SupportResponseEmail(
+            $blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $config,
+            'fr',
+            $this->contentSanitizer(),
+        );
 
         // Act
         $messages = $emailType->compose(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -68,6 +107,7 @@ class SupportResponseEmailTest extends TestCase
             $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             'en',
+            $this->contentSanitizer(),
         );
 
         // Act & Assert
@@ -83,19 +123,20 @@ class SupportResponseEmailTest extends TestCase
             $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             'en',
+            $this->contentSanitizer(),
         );
 
         // Act & Assert
         static::assertFalse($emailType->guardCheck(['request' => $this->makeRequest(verified: false)]));
     }
 
-    private function makeRequest(bool $verified = true): SupportRequest
+    private function makeRequest(bool $verified = true, string $message = 'Help!'): SupportRequest
     {
         $request = $this->createStub(SupportRequest::class);
         $request->method('getAudience')->willReturn(SupportAudience::Organizer);
         $request->method('getRequesterLabel')->willReturn('John');
         $request->method('getEmail')->willReturn('john@example.com');
-        $request->method('getMessage')->willReturn('Help!');
+        $request->method('getMessage')->willReturn($message);
         $request->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-01-01'));
         $request->method('isEmailVerified')->willReturn($verified);
 

@@ -34,6 +34,9 @@
             "books": {
                 "circulation": true,
                 "trustSystem": true
+            },
+            "wishlist": {
+                "navLink": true
             }
         },
         "logo_file": "images/a9f1440f5b3767daa7735bb42b430b904fb90b16.png"

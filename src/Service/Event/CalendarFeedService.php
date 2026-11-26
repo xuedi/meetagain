@@ -38,11 +38,15 @@ final readonly class CalendarFeedService
 
     public function renderFeed(string $host, string $locale, bool $useCache = true): string
     {
-        $entries = $useCache ? $this->cache->get($this->cacheKey($host, $locale), function (ItemInterface $item) use ($locale): array {
+        $allowedEventIds = $this->eventFilterService->getEventIdFilter()->getEventIds();
+        $entries = $useCache ? $this->cache->get($this->cacheKey($host, $locale, $allowedEventIds), function (ItemInterface $item) use (
+                $locale,
+                $allowedEventIds,
+            ): array {
                 $item->expiresAt($this->hourBoundary()->modify('+1 hour'));
 
-                return $this->buildEntries($locale);
-            }) : $this->buildEntries($locale);
+                return $this->buildEntries($locale, $allowedEventIds);
+            }) : $this->buildEntries($locale, $allowedEventIds);
 
         return $this->writer->write($entries, $this->calendarName($host, $locale), $this->hourBoundary());
     }
@@ -58,24 +62,13 @@ final readonly class CalendarFeedService
     }
 
     /**
+     * @param array<int>|null $allowedEventIds
      * @return list<Entry>
      */
-    private function buildEntries(string $locale): array
+    private function buildEntries(string $locale, ?array $allowedEventIds): array
     {
-        $events = $this->eventRepository->findForCalendarFeed($this->windowStart(), $this->windowEnd(), self::MAX_ENTRIES);
-        if ($events === []) {
-            return [];
-        }
-
-        $eventIds = array_values(array_filter(array_map(static fn(Event $event): ?int => $event->getId(), $events)));
-        $accessibleIds = array_flip($this->eventFilterService->getAccessibleEventIds($eventIds));
-
         $entries = [];
-        foreach ($events as $event) {
-            if (!isset($accessibleIds[$event->getId()])) {
-                continue;
-            }
-
+        foreach ($this->eventRepository->findForCalendarFeed($this->windowStart(), $this->windowEnd(), self::MAX_ENTRIES, $allowedEventIds) as $event) {
             $entry = $this->buildEntry($event, $locale);
             if (!$entry instanceof Entry) {
                 continue;
@@ -168,9 +161,15 @@ final readonly class CalendarFeedService
         return is_string($host) ? $host : 'localhost';
     }
 
-    private function cacheKey(string $host, string $locale): string
+    /** @param array<int>|null $allowedEventIds */
+    private function cacheKey(string $host, string $locale, ?array $allowedEventIds): string
     {
-        return sprintf('calendar_feed.%s.%s', hash('xxh128', $host), $locale);
+        if ($allowedEventIds !== null) {
+            sort($allowedEventIds);
+        }
+        $scope = $allowedEventIds === null ? 'all' : hash('xxh128', implode(',', $allowedEventIds));
+
+        return sprintf('calendar_feed.%s.%s.%s', hash('xxh128', $host), $locale, $scope);
     }
 
     private function hourBoundary(): DateTimeImmutable
