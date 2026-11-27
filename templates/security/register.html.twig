@@ -11,9 +11,10 @@
                 <div class="column is-6-tablet is-5-desktop">
 
                     <h1 class="title is-5">{{ "security.headline_register"|trans }}</h1>
-                    {% set loginPath = path('app_login', redirect|default(null) ? {'redirect': redirect} : {}) %}
+                    {% set redirectQuery = redirect|default(null) ? {'redirect': redirect} : {} %}
+                    {% set loginPath = path('app_login', redirectQuery) %}
 
-                    {{ form_start(form, {attr: {'data-action': 'register-form-submit'}}) }}
+                    {{ form_start(form, {action: path('app_register', redirectQuery), attr: {'data-action': 'register-form-submit'}}) }}
                     {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="register-form-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
 
                     {% for flash_error in app.flashes('verify_email_error') %}
