@@ -65,6 +65,9 @@ Error: 错误
 'item_report.validator_explanation_long': '说明太长了。'
 'item_report.validator_good_faith': '请确认你是出于善意提交此举报。'
 'report.validator_remarks_long': '备注太长了。'
+'profile_config.validator_delete_comment_long': '评论太长了。'
+'profile_config.validator_delete_password_blank': '请输入你的密码。'
+'profile_config.validator_delete_acknowledge_missing': '请确认你了解删除账户意味着什么。'
 city_picker:
     validator_required: '请从列表中选择一个城市。'
     validator_unknown: '目录中没有这个城市。'

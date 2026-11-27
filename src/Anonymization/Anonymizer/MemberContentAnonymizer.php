@@ -34,6 +34,7 @@ readonly class MemberContentAnonymizer implements AnonymizerInterface
             Claim::columns('moderation_report', rewritten: ['subject_label', 'excerpt', 'remarks', 'resolution_note'], kept: ['subject_type']),
             Claim::columns('item_report', rewritten: ['explanation', 'notifier_name', 'notifier_email'], kept: ['item_type', 'item_label', 'locale']),
             Claim::columns('image_report', rewritten: ['remarks']),
+            Claim::emptied('account_deletion_feedback'),
         ];
     }
 
@@ -59,6 +60,8 @@ readonly class MemberContentAnonymizer implements AnonymizerInterface
             'notifier_email' => $this->scrubber->address('report'),
         ]);
 
-        $context->report(sprintf('texts: %d', $texts));
+        $feedback = $this->scrubber->empty('account_deletion_feedback');
+
+        $context->report(sprintf('texts: %d, deletion feedback: %d', $texts, $feedback));
     }
 }

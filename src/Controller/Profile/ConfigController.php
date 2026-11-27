@@ -5,12 +5,14 @@ namespace App\Controller\Profile;
 use App\Controller\AbstractController;
 use App\Emails\Types\AccountDeletionEmail;
 use App\Entity\NotificationSettings;
+use App\Form\AccountDeletionType;
 use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\ActionException;
 use App\Service\Member\ActionFailure;
 use App\Service\Member\ConsentService;
 use App\Service\Member\DataExport;
+use App\Service\Member\DeletionFeedbackService;
 use App\Service\Member\Erasure;
 use App\Service\Member\PasswordResetService;
 use App\Service\Member\UserService;
@@ -18,6 +20,8 @@ use App\Service\Notification\SettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +32,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/profile/config')]
 #[IsGranted('ROLE_USER')]
@@ -46,7 +50,7 @@ final class ConfigController extends AbstractController
         private readonly DataExport $dataExport,
         private readonly AccountDeletionEmail $accountDeletionEmail,
         private readonly Security $security,
-        private readonly TranslatorInterface $translator,
+        private readonly DeletionFeedbackService $deletionFeedback,
     ) {}
 
     #[Route('', name: 'app_profile_config', methods: ['GET'])]
@@ -101,33 +105,27 @@ final class ConfigController extends AbstractController
     public function deletePage(): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
-        $user = $this->getAuthedUser();
 
-        return $this->render('profile/config/delete.html.twig', [
-            'user' => $user,
-            'deletionBlocker' => $this->userService->findDeletionBlocker($user),
-            'erasureWindowDays' => Erasure::ERASURE_WINDOW_DAYS,
-        ]);
+        return $this->renderDeletePage($this->createDeletionForm());
     }
 
     #[Route('/delete', name: 'app_profile_config_delete', methods: ['POST'])]
     public function delete(Request $request): Response
     {
         $user = $this->getAuthedUser();
-        if (!$this->isCsrfTokenValid('app_profile_config_delete' . $user->getId(), (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
         $this->denyAccessUnlessGranted(PermissionAttribute::USER_UPDATE_SELF);
 
-        if (!$this->hasher->isPasswordValid($user, (string) $request->request->get('password'))) {
-            $this->addFlash('error', 'profile_config.flash_password_invalid');
-
-            return $this->redirectToRoute('app_profile_config_delete_page');
+        $form = $this->createDeletionForm();
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || $this->failedCsrf($form)) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        if (!$form->isValid()) {
+            return $this->renderDeletePage($form);
         }
 
-        $typed = mb_strtolower(trim((string) $request->request->get('confirmation')));
-        if ($typed !== mb_strtolower($this->translator->trans('profile_config.delete_confirm_word'))) {
-            $this->addFlash('error', 'profile_config.flash_delete_confirmation_invalid');
+        if (!$this->hasher->isPasswordValid($user, (string) $form->get('password')->getData())) {
+            $this->addFlash('error', 'profile_config.flash_password_invalid');
 
             return $this->redirectToRoute('app_profile_config_delete_page');
         }
@@ -140,6 +138,7 @@ final class ConfigController extends AbstractController
             return $this->redirectToRoute('app_profile_config_delete_page');
         }
 
+        $this->deletionFeedback->record($form->get('reason')->getData(), $form->get('comment')->getData(), $request->getLocale());
         $this->accountDeletionEmail->send(['user' => $user]);
         $this->security->logout(false);
         $this->addFlash('success', 'profile_config.flash_deleted');
@@ -225,5 +224,36 @@ final class ConfigController extends AbstractController
         }
 
         return $this->redirectToRoute('app_profile_config');
+    }
+
+    private function createDeletionForm(): FormInterface
+    {
+        return $this->createForm(AccountDeletionType::class, null, [
+            'action' => $this->generateUrl('app_profile_config_delete'),
+            'erasure_window_days' => Erasure::ERASURE_WINDOW_DAYS,
+        ]);
+    }
+
+    private function renderDeletePage(FormInterface $form): Response
+    {
+        $user = $this->getAuthedUser();
+
+        return $this->render('profile/config/delete.html.twig', [
+            'user' => $user,
+            'form' => $form,
+            'deletionBlocker' => $this->userService->findDeletionBlocker($user),
+            'erasureWindowDays' => Erasure::ERASURE_WINDOW_DAYS,
+        ]);
+    }
+
+    private function failedCsrf(FormInterface $form): bool
+    {
+        foreach ($form->getErrors() as $error) {
+            if ($error instanceof FormError && $error->getCause() instanceof CsrfToken) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

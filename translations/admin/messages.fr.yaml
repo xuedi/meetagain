@@ -638,6 +638,7 @@ admin_support:
     col_same_ip_open: 'Ouvrir la demande'
     message_ip: 'depuis %ip%'
     tab_moderation: 'Signalements de membres'
+    tab_deletion_feedback: 'Retours de suppression'
 
 admin_system:
     tab_config: 'Configuration'
@@ -774,3 +775,11 @@ admin_support_moderation:
     label_days: 'Durée de la suspension'
     option_days: '%count% jour(s)'
     flash_warn_needs_note: 'Un avertissement a besoin d''une note - c''est le texte que reçoit l''auteur.'
+
+admin_support_deletion_feedback:
+    summary_total: 'entrées'
+    col_date: 'Date'
+    col_reason: 'Raison'
+    col_locale: 'Langue'
+    col_comment: 'Commentaire'
+    empty: 'Aucun membre n''a encore laissé de retour en supprimant son compte.'
