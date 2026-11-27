@@ -8,22 +8,22 @@
         {% if deletionBlocker %}
             <div class="notification is-warning">{{ deletionBlocker|trans }}</div>
         {% else %}
-            <form data-action="profile-delete-submit" method="post" action="{{ path('app_profile_config_delete') }}">
-                <input type="hidden" name="_token" value="{{ csrf_token('app_profile_config_delete' ~ user.id) }}">
-                <div class="field">
-                    <label class="label" for="delete_password">{{ 'profile_config.form_label_password'|trans }}</label>
-                    <div class="control">
-                        <input class="input" type="password" id="delete_password" name="password" autocomplete="current-password" required>
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label" for="delete_confirmation">{{ 'profile_config.form_label_delete_confirmation'|trans({'%word%': 'profile_config.delete_confirm_word'|trans}) }}</label>
-                    <div class="control">
-                        <input class="input" type="text" id="delete_confirmation" name="confirmation" autocomplete="off" required>
-                    </div>
-                </div>
-                <button class="button is-danger">{{ 'profile_config.button_delete'|trans }}</button>
-            </form>
+            {{ form_start(form, {attr: {'data-action': 'profile-delete-submit'}}) }}
+            {{ form_errors(form) }}
+
+            <h2 class="title is-6 mb-1">{{ 'profile_config.delete_feedback_heading'|trans }}</h2>
+            <p class="has-text-grey is-size-7 mb-4">{{ 'profile_config.delete_feedback_intro'|trans }}</p>
+            {{ form_row(form.reason) }}
+            {{ form_row(form.comment) }}
+
+            <hr>
+
+            {{ form_row(form.password) }}
+            <div class="notification is-danger is-light">
+                {{ form_row(form.acknowledge) }}
+            </div>
+            <button class="button is-danger">{{ 'profile_config.button_delete'|trans }}</button>
+            {{ form_end(form) }}
         {% endif %}
     </div>
 {% endblock %}

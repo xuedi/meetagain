@@ -15,6 +15,7 @@ use App\Enum\EntityAction;
 use App\Enum\SecurityEventType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
+use App\EventSubscriber\KernelRequestSubscriber;
 use App\EventSubscriber\Security\LoginAttemptSubscriber;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
@@ -77,6 +78,7 @@ final class SecurityController extends AbstractController
         private readonly UserService $userService,
         #[AutowireIterator(RegistrationApprovalProviderInterface::class)]
         private readonly iterable $registrationApprovalProviders,
+        private readonly KernelRequestSubscriber $jumpBack,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE, defaults: [LoginAttemptSubscriber::ROUTE_DEFAULT => true])]
@@ -340,9 +342,13 @@ final class SecurityController extends AbstractController
 
     private function loginTarget(Request $request): ?string
     {
-        $requested = $this->sameHostPath($request->query->get('redirect'));
-        if ($requested !== null || !$request->hasPreviousSession()) {
-            return $requested;
+        return $this->sameHostPath($request->query->get('redirect')) ?? $this->sessionTarget($request) ?? $this->refererTarget($request);
+    }
+
+    private function sessionTarget(Request $request): ?string
+    {
+        if (!$request->hasPreviousSession()) {
+            return null;
         }
 
         $session = $request->getSession();
@@ -352,6 +358,18 @@ final class SecurityController extends AbstractController
         }
 
         return $this->sameHostPath($session->get('redirectUrl')) ?? $this->sameHostPath($this->localPart($request, $stored));
+    }
+
+    private function refererTarget(Request $request): ?string
+    {
+        $referer = $request->headers->get('Referer');
+        if ($referer === null || !str_starts_with($referer, $request->getSchemeAndHttpHost() . '/')) {
+            return null;
+        }
+
+        $path = $this->sameHostPath($this->localPart($request, $referer));
+
+        return $path !== null && $this->jumpBack->isJumpBackPath($path) ? $path : null;
     }
 
     private function localPart(Request $request, ?string $url): ?string

@@ -234,6 +234,9 @@ Error: Fehler
 'item_report.validator_explanation_long': 'Die Begründung ist zu lang.'
 'item_report.validator_good_faith': 'Bitte bestätige, dass du die Meldung in gutem Glauben machst.'
 'report.validator_remarks_long': 'Die Bemerkungen sind zu lang.'
+'profile_config.validator_delete_comment_long': 'Der Kommentar ist zu lang.'
+'profile_config.validator_delete_password_blank': 'Bitte gib dein Passwort ein.'
+'profile_config.validator_delete_acknowledge_missing': 'Bitte bestätige, dass du verstehst, was das Löschen deines Kontos bedeutet.'
 city_picker:
     validator_required: 'Bitte eine Stadt aus der Liste wählen.'
     validator_unknown: 'Diese Stadt ist nicht im Verzeichnis.'

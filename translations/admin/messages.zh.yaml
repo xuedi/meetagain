@@ -638,6 +638,7 @@ admin_support:
     col_same_ip_open: '打开请求'
     message_ip: '来自 %ip%'
     tab_moderation: '成员举报'
+    tab_deletion_feedback: '注销反馈'
 
 admin_system:
     tab_config: '配置'
@@ -774,3 +775,11 @@ admin_support_moderation:
     label_days: '暂停时长'
     option_days: '%count% 天'
     flash_warn_needs_note: '警告需要填写备注，作者收到的就是这段文字。'
+
+admin_support_deletion_feedback:
+    summary_total: '条记录'
+    col_date: '日期'
+    col_reason: '原因'
+    col_locale: '语言'
+    col_comment: '评论'
+    empty: '还没有成员在注销账户时留下反馈。'

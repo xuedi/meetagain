@@ -47,6 +47,12 @@ abstract class AbstractSupportController extends AbstractController
                 icon: 'user-shield',
                 isActive: $this->activeSupportTab === 'moderation',
             );
+            $tabs[] = new AdminTab(
+                label: $this->translator->trans('admin_support.tab_deletion_feedback'),
+                target: $this->generateUrl('app_admin_support_deletion_feedback'),
+                icon: 'door-open',
+                isActive: $this->activeSupportTab === 'deletion_feedback',
+            );
         }
 
         return new AdminTabs($tabs);

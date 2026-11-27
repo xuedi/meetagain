@@ -69,8 +69,7 @@
                 </button>
             </form>
         {% else %}
-            {% set loginTarget = app.request.method == 'GET' and (app.request.attributes.get('_route') ?? '') not in ['app_login', 'app_register', 'app_reset', 'app_reset_password', 'app_register_confirm_email'] ? {'redirect': app.request.requestUri} : {} %}
-            <a data-action="nav-login-click" data-action-place="burger" class="navbar-item" href="{{ path('app_login', loginTarget) }}">
+            <a data-action="nav-login-click" data-action-place="burger" class="navbar-item" href="{{ path('app_login') }}">
                 <span class="icon mr-2"><i class="fa fa-sign-in"></i></span>
                 {{ "chrome.menu_login" | trans }}
             </a>

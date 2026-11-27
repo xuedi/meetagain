@@ -638,6 +638,7 @@ admin_support:
     col_same_ip_open: 'Open request'
     message_ip: 'from %ip%'
     tab_moderation: 'Member Reports'
+    tab_deletion_feedback: 'Deletion Feedback'
 
 admin_system:
     tab_config: 'Config'
@@ -774,3 +775,11 @@ admin_support_moderation:
     label_days: 'Suspension length'
     option_days: '%count% day(s)'
     flash_warn_needs_note: 'A warning needs a note - it is the text the author receives.'
+
+admin_support_deletion_feedback:
+    summary_total: 'entries'
+    col_date: 'Date'
+    col_reason: 'Reason'
+    col_locale: 'Language'
+    col_comment: 'Comment'
+    empty: 'No member has left feedback when deleting their account yet.'

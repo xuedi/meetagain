@@ -638,6 +638,7 @@ admin_support:
     col_same_ip_open: 'Anfrage öffnen'
     message_ip: 'von %ip%'
     tab_moderation: 'Mitgliedermeldungen'
+    tab_deletion_feedback: 'Lösch-Feedback'
 
 admin_system:
     tab_config: 'Konfiguration'
@@ -774,3 +775,11 @@ admin_support_moderation:
     label_days: 'Dauer der Sperre'
     option_days: '%count% Tag(e)'
     flash_warn_needs_note: 'Eine Verwarnung braucht eine Notiz - sie ist der Text, den der Urheber erhält.'
+
+admin_support_deletion_feedback:
+    summary_total: 'Einträge'
+    col_date: 'Datum'
+    col_reason: 'Grund'
+    col_locale: 'Sprache'
+    col_comment: 'Kommentar'
+    empty: 'Noch kein Mitglied hat beim Löschen seines Kontos Feedback hinterlassen.'

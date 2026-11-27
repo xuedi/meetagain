@@ -1,0 +1,48 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_support_deletion_feedback.col_date'|trans }}</th>
+                <th>{{ 'admin_support_deletion_feedback.col_reason'|trans }}</th>
+                <th>{{ 'admin_support_deletion_feedback.col_locale'|trans }}</th>
+                <th>{{ 'admin_support_deletion_feedback.col_comment'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for entry in feedback %}
+                <tr>
+                    <td>
+                        {{ entry.createdAt|date('Y-m-d') }}<br>
+                        <small class="has-text-grey">{{ entry.createdAt|date('H:i:s') }}</small>
+                    </td>
+                    <td><span class="tag is-light">{{ entry.reason.label()|trans }}</span></td>
+                    <td>{{ entry.locale }}</td>
+                    <td>
+                        {% if entry.comment %}
+                            {{ entry.comment|safe_message }}
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="has-text-centered has-text-grey">
+                        {{ 'admin_support_deletion_feedback.empty'|trans }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

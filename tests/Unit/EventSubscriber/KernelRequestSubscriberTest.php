@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 class KernelRequestSubscriberTest extends TestCase
 {
@@ -29,7 +31,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/en/events', 'app_event_list');
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertSame('/en/events', $event->getRequest()->getSession()->get('redirectUrl'));
@@ -41,7 +43,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/en/events', 'app_event_list', hasSessionCookie: false);
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertFalse($event->getRequest()->getSession()->isStarted());
@@ -54,7 +56,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/en/events', 'app_event_list', ['Sec-Fetch-Dest' => 'document']);
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertSame('/en/events', $event->getRequest()->getSession()->get('redirectUrl'));
@@ -66,7 +68,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/icon.png?v126', 'app_site_icon', ['Sec-Fetch-Dest' => 'image', 'Accept' => 'image/avif,image/webp,*/*']);
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -78,7 +80,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/icon.png', 'app_site_icon', ['Accept' => 'image/*']);
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -90,7 +92,7 @@ class KernelRequestSubscriberTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $page = $this->makeEvent('GET', '/de/admin/cms/24/edit/de', 'app_admin_cms_edit', ['Sec-Fetch-Dest' => 'document'], $session);
         $icon = $this->makeEvent('GET', '/icon.png?v126', 'app_site_icon', ['Sec-Fetch-Dest' => 'image'], $session);
-        $subscriber = new KernelRequestSubscriber();
+        $subscriber = $this->subscriber();
 
         // Act
         $subscriber->onKernelRequest($page);
@@ -106,7 +108,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('POST', '/en/events', 'app_event_list');
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -118,7 +120,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/en/login', 'app_login');
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -141,7 +143,7 @@ class KernelRequestSubscriberTest extends TestCase
         foreach ($routes as $route => $path) {
             // Act
             $event = $this->makeEvent('GET', $path, $route);
-            new KernelRequestSubscriber()->onKernelRequest($event);
+            $this->subscriber()->onKernelRequest($event);
 
             // Assert
             static::assertNull($event->getRequest()->getSession()->get('redirectUrl'), "Route {$route} should be skipped");
@@ -156,7 +158,7 @@ class KernelRequestSubscriberTest extends TestCase
         foreach ($paths as $path) {
             // Act
             $event = $this->makeEvent('GET', $path, 'some_route');
-            new KernelRequestSubscriber()->onKernelRequest($event);
+            $this->subscriber()->onKernelRequest($event);
 
             // Assert
             static::assertNull($event->getRequest()->getSession()->get('redirectUrl'), "Path {$path} should be skipped");
@@ -169,7 +171,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/nope', null);
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -184,10 +186,54 @@ class KernelRequestSubscriberTest extends TestCase
         $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::SUB_REQUEST);
 
         // Act
-        new KernelRequestSubscriber()->onKernelRequest($event);
+        $this->subscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($request->getSession()->get('redirectUrl'));
+    }
+
+    public function testAJumpBackPageIsAPathThatMatchesAnEligibleRoute(): void
+    {
+        // Arrange
+        $matcher = $this->createStub(UrlMatcherInterface::class);
+        $matcher->method('match')->willReturn(['_route' => 'app_event_list']);
+
+        // Act
+        $eligible = $this->subscriber($matcher)->isJumpBackPath('/en/events?page=2');
+
+        // Assert
+        static::assertTrue($eligible);
+    }
+
+    public function testAnAuthFlowPageIsNoJumpBackPage(): void
+    {
+        // Arrange
+        $matcher = $this->createStub(UrlMatcherInterface::class);
+        $matcher->method('match')->willReturn(['_route' => 'app_register']);
+
+        // Act
+        $eligible = $this->subscriber($matcher)->isJumpBackPath('/en/register');
+
+        // Assert
+        static::assertFalse($eligible);
+    }
+
+    public function testAPathWithoutARouteIsNoJumpBackPage(): void
+    {
+        // Arrange
+        $matcher = $this->createStub(UrlMatcherInterface::class);
+        $matcher->method('match')->willThrowException(new ResourceNotFoundException());
+
+        // Act
+        $eligible = $this->subscriber($matcher)->isJumpBackPath('/nowhere');
+
+        // Assert
+        static::assertFalse($eligible);
+    }
+
+    private function subscriber(?UrlMatcherInterface $matcher = null): KernelRequestSubscriber
+    {
+        return new KernelRequestSubscriber($matcher ?? $this->createStub(UrlMatcherInterface::class));
     }
 
     /**

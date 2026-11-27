@@ -638,6 +638,7 @@ admin_support:
     col_same_ip_open: 'Abrir solicitud'
     message_ip: 'desde %ip%'
     tab_moderation: 'Denuncias de miembros'
+    tab_deletion_feedback: 'Comentarios de baja'
 
 admin_system:
     tab_config: 'Configuración'
@@ -774,3 +775,11 @@ admin_support_moderation:
     label_days: 'Duración de la suspensión'
     option_days: '%count% día(s)'
     flash_warn_needs_note: 'Una advertencia necesita una nota: es el texto que recibe el autor.'
+
+admin_support_deletion_feedback:
+    summary_total: 'entradas'
+    col_date: 'Fecha'
+    col_reason: 'Motivo'
+    col_locale: 'Idioma'
+    col_comment: 'Comentario'
+    empty: 'Ningún miembro ha dejado todavía comentarios al eliminar su cuenta.'
