@@ -387,4 +387,21 @@ class LanguageServiceTest extends TestCase
         // Act & Assert
         static::assertSame('/zh/', $this->service->replaceUriLanguageCode('/', 'zh'));
     }
+
+    public function testReplaceUriLanguageCodeKeepsTrailingSlashAndQuery(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act & Assert
+        static::assertSame('/en/cookie/', $this->service->replaceUriLanguageCode('/de/cookie/', 'en'));
+        static::assertSame('/en/event/featured/', $this->service->replaceUriLanguageCode('/de/event/featured/', 'en'));
+        static::assertSame('/en/events', $this->service->replaceUriLanguageCode('/de/events', 'en'));
+        static::assertSame('/en/cookie/?x=1', $this->service->replaceUriLanguageCode('/de/cookie/?x=1', 'en'));
+        static::assertSame('/en/events?page=2', $this->service->replaceUriLanguageCode('/de/events?page=2', 'en'));
+        static::assertSame('/en/?x=1', $this->service->replaceUriLanguageCode('/?x=1', 'en'));
+    }
 }
