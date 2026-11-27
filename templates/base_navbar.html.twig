@@ -40,8 +40,7 @@
                 {% if is_granted('ROLE_USER') %}
                     {% include 'base_navbar_menu.html.twig' %}
                 {% else %}
-                    {% set loginTarget = app.request.method == 'GET' and (app.request.attributes.get('_route') ?? '') not in ['app_login', 'app_register', 'app_reset', 'app_reset_password', 'app_register_confirm_email'] ? {'redirect': app.request.requestUri} : {} %}
-                    <a data-action="nav-login-click" data-action-place="header" class="navbar-item" href="{{ path('app_login', loginTarget) }}">{{ "chrome.menu_login" | trans }}</a>
+                    <a data-action="nav-login-click" data-action-place="header" class="navbar-item" href="{{ path('app_login') }}">{{ "chrome.menu_login" | trans }}</a>
                     {% include 'base_navbar_cookie.html.twig' %}
                 {% endif %}
                 {% include 'base_navbar_flags.html.twig' %}
