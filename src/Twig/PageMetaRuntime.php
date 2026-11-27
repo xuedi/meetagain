@@ -11,6 +11,7 @@ use App\Service\Seo\NoindexService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Markup;
 
@@ -28,6 +29,7 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
         private CanonicalUrlService $canonicalUrlService,
         private SiteNameResolver $siteNameResolver,
         private NoindexService $noindexService,
+        private TranslatorInterface $translator,
         #[AutowireIterator(MetaDescriptionProviderInterface::class)]
         private iterable $metaDescriptionProviders = [],
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
@@ -56,7 +58,7 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
         return $this->siteNameResolver->resolve();
     }
 
-    public function getMetaDescription(string $context = 'default'): string
+    public function getMetaDescription(string $context = 'default', ?string $pageFallback = null): string
     {
         foreach ($this->metaDescriptionProviders as $provider) {
             $value = $provider->getMetaDescription($context);
@@ -65,16 +67,20 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
             }
         }
 
+        if ($pageFallback !== null && $pageFallback !== '') {
+            return $pageFallback;
+        }
+
         $systemValue = $this->configService->getSeoDescription($context);
         if ($systemValue !== '') {
             return $systemValue;
         }
 
-        return match ($context) {
-            'events' => 'Browse upcoming events and meetups.',
-            'members' => 'Meet the members of this community.',
-            default => 'A community platform for local events and meetups.',
-        };
+        return $this->translator->trans(match ($context) {
+            'events' => 'chrome.meta_description_events',
+            'members' => 'chrome.meta_description_members',
+            default => 'chrome.meta_description_default',
+        });
     }
 
     public function getOrganizationSchema(): Markup

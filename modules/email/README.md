@@ -31,8 +31,7 @@ flowchart TD
 ```
 
 The guard chain is the type's own `getGuardRules()` followed by every `GuardRuleProviderInterface`'s rules for that
-identifier; the first result that is not a pass decides. `SendOutcome` reports the guard result and how many messages
-were queued.
+identifier; the first result that is not a pass decides.
 
 **The blocklist is checked on the composed recipient address**, so it covers every type, including ones whose
 recipient is not a member, without a rule having to be declared. A row queued before an address was blocked is still
@@ -46,18 +45,15 @@ enforced.
 ## The module owns the engine, not the messages
 
 What a message says and who may receive it is domain code, so it stays in the application: the email types and their
-convenience base `App\Emails\EmailAbstract`, the guard rules in `App\Emails\Guard\Rule\`, the shipped template bodies
-in `templates/email/defaults/` (served by `App\Emails\CoreTemplateProvider`), the fallback sending identity
-`App\Emails\SiteSendingIdentityProvider`, `AudienceFilterService`, which narrows installation-wide recipient lists
-before a type is ever called, and `app:email:preview`, a thin command over `PreviewSweepInterface`.
+base `App\Emails\EmailAbstract`, the guard rules, the shipped template bodies, the fallback sending identity, and
+`AudienceFilterService`, which narrows installation-wide recipient lists before a type is ever called.
 
 ## Enqueue decides everything, the send path resolves nothing
 
 Enqueue resolves the sending identity, runs the context enrichers, renders subject and body, and freezes the result
 onto the queue row: the rendered fragment, and the identity as a `_layout` snapshot. Dispatch, on a worker, reads
 only the row, lookups keyed by stored values, the layout template and the translation catalogue - no request, no
-membership query, no provider chain. `LayoutRendererTest` proves it by wrapping a frozen row with every live resolver
-replaced by one that throws.
+membership query, no provider chain.
 
 Two things stay unfrozen on purpose: the layout template and its footer strings are rendered at send time, so a
 layout or wording change reaches mail already queued. A row that carries no `_layout` is sent as the bare body with a
@@ -92,11 +88,10 @@ line breaks of an escaped value as `<br>`. The list is per template: reusing a v
 not make it raw there. Subjects are never escaped.
 
 A stored row must exist before an identifier can be queued. The seed - the `email-template-seed` action on the
-Maintenance page (`TemplateSeedAction`) or `app:email-templates:seed` - creates the missing ones in every enabled
-language and, with its overwrite flag, resets every translation to the shipped default - discarding admin edits;
-editing a default on disk does not otherwise reach an existing install. `TemplatesInterface` adds a newly enabled
-language to every stored template that lacks it, resets one template in every stored language - the call for a data
-hotfix after a default changed its variables - and removes a stored template whose definition is gone.
+Maintenance page or `app:email-templates:seed` - creates the missing ones in every enabled language, and with its
+overwrite flag resets every translation to the shipped default, discarding admin edits. Editing a default on disk does
+not otherwise reach an existing install; `TemplatesInterface` holds the calls that carry a changed default or a newly
+enabled language into stored templates.
 
 ## Scheduled mail is swept, not triggered
 
@@ -112,26 +107,18 @@ set one - the token has its own expiry.
 
 The row is the record and the message is only a doorbell (see [modules/task/README.md](../task/README.md)). Enqueue
 dispatches a `Drain` message right after its flush, and the sweep does the same after each of its flushes, so a
-triggered mail leaves within about a second. The task `email-queue` runs the same drain as the backstop for a message
+triggered mail leaves at once. The task `email-queue` runs the same drain as the backstop for a message
 that never arrived, or for a row committed inside a caller's own transaction, which a drain can claim only after that
 commit.
 
-- **A drain runs on a time budget, not a count.** It claims `Pending` rows in chunks until a chunk comes back short or
-  `EmailService::SEND_BUDGET_SECONDS` have passed; one that stopped on its budget with a full chunk dispatches another
-  `Drain` and ends, so no worker is held for long. A budget sends as much as SMTP, an HTTP API or `null://` allow in
-  the same wall time; a count would fit only the transport it was tuned for.
+- **A drain runs on a time budget, not a count** (`EmailService::SEND_BUDGET_SECONDS`), so it fits any transport;
+  one that ran out with work left dispatches another `Drain` and ends. Rows are claimed with a token in one UPDATE, so
+  two drains never send the same mail and need no deduplication.
 - **Account mails are claimed first.** A type implementing `UrgentEmailInterface` (password reset, verification) is
-  claimed ahead of every other row; all the rest keep `id` order. A bulk run of another type delays them by at most
-  one chunk, whatever the queue holds. The repository receives the identifiers from `EmailService`, which collects
-  them from the tagged types.
-- **A chunk is claimed, not selected.** `EmailQueueRepository::claimPending()` stamps a token on rows in an UPDATE that
-  repeats the claim condition, and the run sends only rows carrying its token. Two drains never send the same mail,
-  and an empty one costs one UPDATE, so drains need no deduplication.
-- **A crash loses at most the mail in flight.** Each outcome is flushed as soon as it is known, releasing its claim; a
-  process that dies mid-send leaves one mail whose claim expires after `EmailService::CLAIM_LEASE_SECONDS`, and a
-  later run sends it again. Chunks are detached as they finish, so memory stays flat however long the queue is.
-- **The sweep never marks a context done with mails unwritten.** It flushes in chunks and always before marking a
-  context sent.
+  claimed ahead of every other row, so a bulk run delays it by at most one chunk.
+- **A crash loses at most the mail in flight.** Each outcome is flushed as soon as it is known; a dead process leaves
+  one claimed mail that a later run sends again after `EmailService::CLAIM_LEASE_SECONDS`. The sweep always flushes
+  before it marks a context sent.
 
 ## Push notifications ride the enqueue
 
@@ -149,12 +136,11 @@ the task `email-delivery-sync` reports "provider unavailable" instead of failing
 
 ## The send log forgets a body first and the row later
 
-The task `email-retention` (`Retention`) clears the rendered body and the template context of a sent row after
+The task `email-retention` clears the rendered body and the template context of a sent row after
 `Retention::EMAIL_BODY_RETENTION_DAYS`, keeping its recipient, subject, template and status, and deletes sent, late
 and failed rows after `Retention::EMAIL_ROW_RETENTION_DAYS`. It never touches a pending row. A late row keeps its body
-until it is deleted, because "Clear cap & retry" sends the frozen body again. `SendlogInterface::forgetRecipient()`
-drops the mail still waiting for one address, `forgetPendingForHost()` the mail still waiting for one site, and
-`forgetAll()` every row; `BlocklistInterface::forgetAll()` empties the blocklist. Both serve anonymizing a copied
+until it is deleted, because "Clear cap & retry" sends the frozen body again. `SendlogInterface` and
+`BlocklistInterface` also forget pending mail per address or host, and everything at once, for anonymizing a copied
 instance.
 
 ## The contract
@@ -171,27 +157,18 @@ Everything outside the module talks to `Module\Email\Contract\`.
 | merged by priority   | `TemplateProviderInterface`                 | default subject, body and variables       |
 | first available wins | `DeliveryProviderInterface`                 | delivery status from the sending provider |
 
-The facades are `MailerInterface` (send, evaluate the chain, push without a mail), `TemplatesInterface`,
-`BlocklistInterface`, `SendlogInterface` and `PreviewSweepInterface` (one mock mail per type and language, for dev
-and test). Everything else in the namespace is a readonly value object or an enum. `TemplatedEmail` crosses the
+The facades are `MailerInterface`, `TemplatesInterface`, `BlocklistInterface`, `SendlogInterface` and
+`PreviewSweepInterface` (one mock mail per type and language, for dev and test). `TemplatedEmail` crosses the
 boundary as Symfony substrate: `compose()` returns a list of them.
 
 ## Surfaces
 
-The admin area lives at `/admin/email/*` behind `ROLE_ADMIN`, with routes named `app_admin_email_*` and templates
-under `@Email/`:
-
-- **Templates** - list, edit per language, preview with the type's mock data, reset to the default.
-- **Planned** - scheduled mail due soon, and every rule's verdict for one of them.
-- **Debugging** - queue any type with mock context to a chosen address. It goes through the queue and the blocklist,
-  so a worker sends it like any other.
-- **Send log** - queued and sent mail, the frozen layout rendered in a sandboxed frame, delivery status sync, and
-  "Clear cap & retry" for a row that went late.
-- **Blocklist** - add and remove addresses. Adding one that is already blocked keeps its first reason.
-
-It also contributes a bell entry for mail pending too long, the `email_queue` metrics gauge, and the tasks
-`email-queue`, `scheduled-emails`, `email-delivery-sync` and `email-retention`. The outbound permit list in `mago.toml` names every core
-class the module reaches for, each with its reason.
+The admin area behind `ROLE_ADMIN` holds the templates (edit per language, preview with mock data, reset), the planned
+scheduled mail with every rule's verdict, a debugging page that queues any type with mock context to a chosen address
+through the normal queue and blocklist, the send log with the frozen layout and delivery sync, and the blocklist,
+where re-adding an address keeps its first reason. The module also contributes a bell entry for mail pending too long,
+the `email_queue` metrics gauge, and the tasks `email-queue`, `scheduled-emails`, `email-delivery-sync` and
+`email-retention`.
 
 ## Becoming a consumer: writing a type
 

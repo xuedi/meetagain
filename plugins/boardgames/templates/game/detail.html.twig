@@ -1,6 +1,12 @@
 {% extends '@Boardgames/base_boardgames.html.twig' %}
 
 {% block title %}{{ game.name }}{% endblock %}
+{% block meta_description %}
+{%- set metaFallbackKey = game.yearPublished and game.playerRange ? 'boardgames_game.meta_description_year_players' : (game.yearPublished ? 'boardgames_game.meta_description_year' : (game.playerRange ? 'boardgames_game.meta_description_players' : null)) -%}
+{% include '_components/item/meta_description.html.twig' with {
+    text: game.description,
+    fallback: metaFallbackKey ? metaFallbackKey|trans({'%name%': game.name, '%year%': game.yearPublished, '%players%': game.playerRange}) : game.name,
+} only %}{% endblock %}
 
 {% block boardgames_body %}
 <div class="columns">

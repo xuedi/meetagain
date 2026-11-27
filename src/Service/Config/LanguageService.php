@@ -167,19 +167,23 @@ readonly class LanguageService
     public function replaceUriLanguageCode(string $link, string $newCode): string
     {
         $languages = $this->getEnabledCodes();
-        $trimmedLink = trim($link, '/');
+        $queryStart = strpos($link, '?');
+        $path = $queryStart === false ? $link : substr($link, 0, $queryStart);
+        $query = $queryStart === false ? '' : substr($link, $queryStart);
+        $trimmedPath = trim($path, '/');
 
-        if ($trimmedLink === '' || in_array($trimmedLink, $languages, true)) {
-            return sprintf('/%s/', $newCode);
+        if ($trimmedPath === '' || in_array($trimmedPath, $languages, true)) {
+            return sprintf('/%s/%s', $newCode, $query);
         }
 
-        $chunks = explode('/', $trimmedLink);
-        if (in_array($chunks[0], $languages, true)) {
-            $chunks[0] = $newCode;
-
-            return sprintf('/%s', implode('/', $chunks));
+        $chunks = explode('/', $trimmedPath);
+        if (!in_array($chunks[0], $languages, true)) {
+            return $link;
         }
 
-        return $link;
+        $chunks[0] = $newCode;
+        $trailingSlash = str_ends_with($path, '/') ? '/' : '';
+
+        return sprintf('/%s%s%s', implode('/', $chunks), $trailingSlash, $query);
     }
 }

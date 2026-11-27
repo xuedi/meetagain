@@ -41,32 +41,22 @@ flowchart TD
         C -->|no| S["ScoreCalculator over the whole context"] --> W["store map + revision"] --> A
     end
     subgraph cache["Cache backend - can be unreachable"]
-        P[("cache.trust")]
+        P[(cache.trust)]
     end
     C -.-> P
     W -.-> P
 ```
 
-One entry per context in the `cache.trust` pool, with no TTL, holding the score map plus the **combined revision**
-it was computed from:
+One entry per context in the `cache.trust` pool, with no TTL, holds the score map plus the **combined revision** it
+was computed from: every action source's `getRevision()`, the grant table's watermark for the context (moved by a
+revoke as surely as by a new vouch) and the context configuration's `updatedAt`. Every read rebuilds that revision
+from cheap aggregates and recomputes the map only when it differs. So the cache stays correct when data it does not
+own changes - a consumer's action record moves its revision and the next read sees it, with no events, tags or
+invalidation call in any consumer.
 
-- every action source's `getRevision()`, sorted so source order does not matter,
-- the grant table's watermark for the context - its row count and latest `updatedAt`, so a revoked vouch moves it as
-  surely as a new one,
-- the context configuration's `updatedAt`.
-
-Every read rebuilds that revision from cheap aggregates and recomputes the map only when it differs. This keeps the
-cache correct when data it does not own changes: a consumer's action record moves its revision and the next read sees
-it, without the consumer knowing the cache exists - no events, no tags, no invalidation call in any consumer. The
-shape suits any cache whose inputs live behind an interface the cache's owner does not control.
-
-Writes the module makes itself - a vouch, a revoke, a restored grant, a rebuild that is not report-only -
-additionally drop the key for immediate effect. `ScoreProvider` keeps the per-request memo, cleared through
-`ResetInterface`. If the cache backend is unreachable the module computes directly and logs one warning per service
-instance.
-
-A report-only rebuild compares a fresh computation against the cache and flags drift: the standing proof that nothing
-here is silently stateful.
+The module's own writes additionally drop the key for immediate effect. If the cache backend is unreachable the module
+computes directly and logs a warning. A report-only rebuild compares a fresh computation against the cache and flags
+drift: the standing proof that nothing here is silently stateful.
 
 ## A score converges without walking paths
 
@@ -76,17 +66,12 @@ score⁰(u) = base(u)
 score^{k+1}(b) = min(maxScore, base(b) + Σ_{a→b} pct(level) · score^k(a))
 ```
 
-`score¹ ≥ score⁰` pointwise, because the sum is non-negative, and the update is monotone in its input, so the
-sequence is non-decreasing; `min(maxScore, …)` bounds it above, so it converges. `ScoreCalculator` iterates until the
-largest change is under one point or `MAX_ROUNDS` is reached, then floors to integers.
-
-**Cycles need no special case.** A and B vouching for each other feed one another a shrinking contribution each
-round, and the cap bounds the result.
-
-A self-edge is dropped rather than summed; a member with no root points, no actions and no incoming vouches scores 0;
-the result is always the complete map for the context, because computing one person's score means computing
-everybody's. A context above `ScoreCalculator::MAX_GRAPH_USERS` members still runs but logs a warning - a community
-that large wants a different design.
+The sequence is non-decreasing and bounded by `maxScore`, so it converges; `ScoreCalculator` iterates until the
+largest change is under one point or `MAX_ROUNDS` is reached, then floors to integers. **Cycles need no special
+case** - two members vouching for each other feed one another a shrinking contribution, and the cap bounds the
+result. Computing one person's score means computing everybody's, so the result is always the complete map for the
+context; above `ScoreCalculator::MAX_GRAPH_USERS` members it still runs but logs a warning - a community that large
+wants a different design.
 
 ## What nobody declares does not exist
 
@@ -116,24 +101,14 @@ Nobody may learn how many points flowed from whom. The public fact is a count.
   little weight.
 - A vouch is refused when its target cannot view the context: `grant()` asks the same `AccessProviderInterface`
   chain the surfaces use.
-- After a vouch the member returns to the context's `returnUrl`; without one, to the referring page only when it is
-  on the same host, otherwise to `/`.
 
 ## Configuration holds overrides, with neutral defaults
 
-A context with no configuration row runs on the defaults in `TrustConfig`'s constructor, which validates every value,
-so an out-of-range setting cannot reach the database. No contract method writes a row and the module has no settings
-page, so every context runs on those defaults until a consumer needs to tune one and a write method is added to
-`TrustInterface`.
-
-| Setting                                              | Meaning                                                  |
-|------------------------------------------------------|----------------------------------------------------------|
-| `maxScore`                                           | hard cap on any score                                    |
-| `percentSlight`, `percentTrusted`, `percentAbsolute` | share of the voucher's score passed on, per `TrustLevel` |
-| `rootPointsPrimary`, `rootPointsSecondary`           | root points for the top authority, and one rung down     |
-| `pointsPerAction`, `capsPerAction`                   | per-action overrides of the descriptor's points and cap  |
-| `minimumToParticipate`                               | the gate `meetsMinimum()` checks; 0 disables it          |
-| `bandThresholds`                                     | the three cut-offs between the four `TrustBand`s         |
+A context with no configuration row runs on the defaults in `TrustConfig`, whose constructor validates every value, so
+an out-of-range setting cannot reach the database. `TrustConfig` holds the score cap, the share passed on per
+`TrustLevel`, the root points per authority rung, per-action point and cap overrides, the participation minimum and
+the cut-offs between the `TrustBand`s. No contract method writes a row and the module has no settings page, so every
+context runs on those defaults until a consumer needs to tune one and a write method is added to `TrustInterface`.
 
 **The two action maps hold overrides only, never the full set.** Points and caps live with the descriptor that
 declares them. Storing the whole map would mean an action a consumer adds later scores 0 in every context an
@@ -159,10 +134,8 @@ What a consumer implements, all `#[AutoconfigureTag]`ed and resolved inside the 
 When no `AccessProviderInterface` answers, access falls back to the viewer holding `ROLE_ADMIN`: a context with no
 access provider is visible to operators and nobody else.
 
-What a consumer calls: `TrustInterface` - score, the whole map (for an administrator; the viewer's own row
-otherwise), band, vouch count, the participation minimum, the explanation, the effective configuration, and a member
-managing their own vouches. The value types are `TrustAction`, `ActionDescriptor`, `ContextDescriptor`,
-`TrustConfig`, `TrustExplanation` and `TrustActionBreakdown`; `TrustLevel` and `TrustBand` are the only closed
+What a consumer calls: `TrustInterface` - scores, bands, vouch counts, the participation minimum, the explanation, the
+effective configuration, and a member managing their own vouches. `TrustLevel` and `TrustBand` are the only closed
 vocabularies, and both describe the module's own mechanics rather than any consumer's domain.
 
 ## Surfaces
@@ -171,17 +144,11 @@ Trust owns no page in anyone else's application; a consumer places its Twig frag
 returns an empty string when no describer claims the context or the viewer may not see it, so a template calls them
 unconditionally:
 
-- `trust_table(context)` - members with band and vouch count, and the raw score only for an administrator or the
-  viewer's own row. It renders only the table; place `trust_info(context)` yourself.
-- `trust_badge(context, userId)` - band plus vouch count, next to a member's name.
-- `trust_vouch_control(context, userId)` - the select over the three `TrustLevel`s plus none.
-- `trust_explanation(context [, userId])` - where a score came from.
-
-The module's one route is `app_trust_vouch`, the POST + CSRF target of the vouch control; it renders nothing.
-The rebuild is the `trust-rebuild` action on the Maintenance page (`RebuildAction`, one context or all, optionally
-report-only), and `app:trust:rebuild [--context=] [--dry-run]` runs the same from the command line, exiting non-zero
-on drift. The outbound permit list in `mago.toml` holds `App\Entity\User`, for the grant's foreign key, and nothing
-else from the application; beside it, the task module's contract for that action.
+`trust_table` lists members with band and vouch count, and the raw score only for an administrator or the viewer's
+own row, and renders no `trust_info` beside it - place that yourself; `trust_badge` sits next to a member's name; `trust_vouch_control` is the vouch select; `trust_explanation`
+shows where a score came from. The vouch control posts to the module's one route, POST + CSRF, which renders nothing.
+The rebuild is the `trust-rebuild` action on the Maintenance page, and `app:trust:rebuild` runs the same from the
+command line, exiting non-zero on drift.
 
 ## Moving data between instances
 

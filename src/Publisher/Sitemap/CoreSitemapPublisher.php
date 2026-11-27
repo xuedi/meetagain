@@ -73,7 +73,6 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             ['route' => 'app_cookie', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
             ['route' => 'app_login', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
             ['route' => 'app_register', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
-            ['route' => 'app_reset', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
         ];
 
         $urls = [];

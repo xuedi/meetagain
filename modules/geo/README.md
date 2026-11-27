@@ -28,22 +28,18 @@ flowchart LR
 
 ## The import adds and updates, it never deletes
 
-`Internal\Import\Loader` runs one dataset at a time (`Import\Dataset`): countries, states, cities, districts, then
-translations. Every row is keyed on its GeoNames id, so a second run updates in place and adds no duplicate, and a
-row GeoNames drops stays. Consumers keep plain city ids, so a deleted row would leave them pointing at nothing.
+The import runs one dataset at a time: countries, states, cities, districts, then translations. Every row is keyed on
+its GeoNames id, so a second run updates in place and adds no duplicate, and a row GeoNames drops stays. Consumers keep
+plain city ids, so a deleted row would leave them pointing at nothing.
 
-- **Worldwide, with a console-only country filter.** The import covers every country GeoNames has; the console's
-  `--country` limits every dataset to one country for development. Translations come from one alternate-name file
-  per country, streamed line by line, never the single worldwide file.
-- **What counts as a city.** A populated place that is not a section, historic, abandoned or destroyed place, above
-  the minimum population that picks the dump; a capital or a state seat is kept whatever its population. A section
-  (`PPLX`) becomes a district of the nearest more populous city of its state within `Loader::DISTRICT_RADIUS_KM`.
-- **Which name wins.** For one place and language a name GeoNames marks both preferred and short wins, then a
-  preferred name, then a plain alternate; a short name alone is a last resort, and historic or colloquial names are
-  never taken. The languages are the ones the installation has enabled (`LanguageService::getEnabledCodes()`), so
-  enabling a language and pressing play again fills its names.
-- **Countries are derived last.** `countryInfo.txt` has no coordinates, so after the cities each country takes its
-  capital's position and its cities' extent as its bounding box.
+- **Worldwide.** The import covers every country GeoNames has; translations come from one alternate-name file per
+  country, streamed line by line, never the single worldwide file.
+- **What counts as a city.** A living populated place above the minimum population that picks the dump; a capital or
+  a state seat is kept whatever its population. A section of a city becomes a district of the nearest more populous
+  city of its state, within `Loader::DISTRICT_RADIUS_KM`.
+- **Which name wins.** GeoNames' preferred and short flags rank the names of one place and language; historic or
+  colloquial names are never taken. The languages are the enabled ones, so enabling a language and pressing play
+  again fills its names.
 - **Nothing is cached between runs.** Each download lands in the system temp directory and is deleted when its
   dataset is done; the release image's root filesystem is read-only.
 
@@ -67,18 +63,13 @@ each one its own worker message, by returning the next cursor to the task module
 even with the development query log. The scope is fixed: GeoNames' download address and
 `Options::DEFAULT_MIN_POPULATION`.
 
-- **Windows keep the slug rules.** Every city window reads the whole dump once to find the most populous city of each
-  name, and takes the slugs already used from the database, so a window writes the same rows the whole file would.
-  Each window places the countries it touched; the last one that touches a country sees all its cities.
-- **Every press fetches every country's names.** Names are refreshed for each country with cities, so cities added
-  since the last press get theirs and renamed places follow GeoNames.
-- **Nothing schedules it.** An installation that never presses play never reaches the network; a periodic refresh
-  would be a task of its own.
+- **Windows keep the slug rules.** Every city window reads the whole dump to find the most populous city of each name
+  and takes the slugs already used from the database, so a window writes the same rows the whole file would.
+- **Every press fetches every country's names**, so new cities get theirs and renamed places follow GeoNames.
+- **Nothing schedules it.** An installation that never presses play never reaches the network.
 
-The console command `app:geo:import all` walks the same steps in one process and resets the container's services
-between them, as a worker does between messages. With one dataset it runs that dataset in one go. Its options
-(`--country`, `--min-population`, `--source`, `--base-url`) exist for development and the tests, which import the
-sample through `--source`.
+The console command `app:geo:import` walks the same steps in one process, or runs one dataset; its options exist for
+development and the tests, which import the sample through `--source`.
 
 ## A city has two slugs
 
@@ -90,10 +81,8 @@ country therefore has the address `berlin-2` but still answers to `berlin`.
 ## Every name arrives resolved
 
 A view carries the name in the requested language, else English, else the ASCII name; no caller sees the chain.
-`findCitiesNamed()` matches a name against the `nameSlug` of every city and its translations. `findPlaceNamed()`
-matches a single label against cities, countries and their translations, and retries with German umlauts spelled out
-(`ae`, `oe`, `ue`) folded back, so `muenchen` finds Munich.
-Search orders by population, so the well-known city of a shared name comes first.
+Name lookups match the `nameSlug` of every city and its translations, and fold spelled-out German umlauts back, so
+`muenchen` finds Munich. Search orders by population, so the well-known city of a shared name comes first.
 
 ## Attribution is an obligation
 
@@ -103,19 +92,10 @@ GeoNames data is CC BY 4.0. Every public page that renders names or positions fr
 ## The contract
 
 Everything outside the module talks to `Module\Geo\Contract\`, and the module offers no chain: `DirectoryInterface`
-looks cities up by id, by a page of ids, by country and slug, by GeoNames id and by name, searches them for the
-autocomplete, lists countries and counts cities per country. `CityView` and `CountryView` are the readonly views it
-returns. `hasCities()` says whether anything is imported and
-is memoised per service instance. The autocomplete endpoint `app_geo_cities` reads through the same directory,
-requires a login, and ignores a query shorter than `CityController::MIN_QUERY_LENGTH`.
-
-## Surfaces
-
-- **Console** - `app:geo:import` with one dataset or `all`.
-- **Maintenance page** - the `geo-import` action: a play button on its row, the step's progress while it runs, and
-  the count of every dataset as its facts.
-- **Endpoint** - `GET /{_locale}/geo/cities?country=&q=` for the city field's autocomplete.
-- **Template** - `@Geo/attribution.html.twig`.
+looks cities up and searches them, lists countries and counts cities per country, returning readonly views.
+`hasCities()` says whether anything is imported. The city field's autocomplete endpoint reads through the same
+directory, requires a login, and ignores a query shorter than `CityController::MIN_QUERY_LENGTH`. The Maintenance
+page carries the `geo-import` action, with the step's progress and every dataset's count.
 
 ## Moving data between instances
 

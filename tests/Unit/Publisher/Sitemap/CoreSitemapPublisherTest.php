@@ -36,7 +36,7 @@ use Tests\Unit\Stubs\EventStub;
 
 class CoreSitemapPublisherTest extends TestCase
 {
-    private const int STATIC_ROUTE_COUNT = 8;
+    private const int STATIC_ROUTE_COUNT = 7;
 
     public function testEmitsStaticRoutesWithLocaleAlternates(): void
     {
@@ -72,11 +72,11 @@ class CoreSitemapPublisherTest extends TestCase
             'app_cookie',
             'app_login',
             'app_register',
-            'app_reset',
         ];
         foreach ($expected as $route) {
             self::assertNotEmpty(array_filter($locs, static fn($loc) => str_contains($loc, $route)), "expected route {$route} in sitemap");
         }
+        self::assertSame([], array_values(array_filter($locs, static fn($loc) => str_contains($loc, 'app_reset'))));
     }
 
     public function testAuthRoutesUseLowPriority(): void

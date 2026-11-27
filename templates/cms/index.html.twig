@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block title %}{{ title is defined ? title : "cms.page_title_cms"|trans }}{% endblock %}
+{% block meta_description %}{{ home|default(false) ? get_meta_description('default', description|default(null)) : (description|default(null) ?: get_meta_description('default')) }}{% endblock %}
 
 {% block body %}
     {{ body|raw }}

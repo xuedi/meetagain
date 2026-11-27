@@ -3,6 +3,10 @@
 {% set dishName = dish.getTranslatedName(app.locale) %}
 
 {% block title %}{{ dishName }}{% endblock %}
+{% block meta_description %}{% include '_components/item/meta_description.html.twig' with {
+    text: dish.getTranslatedDescription(app.locale),
+    fallback: dishName,
+} only %}{% endblock %}
 
 {% block javascripts %}
     {% if dish.previewImage or dish.visibleGalleryImages|length > 0 %}

@@ -11,6 +11,9 @@ boardgames:
     event_list_tag: '%count% jeux'
 
 boardgames_game:
+    meta_description_year_players: '%name% (%year%, %players% joueurs)'
+    meta_description_year: '%name% (%year%)'
+    meta_description_players: '%name% (%players% joueurs)'
     page_title_list: 'Liste des jeux de societe'
     browser_title_list: 'Jeux de societe'
     page_title_manual: 'Ajouter un jeu manuellement'

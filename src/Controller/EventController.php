@@ -25,6 +25,7 @@ use App\Form\EventFilterType;
 use App\Form\EventGeoFilterContributor;
 use App\Item\AttachControlBuilder;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Config\SiteNameResolver;
 use App\Service\Event\CalendarFeedService;
 use App\Service\Event\EventService;
 use App\Service\Event\RsvpService;
@@ -63,6 +64,7 @@ final class EventController extends AbstractController
         private readonly AdminEventListFilterService $adminEventFilterService,
         private readonly ContributionRegistry $contributionRegistry,
         private readonly SuggestionInterface $suggestions,
+        private readonly SiteNameResolver $siteNameResolver,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
         #[AutowireIterator(AdminEntryProviderInterface::class)]
@@ -95,6 +97,7 @@ final class EventController extends AbstractController
                 'structuredList' => $structuredList,
                 'filter' => $form,
                 'time' => $time,
+                'titlePlace' => $this->siteNameResolver->resolvePlace($locale),
                 'hasFeatured' => $this->getFeaturedEvents($allowedEventIds, $locale) !== [],
                 'editLinks' => $this->editLinks(array_merge(...array_column($structuredList, 'events'))),
                 'newEventLink' => $this->newEventLink(),

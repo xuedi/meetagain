@@ -12,9 +12,12 @@ use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
+use App\Publisher\SiteName\TitlePlaceProviderInterface;
 use App\Repository\CmsRepository;
 use App\Repository\ImageRepository;
 use App\Service\Cms\CmsService;
+use App\Service\Config\ConfigService;
+use App\Service\Config\SiteNameResolver;
 use DateInterval;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,7 +29,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Twig\Environment;
@@ -50,9 +54,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cache: $this->createStub(TagAwareCacheInterface::class),
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Act
@@ -87,9 +92,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
             cache: $cacheMock,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Assert
@@ -139,9 +145,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceMock,
             cache: $cacheMock,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Act
@@ -189,7 +196,7 @@ class CmsServiceTest extends TestCase
                     return $renderedBody;
                 }
                 static::assertSame('cms/index.html.twig', $name);
-                static::assertSame(['title' => $pageTitle, 'body' => $renderedBody], $context);
+                static::assertSame(['title' => $pageTitle . ' - Site', 'description' => null, 'home' => false, 'body' => $renderedBody], $context);
                 return $expectedContent;
             });
 
@@ -264,9 +271,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceMock,
             cmsFilterService: $cmsFilterServiceMock,
             cache: $cacheMock,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Act
@@ -323,68 +331,67 @@ class CmsServiceTest extends TestCase
         $subject->invalidateImage(7);
     }
 
-    public function testHandleUsesDefaultTitleWhenPageTitleIsNull(): void
+    #[DataProvider('titleProvider')]
+    public function testHandleComposesTheTitleFromPageTitleSiteNameAndPlace(?string $pageTitle, ?string $place, string $expectedTitle): void
     {
         // Arrange
-        $locale = 'en';
-        $slug = 'page-without-title';
-        $expectedContent = 'rendered page content';
-        $blocks = new ArrayCollection([self::textBlock()]);
-
-        // Arrange
         $cmsStub = $this->createStub(Cms::class);
-        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn($blocks);
-        $cmsStub->method('getPageTitle')->willReturn(null);
+        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn(new ArrayCollection([self::textBlock()]));
+        $cmsStub->method('getPageTitle')->willReturn($pageTitle);
         $cmsStub->method('getId')->willReturn(456);
-
-        // Arrange
-        $cmsRepoStub = $this->createStub(CmsRepository::class);
-        $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsStub);
-
-        // Arrange
-        $cmsFilterServiceStub = $this->createStub(CmsFilterService::class);
-        $cmsFilterServiceStub->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
-
-        $eventFilterServiceStub = $this->createStub(EventFilterService::class);
-        $eventFilterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
-
-        // Arrange
-        $renderedBody = '<inner-body/>';
-        $twigMock = $this->createMock(Environment::class);
-        $twigMock
-            ->expects($this->exactly(2))
-            ->method('render')
-            ->willReturnCallback(static function (string $name, array $context) use ($blocks, $renderedBody, $expectedContent): string {
-                if ($name === 'cms/_blocks.html.twig') {
-                    static::assertSame(['blocks' => $blocks, 'images' => []], $context);
-                    return $renderedBody;
-                }
-                static::assertSame('cms/index.html.twig', $name);
-                static::assertSame(['title' => 'cms.page_no_title_fallback', 'body' => $renderedBody], $context);
-                return $expectedContent;
-            });
-
-        $cacheStub = $this->createStub(TagAwareCacheInterface::class);
-        $cacheStub->method('get')->willReturnCallback(static fn(string $key, callable $callback, ?float $beta = null): string => $callback(
-            self::createCacheItem(),
-        ));
-
-        $subject = new CmsService(
-            twig: $twigMock,
-            repo: $cmsRepoStub,
-            eventFilterService: $eventFilterServiceStub,
-            cmsFilterService: $cmsFilterServiceStub,
-            cache: $cacheStub,
-            translator: new IdentityTranslator(),
-            requestStack: $this->createStub(RequestStack::class),
-            imageRepo: $this->createStub(ImageRepository::class),
-        );
+        $capturedContext = [];
 
         // Act
-        $response = $subject->handle($locale, $slug, new Response());
+        $this->createRenderingService($cmsStub, $capturedContext, $this->siteNameResolver('Weiqi Club', $place))->handle('en', 'about', new Response());
 
         // Assert
-        static::assertSame($expectedContent, $response->getContent());
+        static::assertSame($expectedTitle, $capturedContext['title']);
+    }
+
+    /**
+     * @return iterable<string, array{?string, ?string, string}>
+     */
+    public static function titleProvider(): iterable
+    {
+        yield 'a page title gets the site name' => ['About', null, 'About - Weiqi Club'];
+        yield 'a page title gets the site name and the place' => ['About', 'Berlin', 'About - Weiqi Club, Berlin'];
+        yield 'no page title serves the site name alone' => [null, null, 'Weiqi Club'];
+        yield 'no page title serves the site name with the place' => [null, 'Berlin', 'Weiqi Club, Berlin'];
+        yield 'a page title naming the site stays alone' => ['Welcome to the weiqi club', 'Berlin', 'Welcome to the weiqi club'];
+    }
+
+    #[DataProvider('descriptionProvider')]
+    public function testHandleCutsThePageExcerptAndFlagsTheHomePage(string $slug, ?string $content, ?string $expectedDescription, bool $expectedHome): void
+    {
+        // Arrange
+        $cmsStub = $this->createStub(Cms::class);
+        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn(new ArrayCollection([self::textBlock()]));
+        $cmsStub->method('getPageContent')->willReturn($content);
+        $cmsStub->method('getId')->willReturn(456);
+        $capturedContext = [];
+
+        // Act
+        $this->createRenderingService($cmsStub, $capturedContext, $this->siteNameResolver('Weiqi Club'))->handle('en', $slug, new Response());
+
+        // Assert
+        static::assertSame($expectedDescription, $capturedContext['description']);
+        static::assertSame($expectedHome, $capturedContext['home']);
+    }
+
+    /**
+     * @return iterable<string, array{string, ?string, ?string, bool}>
+     */
+    public static function descriptionProvider(): iterable
+    {
+        $long = str_repeat('weiqi ', 40);
+
+        yield 'a short text stays untouched' => ['about', 'We play Go.', 'We play Go.', false];
+        yield 'a page without text blocks gets none' => ['about', null, null, false];
+        yield 'markup only gives none' => ['about', '<p> </p><br>', null, false];
+        yield 'tags are stripped and blocks keep a space' => ['about', '<h2>Title</h2><p>Body &amp; soul</p>', 'Title Body & soul', false];
+        yield 'whitespace collapses' => ['about', "Line one\n\n   line   two", 'Line one line two', false];
+        yield 'a long text is cut before a word with an ellipsis' => ['about', $long, rtrim(str_repeat('weiqi ', 25)) . '…', false];
+        yield 'the home page is flagged' => ['index', '<p>Welcome.</p>', 'Welcome.', true];
     }
 
     public function testHandleReturnsCachedBodyWithoutFetchingBlocksOnCacheHit(): void
@@ -421,7 +428,7 @@ class CmsServiceTest extends TestCase
         $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('cms/index.html.twig', ['title' => $pageTitle, 'body' => $cachedBody])
+            ->with('cms/index.html.twig', ['title' => $pageTitle . ' - Site', 'description' => null, 'home' => false, 'body' => $cachedBody])
             ->willReturn($outerHtml);
 
         $subject = new CmsService(
@@ -430,9 +437,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceStub,
             cache: $cacheMock,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Act
@@ -486,9 +494,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceStub,
             cache: $cacheStub,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $requestStack,
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Act
@@ -546,9 +555,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceStub,
             cache: $cacheStub,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $imageRepoMock,
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
 
         // Act
@@ -594,6 +604,70 @@ class CmsServiceTest extends TestCase
         $subject->invalidateMenuCaches();
     }
 
+    /**
+     * @param array<string, mixed> $capturedContext
+     */
+    private function createRenderingService(Cms $cms, array &$capturedContext, SiteNameResolver $siteNameResolver): CmsService
+    {
+        $repoStub = $this->createStub(CmsRepository::class);
+        $repoStub->method('findPublishedBySlug')->willReturn($cms);
+        $cmsFilterStub = $this->createStub(CmsFilterService::class);
+        $cmsFilterStub->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
+        $eventFilterStub = $this->createStub(EventFilterService::class);
+        $eventFilterStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
+        $twigStub = $this->createStub(Environment::class);
+        $twigStub
+            ->method('render')
+            ->willReturnCallback(static function (string $name, array $context) use (&$capturedContext): string {
+                if ($name === 'cms/index.html.twig') {
+                    $capturedContext = $context;
+                }
+
+                return 'html';
+            });
+        $cacheStub = $this->createStub(TagAwareCacheInterface::class);
+        $cacheStub->method('get')->willReturnCallback(static fn(string $key, callable $callback): ?string => $callback(self::createCacheItem()));
+
+        return new CmsService(
+            twig: $twigStub,
+            repo: $repoStub,
+            eventFilterService: $eventFilterStub,
+            cmsFilterService: $cmsFilterStub,
+            cache: $cacheStub,
+            translator: self::translator(),
+            requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $siteNameResolver,
+        );
+    }
+
+    private function siteNameResolver(string $siteName, ?string $place = null): SiteNameResolver
+    {
+        $configStub = $this->createStub(ConfigService::class);
+        $configStub->method('getSiteName')->willReturn($siteName);
+        $placeStub = $this->createStub(TitlePlaceProviderInterface::class);
+        $placeStub->method('getTitlePlace')->willReturn($place);
+
+        return new SiteNameResolver($configStub, [], [$placeStub]);
+    }
+
+    private static function translator(): Translator
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource(
+            'array',
+            [
+                'cms.title_site_place' => '%site%, %place%',
+                'cms.title_page_site' => '%title% - %site%',
+                'cms.title_page_site_place' => '%title% - %site%, %place%',
+            ],
+            'en',
+        );
+
+        return $translator;
+    }
+
     private function createServiceWithCache(TagAwareCacheInterface $cache): CmsService
     {
         return new CmsService(
@@ -602,9 +676,10 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cache: $cache,
-            translator: new IdentityTranslator(),
+            translator: self::translator(),
             requestStack: $this->createStub(RequestStack::class),
             imageRepo: $this->createStub(ImageRepository::class),
+            siteNameResolver: $this->siteNameResolver('Site'),
         );
     }
 

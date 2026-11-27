@@ -9,10 +9,12 @@ use App\Service\Config\SiteNameResolver;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\NoindexService;
 use App\Twig\PageMetaRuntime;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class PageMetaRuntimeTest extends TestCase
 {
@@ -36,6 +38,7 @@ class PageMetaRuntimeTest extends TestCase
             $this->canonicalUrlServiceStub,
             $this->siteNameResolverStub,
             $this->noindexServiceStub,
+            new IdentityTranslator(),
         );
     }
 
@@ -115,6 +118,7 @@ class PageMetaRuntimeTest extends TestCase
             $this->canonicalUrlServiceStub,
             $this->siteNameResolverStub,
             $this->noindexServiceStub,
+            new IdentityTranslator(),
             [$provider],
         );
 
@@ -137,7 +141,7 @@ class PageMetaRuntimeTest extends TestCase
         static::assertSame('System events description', $result);
     }
 
-    public function testGetMetaDescriptionFallsBackToHardcodedWhenNothingConfigured(): void
+    public function testGetMetaDescriptionFallsBackToATranslatedLineWhenNothingConfigured(): void
     {
         // Arrange
         $this->configServiceStub->method('getSeoDescription')->willReturn('');
@@ -146,7 +150,41 @@ class PageMetaRuntimeTest extends TestCase
         $result = $this->subject->getMetaDescription('members');
 
         // Assert
-        static::assertSame('Meet the members of this community.', $result);
+        static::assertSame('chrome.meta_description_members', $result);
+    }
+
+    #[DataProvider('pageFallbackProvider')]
+    public function testThePageFallbackSitsBetweenTheChainAndTheSystemValue(?string $providerValue, ?string $pageFallback, string $expected): void
+    {
+        // Arrange
+        $provider = $this->createStub(MetaDescriptionProviderInterface::class);
+        $provider->method('getMetaDescription')->willReturn($providerValue);
+        $this->configServiceStub->method('getSeoDescription')->willReturn('System description');
+        $subject = new PageMetaRuntime(
+            $this->requestStackStub,
+            $this->configServiceStub,
+            $this->canonicalUrlServiceStub,
+            $this->siteNameResolverStub,
+            $this->noindexServiceStub,
+            new IdentityTranslator(),
+            [$provider],
+        );
+
+        // Act
+        $result = $subject->getMetaDescription('default', $pageFallback);
+
+        // Assert
+        static::assertSame($expected, $result);
+    }
+
+    /**
+     * @return iterable<string, array{?string, ?string, string}>
+     */
+    public static function pageFallbackProvider(): iterable
+    {
+        yield 'a provider value beats the page' => ['Group text', 'Page excerpt', 'Group text'];
+        yield 'the page beats the system value' => [null, 'Page excerpt', 'Page excerpt'];
+        yield 'an empty page fallback falls through' => [null, '', 'System description'];
     }
 
     public function testLdJsonKeepsAClosingScriptTagFromEndingTheBlock(): void
@@ -202,6 +240,7 @@ class PageMetaRuntimeTest extends TestCase
             $this->canonicalUrlServiceStub,
             $this->siteNameResolverStub,
             $this->noindexServiceStub,
+            new IdentityTranslator(),
             [],
             [$provider],
         );

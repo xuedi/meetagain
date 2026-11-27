@@ -30,37 +30,31 @@ Implement nothing beyond this; the unit tests assert it. Two things the diagram 
   immediately - that would hand it straight back to the person who just cancelled. The maintenance task re-matches
   free copies to waiting queues.
 
-`HandoverService::confirm()` is idempotent per side, completes only on the second *distinct* side, and refuses a
-non-participant. A handover whose giver is `null` - the account was deleted - completes on the receiver alone.
+Confirming is idempotent per side and completes only on the second *distinct* side; a handover whose giver's account
+was deleted completes on the receiver alone.
 
-The chat on the handover page is the application's comment section under the target type
-`CirculationInterface::COMMENT_TARGET`, made a **private** target by `Internal\Comment\HandoverTargetProvider`:
-only the two participants may comment, and only while the handover is `Open`; the page itself is gated to
-participants plus stewards whose scope holds the copy. `Internal\DashboardService::isInScope()` - the copy's context
-and the item filter - is that scope, and it gates retiring a copy too. Handover chat never reaches the activity log, and the bell entry for an unread message
-is derived on read through `CommentService::isUnreadBy()`.
+The chat on the handover page is the application's comment section under `CirculationInterface::COMMENT_TARGET`,
+made a **private** target: only the two participants may comment, and only while the handover is open. The page
+itself is open to the participants and to stewards whose scope holds the copy - the same scope that gates retiring a
+copy. Handover chat never reaches the activity log.
 
 ## The ledger is the truth; the holder is a cache of it
 
-`mod_circulation_copy` is one physical object, `mod_circulation_request` a place in a waiting list,
-`mod_circulation_handover` a live two-sided negotiation, and `mod_circulation_ledger` append-only history. The first
-three are working state. The ledger is not: `Internal\Entity\LedgerEntry` has no setters, `LedgerService::append()`
-is its only writer, and a mistake is corrected by appending. Each entry carries `occurredAt` and `recordedAt`, which
-diverge whenever a confirmation lands late.
+A copy is one physical object, a request a place in a waiting list, a handover a live two-sided negotiation - all
+working state. The ledger is append-only history: `LedgerService::append()` is its only writer, and a mistake is
+corrected by appending. Each entry carries when the move happened and when it was recorded, which diverge whenever a
+confirmation lands late.
 
-The copy's `holder`, `heldSince` and status exist so a list page does not replay history, and they must always be
-reproducible from the ledger. `LedgerReplay` is that replay, and the rebuild is the standing proof: report-only it
-lists the copies that drifted, otherwise it rewrites their derived columns, and a copy with no ledger entry is named
-but never touched. It is the `circulation-rebuild` action on the Maintenance page (`RebuildAction`) and
-`app:circulation:rebuild [--context=] [--dry-run]` on the command line, which exits non-zero on drift.
+The copy's holder, holding date and status exist so a list page does not replay history, and they must always be
+reproducible from the ledger. The rebuild is the standing proof: report-only it lists the copies that drifted,
+otherwise it rewrites their derived columns, and a copy with no ledger entry is named but never touched. It is the
+`circulation-rebuild` action on the Maintenance page and `app:circulation:rebuild` on the command line, which exits
+non-zero on drift.
 
 ## The waiting list is per title, not per copy
 
 A member requests *the item*, and the module matches them to whichever copy frees up first - that is what makes
-"there are three copies of this one" work at all. A member holds one place per title, enforced by a unique index
-over `(context, item_type, item_id, user_id, open_slot)`: `open_slot` is `1` while the request is `Waiting` or
-`Offered` and `null` once it closes, and a unique index treats rows with a NULL as distinct, so the constraint binds
-on exactly the open rows.
+"there are three copies of this one" work at all. A member holds one place per title, enforced by a unique index that binds only on open requests.
 
 ## A context is opaque, and visibility is not the module's
 
@@ -83,11 +77,9 @@ key and parameters rather than a bare bool.
 `Internal\Trust\` implements the [Trust module's](../trust/README.md) contract; circulation depends on Trust, never
 the reverse. It stays inert unless a consumer switches it on.
 
-- `ContextIndex` is the single answer to "is this context one circulation owns": the currently resolved context per
-  trust-enabled item type, unioned with every context found on existing copies. Nothing else parses a context.
-- `LedgerActionSource` declares `circulation_handover_completed` and `circulation_donation`, with points from its
-  `HANDOVER_POINTS` and `DONATION_POINTS`, and replays the ledger for them. A completed handover rewards **both**
-  sides; one with no giver rewards the receiver alone.
+- `ContextIndex` is the single answer to "is this context one circulation owns". Nothing else parses a context.
+- `LedgerActionSource` declares the handover and donation actions and replays the ledger for them. A completed
+  handover rewards **both** sides; one with no giver rewards the receiver alone.
 - `ParticipationEligibilityProvider` plugs the trust minimum into the eligibility chain and names the shortfall in
   its refusal.
 
@@ -104,29 +96,23 @@ resolved inside the module.
 | AND, `null` abstains             | `EligibilityProviderInterface`   | may this member join this waiting list |
 | union, by priority               | `DashboardTabInterface`          | one more tab on the dashboard          |
 
-`CirculationInterface` is the one injectable facade: contexts, and moving shelves between instances. The enums
-(`CopyStatus`, `RequestStatus`, ...) are the states in the diagram; `PortableShelf` and its row value objects carry a
-shelf for export and restore. Every member receives a user as an `int $userId`. `EligibilityProviderInterface` has
-no default implementation.
+`CirculationInterface` is the one injectable facade: contexts, and moving shelves between instances. The enums are
+the states in the diagram. `EligibilityProviderInterface` has no default implementation.
 
 ## Surfaces
 
-- **Twig** - `circulation_enabled()`, `circulation_warm()`, `circulation_badge()`, `circulation_panel()` and
-  `circulation_dashboard_url()`. All return nothing when the participation chain says the type is off, so a plugin
-  template calls them unconditionally. `circulation_warm(itemType, itemIds)` is the N+1 guard: a list page calls it
-  once before its loop, and every later badge reads a per-request memo.
-- **Dashboard** - `app_circulation_dashboard` (`/circulation/{itemType}`), 404 when the type does not circulate.
-  `DashboardService` renders the built-in tabs; **About me** is Stats narrowed to the viewer within the serving
-  context, with a `trust_explanation()` sidebar when trust is on. Anything else registers a `DashboardTabInterface`.
-- **Handover page** - `app_circulation_handover`. Every mutation is POST + CSRF, validated before any entity lookup.
-  Routes are named `app_circulation_*`, templates live under `@Circulation/`.
-- **Task** - `circulation-maintenance` (`Internal\Cron\MaintenanceTask`, on a message worker, see
-  [modules/task/README.md](../task/README.md)) expires offers older than `QueueService::OFFER_WINDOW_DAYS`, closes
-  handovers open longer than `MaintenanceTask::CLOSE_AFTER_DAYS`, re-matches free copies against waiting queues, and
-  counts the handovers waiting on a confirmation. The nudge needs no work of its own: the bell entry for an
-  unconfirmed handover is derived live by `Internal\Notification\NotificationProvider`.
-
-The outbound permit list in `mago.toml` names every core class the module reaches for, each with its reason.
+- **Twig** - the `circulation_*` functions place the badge, the panel and the dashboard link. All return nothing when
+  the participation chain says the type is off, so a plugin template calls them unconditionally.
+  `circulation_warm(itemType, itemIds)` is the N+1 guard: a list page calls it once before its loop, and every later
+  badge reads a per-request memo.
+- **Dashboard** - one per item type, 404 when the type does not circulate. **About me** is Stats narrowed to the
+  viewer within the serving context, with a trust explanation when trust is on. Anything else registers a
+  `DashboardTabInterface`.
+- **Handover page** - every mutation is POST + CSRF, validated before any entity lookup.
+- **Task** - `circulation-maintenance` (see [modules/task/README.md](../task/README.md)) expires stale offers, closes
+  handovers left open too long (`QueueService::OFFER_WINDOW_DAYS`, `MaintenanceTask::CLOSE_AFTER_DAYS`) and
+  re-matches free copies against waiting queues. The bell entries for an unconfirmed handover and an unread handover
+  message are derived on read, so the nudge needs no work of its own.
 
 ## Moving data between instances
 
@@ -134,10 +120,9 @@ The outbound permit list in `mago.toml` names every core class the module reache
 those shelves as a `PortableShelf`, visibility ignored; `restore()` writes a shelf back exactly as given, without
 matching queues, logging activity or notifying anyone.
 
-Rows point at each other by ref. On export a ref is the row's id; on restore it is any number the caller chose,
-unique per row kind, and `restore()` returns the new id of every handover so the caller can re-attach the handover
-chat. A ref the shelf does not carry resolves to null, and a handover whose copy is missing is skipped. The ledger's
-pointer at its handover travels as `PortableLedgerEntry::$handoverRef`, not inside the payload.
+Rows point at each other by ref: on export a row's id, on restore any number the caller chose, unique per row kind.
+`restore()` returns the new id of every handover so the caller can re-attach the handover chat; a ref the shelf does
+not carry resolves to null, and a handover whose copy is missing is skipped.
 
 The application's archive section is the one production caller. It decides which rows leave, and files restored rows
 under the importing instance's own context.
@@ -155,6 +140,4 @@ under the importing instance's own context.
 4. Implement `ContextProviderInterface` only if one shelf per item type is not what you want.
 
 The books plugin is the reference: `plugins/books/src/Circulation/` holds its two providers, and its
-`Config::isTrustActive()` is the AND from step 3. `plugins/books/templates/book/detail.html.twig` places the panel,
-and `plugins/books/templates/item/list_body.html.twig` warms a list. `modules/circulation/tests/Stub/` is the
-smallest stand-in consumer.
+`Config::isTrustActive()` is the AND from step 3. `modules/circulation/tests/Stub/` is the smallest stand-in consumer.

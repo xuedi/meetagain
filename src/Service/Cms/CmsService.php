@@ -14,18 +14,25 @@ use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
 use App\Repository\ImageRepository;
+use App\Service\Config\SiteNameResolver;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\String\TruncateMode;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
+use function Symfony\Component\String\u;
+
 readonly class CmsService
 {
+    public const int DESCRIPTION_LENGTH = 155;
+    private const string HOME_SLUG = 'index';
+
     private const string EVENT_TEASER_TAG = 'cms_event_teaser';
     private const string IMAGE_TAG_PREFIX = 'cms_image_';
 
@@ -39,6 +46,7 @@ readonly class CmsService
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
         private ImageRepository $imageRepo,
+        private SiteNameResolver $siteNameResolver,
     ) {}
 
     public function getSites(): array
@@ -82,7 +90,9 @@ readonly class CmsService
         }
 
         $content = $this->twig->render('cms/index.html.twig', [
-            'title' => $cms->getPageTitle($locale) ?? $this->translator->trans('cms.page_no_title_fallback'),
+            'title' => $this->composeTitle($cms->getPageTitle($locale), $locale),
+            'description' => $this->excerpt($cms->getPageContent($locale)),
+            'home' => $slug === self::HOME_SLUG,
             'body' => $body,
         ]);
 
@@ -115,6 +125,42 @@ readonly class CmsService
     public function invalidateMenuCaches(): void
     {
         $this->cache->invalidateTags(['cms_menu']);
+    }
+
+    private function composeTitle(?string $pageTitle, string $locale): string
+    {
+        $siteName = $this->siteNameResolver->resolve();
+        $pageTitle = trim((string) $pageTitle);
+        if ($pageTitle !== '' && ($siteName === '' || mb_stripos($pageTitle, $siteName) !== false)) {
+            return $pageTitle;
+        }
+
+        $place = $this->siteNameResolver->resolvePlace($locale);
+        if ($pageTitle === '' && $place === null) {
+            return $siteName;
+        }
+
+        $key = match (true) {
+            $pageTitle === '' => 'cms.title_site_place',
+            $place === null => 'cms.title_page_site',
+            default => 'cms.title_page_site_place',
+        };
+
+        return $this->translator->trans($key, ['%title%' => $pageTitle, '%site%' => $siteName, '%place%' => (string) $place], null, $locale);
+    }
+
+    private function excerpt(?string $html): ?string
+    {
+        if ($html === null) {
+            return null;
+        }
+
+        $text = u(html_entity_decode(strip_tags(str_replace('<', ' <', $html)), ENT_QUOTES | ENT_HTML5))->collapseWhitespace();
+        if ($text->isEmpty()) {
+            return null;
+        }
+
+        return $text->truncate(self::DESCRIPTION_LENGTH, '…', TruncateMode::WordBefore)->toString();
     }
 
     /**
