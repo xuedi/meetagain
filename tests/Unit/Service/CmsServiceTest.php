@@ -358,6 +358,8 @@ class CmsServiceTest extends TestCase
         yield 'no page title serves the site name alone' => [null, null, 'Weiqi Club'];
         yield 'no page title serves the site name with the place' => [null, 'Berlin', 'Weiqi Club, Berlin'];
         yield 'a page title naming the site stays alone' => ['Welcome to the weiqi club', 'Berlin', 'Welcome to the weiqi club'];
+        yield 'punctuation and spacing do not hide the site name' => ['weiqi-club.de - Go in Berlin', 'Berlin', 'weiqi-club.de - Go in Berlin'];
+        yield 'a page title naming the place drops it' => ['Go evenings in Berlin', 'Berlin', 'Go evenings in Berlin - Weiqi Club'];
     }
 
     #[DataProvider('descriptionProvider')]

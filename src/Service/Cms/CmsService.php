@@ -131,11 +131,15 @@ readonly class CmsService
     {
         $siteName = $this->siteNameResolver->resolve();
         $pageTitle = trim((string) $pageTitle);
-        if ($pageTitle !== '' && ($siteName === '' || mb_stripos($pageTitle, $siteName) !== false)) {
+        if ($pageTitle !== '' && $this->mentions($pageTitle, $siteName)) {
             return $pageTitle;
         }
 
         $place = $this->siteNameResolver->resolvePlace($locale);
+        if ($place !== null && $this->mentions($pageTitle, $place)) {
+            $place = null;
+        }
+
         if ($pageTitle === '' && $place === null) {
             return $siteName;
         }
@@ -147,6 +151,18 @@ readonly class CmsService
         };
 
         return $this->translator->trans($key, ['%title%' => $pageTitle, '%site%' => $siteName, '%place%' => (string) $place], null, $locale);
+    }
+
+    private function mentions(string $title, string $name): bool
+    {
+        $name = $this->lettersAndDigits($name);
+
+        return $name === '' || str_contains($this->lettersAndDigits($title), $name);
+    }
+
+    private function lettersAndDigits(string $text): string
+    {
+        return mb_strtolower((string) preg_replace('/[^\p{L}\p{N}]+/u', '', $text));
     }
 
     private function excerpt(?string $html): ?string
