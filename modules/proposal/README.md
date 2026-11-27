@@ -63,15 +63,12 @@ changes with it. It reads a `Change\View` plus the rows the caller hands in, so 
 - **A place travels with a suggestion** through `Suggestion\ScopeProviderInterface`. The same key lets a caller drop
   every suggestion made in one place, `SuggestionInterface::removeForScope()`.
 
-The outbound permit list in `mago.toml` names every core class the module reaches for, each with its reason.
-
 ## Traps
 
-- **The module registers two migration namespaces.** `ModuleSuggestionMigrations`
-  (`modules/proposal/migrations/suggestion/`) keeps the history the suggestion tool shipped with, because Doctrine
-  records executed migrations by class name; `ModuleProposalMigrations` (`modules/proposal/migrations/change/`) holds
-  the change table's. Doctrine orders by namespace, so a new migration for a suggestion table goes into the first and
-  one for a change table into the second.
+- **The module registers two migration namespaces.** `ModuleSuggestionMigrations` (`modules/proposal/migrations/suggestion/`) holds
+  the suggestion tables' migrations and `ModuleProposalMigrations` (`modules/proposal/migrations/change/`) the change table's. Doctrine
+  records an executed migration by class name, so neither folder moves into the other; a new migration goes into the
+  namespace of the table it alters.
 
 ## Related
 

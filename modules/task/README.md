@@ -25,12 +25,11 @@ flowchart LR
 
 - **The scheduler** consumes the `scheduler_default` transport. Its schedule is locked through the Valkey lock store
   and stateful in its own pool, `cache.task_schedule`, so a second scheduler stands by without doubling a run, and a
-  restart neither skips nor repeats one. The pool stays out of `cache.app` because every deploy clears that: a lost
-  checkpoint restarts at "now", a moment past the slot that is due, and that slot is skipped.
-- **The workers** consume `async`, a Valkey stream on the database `REDIS_URL` names. Each consumer is named after its
-  host, so every pod or container claims its own messages, and a message whose consumer died is taken over after the
-  transport's `redeliver_timeout`. `StaleConsumers` removes the consumers of gone hosts, but never one that still
-  holds a message, so the group does not grow with every deploy.
+  restart neither skips nor repeats one. The pool stays out of `cache.app` because every deploy clears that, and a lost
+  checkpoint skips the slot that is due.
+- **The workers** consume `async`, a Valkey stream. Each consumer is named after its host, a message whose consumer
+  died is taken over after the transport's `redeliver_timeout`, and the consumers of gone hosts are removed so the
+  group does not grow with every deploy.
 - **A failed message** is retried per the `async` transport's `retry_strategy`
   (`modules/task/config/packages/messenger.yaml`), then lands in the Doctrine failure transport (`mod_task_message`),
   where it stays until someone retries or deletes it.
@@ -43,9 +42,8 @@ every implementation, and `ScheduleProvider` turns each one into a recurring mes
 
 - `Cadence::$cron` is a cron expression in the server's timezone. A time window such as "only during the day" belongs
   in the expression, not in an `if` inside the task.
-- `Cadence::$jitterSeconds` spreads daily tasks so they do not all start at the same second. `CadenceTrigger` derives
-  the delay from the identifier and the slot, so a scheduler that restarts between the slot and the delayed time still
-  runs it, and the Tasks page shows the real next run.
+- `Cadence::$jitterSeconds` spreads daily tasks so they do not all start at the same second; the delay is derived
+  from the identifier and the slot, so a restart does not lose it and the Tasks page shows the real next run.
 - `Cadence::$offloaded` sends the run to a worker instead of running it in the scheduler process. Use it for anything
   that takes more than a few seconds, so the scheduler stays on time.
 
@@ -101,17 +99,14 @@ sequenceDiagram
   doorbell again. A result without one finishes the request, and the run log gets one row for the whole request,
   timed from its first step. The lease (`Runner::LEASE_SECONDS`) covers one step, so an action that may run longer
   returns a cursor. The geo module's `ImportAction` is the reference.
-- **One request per action at a time.** The worker takes a lock named after the action (`Runner::LOCK_PREFIX`) for
-  one step, and a request does not start while another of the same action is part-way through its steps; it stays
-  pending and the drain picks it up later. A request whose lease ran out holds nobody back.
+- **One request per action at a time.** A request does not start while another of the same action is part-way
+  through its steps; it stays pending and the drain picks it up later.
 - **An interrupted action is not rerun.** Not every action is safe twice, so a request whose lease expired is marked
   failed and the admin queues it again. A request still pending after `Drain::GRACE_SECONDS` lost its message and is
   run by the drain.
 - **Remembered values.** A parameter built with `remembered: true` gets a settings form on the action's page; its
-  saved value pre-fills the run form and is readable by other code through `ActionSettingsInterface`, so a scheduled
-  task can reuse what the admin chose. No action in this tree uses it.
-- **The request is reloaded after every step.** An action may clear the entity manager, and saving the detached
-  instance would insert a copy, so `Runner` reloads the request before it records the result.
+  saved value pre-fills the run form and is readable through `ActionSettingsInterface`, so a scheduled task can reuse
+  what the admin chose.
 
 The Maintenance page holds what an admin starts deliberately and expects to finish; the Tasks page holds what runs on
 its own, and its "run now" only runs a task early. Work that must happen on a schedule is a task even if an admin
@@ -131,28 +126,20 @@ running.
 | union, every action | `ActionInterface` | one unit of on-demand work, its form and facts |
 
 `TriggerInterface` sends one run of a task to a worker now. `ActionQueueInterface` queues an action from a page of
-its own, the way the Maintenance form does, and reads that action's newest request, so a page can show its progress
-without the Maintenance page; core's Import / Export tab is the reference. `latest()` also takes values: it then
-answers the newest request whose values contain every given pair, so a page that queues one action per record shows
-only the requests for its own record. `ActionSettingsInterface` reads an
-action's remembered values. For anonymizing a copied instance, `ActionQueueInterface::forgetRequesters()` clears who
-asked for every request and `HealthInterface::discardFailed()` deletes the failed messages.
-`RunLogInterface` and `HealthInterface` expose the run log and the worker health to other
-consumers, such as an API or a status page. `Cadence`, `Result`, `Status`, `FinishedRun`, `RequestedAction`,
-`Health`, `ActionSection` and `ActionParameter` are the value types.
+its own and reads its newest request - optionally the newest whose values match, so a page that queues one action per
+record shows only its own - so a page can show progress without the Maintenance page; core's Import / Export tab is
+the reference. `RunLogInterface` and `HealthInterface` expose the run log and the worker health to other consumers,
+such as an API or a status page, and both queues can forget their requesters and failed messages for anonymizing a
+copied instance.
 
 ## Surfaces
 
-- **Tasks page** - Admin, Logs, Tasks (`/admin/logs/tasks`): Schedules (every task, its cadence, next and last run,
-  and "run now"), Runs (the run log, filtered by task and status) and Queue (pending messages, the live workers and
-  schedulers, and failed messages to retry on their original transport or delete).
-- **Maintenance page** - Admin, System, Maintenance (`/admin/system/maintenance`): every action grouped by section with
-  its last request, and per action its facts, the run form, the remembered-values form and the recent requests.
-- **Commands** - `app:task:list` (every task with its cadence, next run and last result), `app:task:run <identifier>`
-  (one run now, recorded, non-zero exit on failure) and `messenger:stop-workers` (every worker exits after its current
-  message; `just workerRestart`).
-
-The outbound permit list in `mago.toml` names every core class the module reaches for, each with its reason.
+- **Tasks page** - every task with its cadence, next and last run and "run now"; the run log; the queue with the live
+  workers and the failed messages to retry or delete.
+- **Maintenance page** - every action grouped by section, with its facts, run form, remembered-values form and recent
+  requests.
+- **Commands** - `app:task:list`, `app:task:run <identifier>` (one recorded run, non-zero exit on failure) and
+  `messenger:stop-workers` (`just workerRestart`).
 
 ## Becoming a consumer
 
@@ -169,4 +156,4 @@ The outbound permit list in `mago.toml` names every core class the module reache
    every message, so a kept entity would be detached anyway.
 
 Switching a plugin on or off asks every worker and scheduler to restart (Messenger's restart signal), so the schedule
-and the chains are rebuilt within seconds. `RunRetention` is the reference task.
+and the chains are rebuilt within seconds.

@@ -10,31 +10,11 @@ for. `trust/` is the smallest complete module; read its `config/` and `mago.toml
 
 ## A directory that exists is a module that loads
 
-```
-modules/
-  autoload.php               registers Module\<Name>\ and Module\<Name>\Tests\ as PSR-4 roots
-  <name>/
-    README.md                what this module does
-    mago.toml                the module's guard perimeter, pulled into core's Mago run
-    config/
-      services.yaml          the module's service definitions
-      routes.yaml            attribute routes over src/Internal/Controller
-      packages/doctrine.yaml ORM mapping + migrations namespace
-      packages/twig.yaml     the template namespace
-      packages/translation.yaml
-      packages/cache.yaml    any cache pools the module owns (optional)
-    migrations/
-    src/Contract/            the public surface: interfaces, enums, readonly value objects
-    src/Internal/            everything else - unreachable from outside
-    templates/
-    translations/
-    tests/
-      Unit/Contract/         unit tests, mirroring src/ one class per file
-      Unit/Internal/
-      Functional/            the module driven through its contract by stub consumers
-      Stub/                  those stub consumers, shared with the unit tests
-      config/services.yaml   wires the stubs; loaded only by the module test kernel
-```
+A module directory holds `config/` (services, attribute routes over its internal controllers, and the Doctrine, Twig,
+translation and optional cache packages), `migrations/`, `templates/`, `translations/`, its `README.md` and its
+`mago.toml`. Code splits into `modules/<name>/src/Contract/` - the public surface - and
+`modules/<name>/src/Internal/`, everything else. `tests/` holds `Unit/` mirroring `src/`, `Functional/`, the stand-in
+consumers in `Stub/`, and a `config/services.yaml` that wires them. `modules/autoload.php` registers each `Module\<Name>\` and its `Tests\` namespace as PSR-4 roots.
 
 `App\Kernel::getModuleConfigDirs()` globs `modules/*/config` and feeds it to `configureContainer()` and
 `configureRoutes()`, so there is no registration list to keep in sync. Modules ship no bundles, so
@@ -79,10 +59,9 @@ The rules run as `just checkMagoGuard`, in the `just check` chain and as their o
 - **`tests/config/mago-rules.toml`** - the shared rule file every plugin's config extends: the generic inbound
   backstops and the structural rules on `Contract/`.
 
-A module file is a fragment, never a run of its own. An inbound violation is reported on the file doing the reaching,
-which is outside the module, and one outbound rule puts the whole run into allowlist mode, so every module's entries
-must sit in the same run as core. `extends` appends list entries from each file rather than replacing them, but takes
-no globs - hence the explicit list.
+A module file is a fragment, never a run of its own: an inbound violation is reported on the file doing the reaching,
+outside the module, and one outbound rule puts the whole run into allowlist mode, so every module's entries sit in the
+same run as core. `extends` takes no globs - hence the explicit list.
 
 Three kinds of rule, all needed:
 
@@ -120,16 +99,10 @@ binding, and adding the backstop loosens nothing.
 The outbound half cannot be collapsed into a wildcard at all. A `permit` list is the per-module decision: a
 `Module\*\` catch-all would hand every future module the exceptions one module was granted.
 
-The backstops - `Module\*\Internal\**` and `Plugin\*\Module\*\Internal\**` - and the two structural rules for each
-`Contract\**` root live in `tests/config/mago-rules.toml`. `bin/mago.sh` skips guard for a config that declares no
-guard rules at all, so keeping them in the shared file is what makes every plugin run enforce them: a plugin cannot
-import a module's `Internal` namespace either.
-
-`tests/Unit/ModulePerimeterTest.php` globs `modules/*/src` and `plugins/*/modules/*/src` and fails, with the exact
-line to paste, when a module has no `mago.toml`, when that file is missing from the `extends` of the run that owns it
-(core's, or its plugin's), when it lacks its inbound restriction, its outbound rule or a rule for its test suite, or
-when that test rule permits a catch-all. It also checks that the backstops and both structural rules are present in
-the shared file. A new module therefore cannot half-exist.
+The backstops and the structural rules for each `Contract\**` root live in the shared `tests/config/mago-rules.toml`,
+so every plugin run enforces them too: a plugin cannot import a module's `Internal` namespace either.
+`tests/Unit/ModulePerimeterTest.php` fails, with the line to paste, when a module's `mago.toml` or any of its required
+rules is missing, or its test rule permits a catch-all - a new module cannot half-exist.
 
 **Prove a new rule fails before you trust it.** Write a file that violates it, watch `just checkMagoGuard` go red,
 then delete the file. A mis-scoped rule that silently matches nothing looks exactly like a rule that passes.
@@ -138,16 +111,10 @@ then delete the file. A mis-scoped rule that silently matches nothing looks exac
 
 A module proves its own behaviour, in this repository, on every commit. Its functional tests drive it the way a
 consumer would - through `Contract/` - with stand-in consumers it ships in `modules/<name>/tests/Stub/`, on a
-database that holds nothing but the schema and the install seed. `just testModules` runs them, on three pieces of
-infrastructure in `tests/`:
-
-- **`tests/Module/ModuleKernel.php`** boots core and every module and no plugin, still in the `test` environment,
-  with its own cache directory and its own database. It loads each `modules/<name>/tests/config/services.yaml`, so
-  stubs exist only in this kernel. `tests/config/phpunit.modules.xml` points the suite at it.
-- **`tests/bin/module-db.sh`** builds that database when `test-stamp --config test-stamp-modules` reports that
-  something shaping it changed (an entity, a mapping, the seed), or when it is missing.
-- **`tests/Module/Members.php`** persists the members a test needs. Each test creates its own rows, and the DAMA
-  extension rolls them back.
+database that holds nothing but the schema and the install seed. `just testModules` runs them on
+`tests/Module/ModuleKernel.php`, which boots core and every module and no plugin, with its own cache and database, and
+loads each `modules/<name>/tests/config/services.yaml` - so stubs exist only in this kernel. `tests/bin/module-db.sh`
+rebuilds that database when `test-stamp --config test-stamp-modules` sees something that shapes it change.
 
 Four rules keep these tests honest:
 
@@ -160,19 +127,17 @@ Four rules keep these tests honest:
   permits what the module's code may, plus PHPUnit and `Tests\Module\**` - the shared harness, because a `User` row
   needs core enums no module is permitted. It does not permit `App\**` or `Tests\**`: a test that could import any
   core class would drift back into testing the module through its real consumers. Any further core class is listed
-  there with its reason - circulation's tests list the four classes behind `CommentService`, because that service is
-  `final` and cannot be stubbed - and `ModulePerimeterTest` rejects a catch-all.
+  there with its reason, and `ModulePerimeterTest` rejects a catch-all.
 - **Stubs stay out of `config/services_test.yaml`.** That file loads into every test container, so a stub there
-  would leak into other suites - a stub email type would appear in the email admin's planned list and in the preview
-  sweep's counts. Stubs live in `modules/<name>/tests/config/services.yaml`, which only the module kernel imports.
+  would leak into other suites. Stubs live in `modules/<name>/tests/config/services.yaml`, which only the module
+  kernel imports.
 
-A module's unit tests mirror `src/`: `modules/<name>/tests/Unit/Contract/` and `.../Unit/Internal/`, one file per
-class, named after it. Tests that need real consumers on real data - a plugin driving a module, say - belong to the
-application's functional suite, not to the module.
+A module's unit tests mirror `src/`, one file per class. Tests that need real consumers on real data - a plugin driving
+a module, say - belong to the application's functional suite, not to the module.
 
 ## Adding a module
 
-1. `modules/<name>/` with the directory shape above, `<name>` one lowercase word. Namespace root `Module\<Name>\`,
+1. `modules/<name>/` with the directory layout above, `<name>` one lowercase word. Namespace root `Module\<Name>\`,
    tables `mod_<name>_*`.
 2. The config files, copied from `modules/trust/config/` with the paths swapped.
 3. `modules/<name>/mago.toml`, copied from `modules/trust/mago.toml` with the names swapped: the perimeter
@@ -200,10 +165,8 @@ A plugin carries modules in `plugins/<plugin>/modules/<name>/`, built exactly as
 | `mago.toml` listed in | `tests/config/mago.toml` | the plugin's `tests/config/mago.toml`                                                         |
 | Guard rules name      | `Module\<Name>\...`      | `Plugin\<Plugin>\Module\<Name>\...`                                                           |
 
-`plugins/autoload.php` registers the namespaces and `App\Kernel::getPluginModuleConfigDirs()` finds the config
-directories. The module test kernel loads every plugin module in the checkout, still without any plugin, and imports
-each one's stub wiring, so a plugin module tests itself under `just testModules` like any other. Its unit tests join
-the unit suite.
+The module test kernel loads every plugin module in the checkout, still without any plugin, so a plugin module tests
+itself under `just testModules` like any other.
 
 Declaring a plugin module's outbound rule puts that plugin's whole run into allowlist mode, so the plugin's config
 carries the same catch-alls core's does (`@global`, `App\`, `Plugin\`, `Tests\`, its migration namespace). A plugin

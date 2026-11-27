@@ -32,28 +32,17 @@ ballot from a genuine deadlock.
 
 ## It counts, it does not interpret
 
-Everything that varies between one kind of decision and another is answered by the consumer.
-
-| Question                       | Answered by                                                      |
-|--------------------------------|------------------------------------------------------------------|
-| What are the candidates?       | the caller, when it opens the ballot                             |
-| How long is it open?           | the caller, as a deadline on the request                         |
-| Approve many, or pick one?     | `TallyMode` on the request                                       |
-| Settled by a person or a task? | `SettlementMode` on the request                                  |
-| Who may vote?                  | `ElectorateProviderInterface`, matched on the purpose            |
-| What does winning *mean*?      | `SettlementListenerInterface`, matched on the purpose            |
-| Who may see it?                | `VisibilityFilterInterface`, an AND-intersection over ballot ids |
-| Where is it voted on?          | `PageProviderInterface`, matched on the purpose                  |
+Everything that varies between one kind of decision and another is answered by the consumer. The opener's
+`BallotRequest` carries the candidates, the deadline, the `TallyMode` (approve many, or pick one) and the
+`SettlementMode` (settled by a person or by the task); the seams in "The contract" answer the rest.
 
 - **A candidate is a key, not a row.** `Candidate` carries an opaque key chosen by the opener plus a display label.
   One ballot's options can come from a curated list and another's be typed in by hand, because the module never
   resolves a key: it counts them and hands the winner back.
-- **A subject is a `(type, id)` pair, not a foreign key.** `BallotSubject` says what the decision is *for*, and it is
-  nullable because a decision need not attach to anything. The only foreign key the module holds into the rest of
-  the application is the voter on `mod_ballot_vote`.
+- **A subject is a `(type, id)` pair, not a foreign key.** `BallotSubject` says what the decision is *for*, and is
+  nullable because a decision need not attach to anything. The only foreign key into the application is the voter.
 - **`purpose` is the routing key** all four seams match on. Consumers namespace theirs.
-- **The title is opaque too.** `BallotRequest::$title` is an optional pre-translated heading, stored and echoed like a
-  candidate label; without one the page falls back to the tally mode's label.
+- **The title is opaque too** - an optional pre-translated heading, echoed like a candidate label.
 
 ## Visibility and electorate are separate questions
 
@@ -77,9 +66,8 @@ belongs depends on the ballot. Visibility filters split along that line rather t
   a filter can scope, and it is a convention rather than a field because the module routes on purposes and never
   interprets them. A filter claims a prefix only for an item type it actually scopes; an unknown prefix means *no
   opinion*, not *hidden*.
-- **The seam hands filters the data, not just ids.** `narrowVisibleBallotIds()` is called once per purpose with a
-  list of `BallotScope` values - id, purpose, subject and candidate keys - because a filter given ids alone would
-  have to read the module's tables to learn what a ballot is about, and the perimeter forbids exactly that.
+- **The seam hands filters the data, not just ids** - `BallotScope` values with purpose, subject and candidate keys -
+  because a filter given ids alone would have to read the module's tables, and the perimeter forbids exactly that.
 
 A ballot the chain refuses does not exist for that viewer: `view()` returns `null`, so `/ballots/{id}` and its vote
 action answer 404.
@@ -101,34 +89,24 @@ actually changed.
 viewer, subject and purpose, and moving data. The four seams are `#[AutoconfigureTag]`ed and resolved inside the
 module.
 
-| Chain shape                                 | Seam                          | With nothing registered  |
-|---------------------------------------------|-------------------------------|--------------------------|
-| first match on the purpose, by priority     | `SettlementListenerInterface` | settles, writes nothing  |
-| first match on the purpose                  | `ElectorateProviderInterface` | any authenticated member |
-| first match on the purpose                  | `PageProviderInterface`       | the module's own page    |
-| AND (`null` = no opinion, `[]` = block all) | `VisibilityFilterInterface`   | everything visible       |
+| Chain shape                                 | Seam                          | Answers                   | With nothing registered  |
+|---------------------------------------------|-------------------------------|---------------------------|--------------------------|
+| first match on the purpose, by priority     | `SettlementListenerInterface` | what winning means        | settles, writes nothing  |
+| first match on the purpose                  | `ElectorateProviderInterface` | who may vote              | any authenticated member |
+| first match on the purpose                  | `PageProviderInterface`       | where it is voted on      | the module's own page    |
+| AND (`null` = no opinion, `[]` = block all) | `VisibilityFilterInterface`   | who may see it            | everything visible       |
 
 A ballot whose purpose nobody claims settles and writes nothing: the arithmetic is still true, there is simply
 nobody who wanted the answer.
 
-`BallotOutcome` carries **both** user ids: `settledByUserId`, null when the deadline task settled it, and
-`openedByUserId`, which never is. A listener whose write is permissioned writes as the opener without calling back
-into the module to find out who asked.
-
-The contract speaks in scalars, enums and readonly value objects: `BallotRequest`, `Candidate`, `BallotSubject`,
-`BallotScope`, `BallotOutcome`, `BallotView`, `PortableBallot`, and the `TallyMode`, `SettlementMode` and
-`BallotStatus` enums.
+`BallotOutcome` carries the opener's user id as well as the settler's (null when the deadline task settled it), so a
+listener whose write is permissioned writes as the opener without calling back into the module.
 
 ## Surfaces
 
-- **Routes** - `app_ballot_index` (`/ballots`, every open ballot the viewer may vote in), `app_ballot_show` and
-  `app_ballot_vote`. For a purpose a `PageProviderInterface` claims, the list links to the claimed URL and
-  `/ballots/{id}` redirects there; for any other it renders the labels as text.
-- **Bell** - `Internal\Notification\OpenBallotNotificationProvider` lists ballots the viewer can still vote in, and
-  links to the list.
-- **Task** - `ballot.settle-due`.
-
-The outbound permit list in `mago.toml` names every core class the module reaches for, each with its reason.
+`/ballots` lists every open ballot the viewer may vote in, beside the ballot page and its vote action. For a purpose a
+`PageProviderInterface` claims, the list links to the claimed URL and the ballot page redirects there. The
+application's notification bell lists ballots the viewer can still vote in.
 
 ## Moving data between instances
 
@@ -150,9 +128,8 @@ application's archive section is the one caller, and it decides per purpose whic
    `VisibilityFilterInterface` if not every member may even see it.
 4. Decide whose page members vote on (below).
 5. Prove your listener through `cast()` and `settle()`: that the winning key becomes the right change, and that a
-   tie changes nothing. There is no public way to make a ballot due - `cast()` requires a future deadline, and moving
-   one needs the module's own tables - so the step from a passed deadline to those calls is covered once, by
-   `modules/ballot/tests/Functional/DeadlineTest.php`, and needs no second proof per consumer.
+   tie changes nothing. The step from a passed deadline to those calls is the module's own test and needs no second
+   proof per consumer.
 
 The proposal module's field ballot (`modules/proposal/change.md`) is the reference: one candidate per competing value
 proposed for a field plus one for leaving it alone, and a settlement that writes the winner through the change tool. It is
