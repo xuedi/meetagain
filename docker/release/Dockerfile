@@ -46,6 +46,8 @@ RUN set -eux; \
 
 FROM runtime AS builder
 
+RUN echo 'memory_limit=1G' > "$PHP_INI_DIR/conf.d/zz-build.ini"
+
 COPY --from=composer:2.11.2@sha256:5bcb28b8d0edc4091125f8218f9d088f998bdfc843f8fbb9a4beb4dcd8625684 /usr/bin/composer /usr/local/bin/composer
 
 ARG DART_SASS_VERSION=1.86.3
@@ -91,7 +93,7 @@ RUN set -eux; \
     php bin/console assets:install public; \
     php bin/console app:media:compile; \
     purgecss --config assets/purgecss.config.js; \
-    php -d memory_limit=1G bin/console cache:warmup; \
+    php bin/console cache:warmup; \
     rm -f .env .env.dist .env.local .env.local.php .env.test; \
     rm -rf var/log var/tmp node_modules bin/dart-sass
 
