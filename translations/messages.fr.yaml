@@ -42,6 +42,7 @@ chrome:
     aria_close: 'Fermer'
 security:
     page_title_login: 'Connexion'
+    meta_description_login: 'Connecte-toi pour répondre aux événements, écrire aux autres membres et gérer ton profil, tes notifications et ta confidentialité.'
     headline_login: 'Connexion'
     link_forgot_password: 'Mot de passe oublié ?'
     login_error_reset_link: 'Réinitialiser le mot de passe'
@@ -574,6 +575,7 @@ profile_image:
     detail_reported_no: 'non'
     flash_upload_error: 'Une erreur est survenue lors du téléversement du fichier.'
 support:
+    meta_description: 'Une question, un retour ou un problème avec le site ? Écris à l''équipe qui s''en occupe et reçois une réponse par e-mail.'
     sidebar_title: 'Comment nous pouvons aider'
     sidebar_intro: 'Envoie-nous un message et nous te répondrons dès que possible. Choisis qui doit le lire :'
     response_time: 'Nous répondons généralement sous 2 jours ouvrés.'

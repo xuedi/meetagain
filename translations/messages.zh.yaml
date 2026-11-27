@@ -42,6 +42,7 @@ chrome:
     aria_close: '关闭'
 security:
     page_title_login: '登录'
+    meta_description_login: '登录后即可报名活动、给其他成员发消息，并管理你的个人资料、通知和隐私设置。'
     headline_login: '请登录'
     link_forgot_password: '忘记密码？'
     login_error_reset_link: '重置密码'
@@ -574,6 +575,7 @@ profile_image:
     detail_reported_no: '否'
     flash_upload_error: '上传文件时出错。'
 support:
+    meta_description: '对本站有疑问、反馈或遇到问题？给背后的团队发一条消息，我们会通过电子邮件回复你。'
     sidebar_title: '我们如何帮助您'
     sidebar_intro: '给我们发送消息，我们会尽快回复您。请选择由谁来阅读：'
     response_time: '我们通常在2个工作日内回复。'

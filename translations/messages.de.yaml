@@ -42,6 +42,7 @@ chrome:
     aria_close: 'Schließen'
 security:
     page_title_login: 'Login'
+    meta_description_login: 'Melde dich an, um Terminen zuzusagen, anderen Mitgliedern zu schreiben und dein Profil, deine Benachrichtigungen und Privatsphäre zu verwalten.'
     headline_login: 'Anmeldung'
     link_forgot_password: 'Passwort vergessen?'
     login_error_reset_link: 'Passwort zurücksetzen'
@@ -574,6 +575,7 @@ profile_image:
     detail_reported_no: 'nein'
     flash_upload_error: 'Beim Hochladen der Datei ist ein Fehler aufgetreten.'
 support:
+    meta_description: 'Eine Frage, Feedback oder ein Problem mit der Seite? Schreib dem Team dahinter eine Nachricht und erhalte eine Antwort per E-Mail.'
     sidebar_title: 'Wie wir helfen können'
     sidebar_intro: 'Schick uns eine Nachricht und wir melden uns so schnell wie möglich. Wähl aus, wer sie lesen soll:'
     response_time: 'Wir antworten in der Regel innerhalb von 2 Werktagen.'

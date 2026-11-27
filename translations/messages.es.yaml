@@ -42,6 +42,7 @@ chrome:
     aria_close: 'Cerrar'
 security:
     page_title_login: 'Iniciar sesión'
+    meta_description_login: 'Inicia sesión para confirmar eventos, escribir a otros miembros y gestionar tu perfil, tus notificaciones y tu privacidad.'
     headline_login: 'Inicia sesión'
     link_forgot_password: '¿Olvidaste tu contraseña?'
     login_error_reset_link: 'Restablecer la contraseña'
@@ -574,6 +575,7 @@ profile_image:
     detail_reported_no: 'no'
     flash_upload_error: 'Hubo un error al subir el archivo.'
 support:
+    meta_description: '¿Una pregunta, una sugerencia o un problema con el sitio? Escribe al equipo que lo lleva y recibe la respuesta por correo.'
     sidebar_title: 'Cómo podemos ayudarte'
     sidebar_intro: 'Envíanos un mensaje y te responderemos lo antes posible. Elige quién debe leerlo:'
     response_time: 'Normalmente respondemos en un plazo de 2 días laborables.'
