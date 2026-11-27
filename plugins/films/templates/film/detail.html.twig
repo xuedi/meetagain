@@ -1,6 +1,10 @@
 {% extends '@Films/base_films.html.twig' %}
 
 {% block title %}{{ film.title }}{% endblock %}
+{% block meta_description %}{% include '_components/item/meta_description.html.twig' with {
+    text: film.description,
+    fallback: film.year ? 'films_film.meta_description_year'|trans({'%title%': film.title, '%year%': film.year}) : film.title,
+} only %}{% endblock %}
 
 {% block films_body %}
 <div class="columns">

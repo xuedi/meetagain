@@ -1,6 +1,10 @@
 {% extends '@Books/base_books.html.twig' %}
 
 {% block title %}{{ book.title }}{% endblock %}
+{% block meta_description %}{% include '_components/item/meta_description.html.twig' with {
+    text: book.description,
+    fallback: book.author ? 'books_book.meta_description_author'|trans({'%title%': book.title, '%author%': book.author}) : book.title,
+} only %}{% endblock %}
 
 {% block books_body %}
 <div class="columns">

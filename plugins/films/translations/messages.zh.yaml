@@ -28,6 +28,7 @@ films:
         wishlist_group: '全组'
 
 films_film:
+    meta_description_year: '%title%（%year%）'
     page_title_list: '电影列表'
     button_lookup: '搜索并添加'
     button_manual: '手动添加'

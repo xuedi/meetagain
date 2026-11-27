@@ -9,6 +9,7 @@ books:
     attach_button: 'Attach'
 
 books_book:
+    meta_description_author: '%title% by %author%'
     browser_title_list: 'Books'
     page_title_list: 'Book list'
     page_title_add: 'Add a book by ISBN'

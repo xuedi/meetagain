@@ -11,6 +11,9 @@ boardgames:
     event_list_tag: '%count% games'
 
 boardgames_game:
+    meta_description_year_players: '%name% (%year%, %players% players)'
+    meta_description_year: '%name% (%year%)'
+    meta_description_players: '%name% (%players% players)'
     page_title_list: 'Board game list'
     browser_title_list: 'Board games'
     page_title_manual: 'Add board game manually'

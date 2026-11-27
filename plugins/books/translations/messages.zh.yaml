@@ -9,6 +9,7 @@ books:
     attach_button: '关联'
 
 books_book:
+    meta_description_author: '%author%《%title%》'
     browser_title_list: '书籍'
     page_title_list: '书籍列表'
     page_title_add: '按 ISBN 添加书籍'

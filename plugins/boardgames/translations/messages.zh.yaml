@@ -11,6 +11,9 @@ boardgames:
     event_list_tag: '%count% 款桌游'
 
 boardgames_game:
+    meta_description_year_players: '%name%（%year%，%players% 人）'
+    meta_description_year: '%name%（%year%）'
+    meta_description_players: '%name%（%players% 人）'
     page_title_list: '桌游列表'
     browser_title_list: '桌游'
     page_title_manual: '手动添加桌游'

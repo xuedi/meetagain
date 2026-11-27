@@ -28,6 +28,7 @@ films:
         wishlist_group: 'Groupe'
 
 films_film:
+    meta_description_year: '%title% (%year%)'
     page_title_list: 'Liste des films'
     button_lookup: 'Rechercher et ajouter'
     button_manual: 'Ajouter manuellement'
