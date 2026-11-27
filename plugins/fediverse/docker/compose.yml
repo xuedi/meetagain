@@ -32,7 +32,7 @@ x-mastodon: &mastodon
 
 services:
   fedi-proxy:
-    image: caddy:2.10.0-alpine@sha256:ae4458638da8e1a91aafffb231c5f8778e964bca650c8a8cb23a7e8ac557aa3c
+    image: caddy:2.11.9-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
     container_name: ma-fedi-proxy
     restart: unless-stopped
     volumes:
@@ -55,7 +55,7 @@ services:
     command: bundle exec sidekiq
 
   fedi-mastodon-db:
-    image: postgres:17-alpine@sha256:979c4379dd698aba0b890599a6104e082035f98ef31d9b9291ec22f2b13059ca
+    image: postgres:17-alpine@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73
     container_name: ma-fedi-mastodon-db
     restart: unless-stopped
     environment:
@@ -75,7 +75,7 @@ services:
       - fediverse
 
   fedi-mobilizon:
-    image: kaihuri/mobilizon:5.2.4@sha256:95c201b39d7041678273ff6c4049deaec10c5a66824885b654a2662a4d4a52fa
+    image: kaihuri/mobilizon:5.3.0@sha256:50ed30702ed8c83ac747b81fe9b64012ff1d528338c5bb1bf3b7d5f0c3214e43
     container_name: ma-fedi-mobilizon
     restart: unless-stopped
     volumes:
