@@ -17,15 +17,6 @@ enum EventTimeFilter: int
         };
     }
 
-    public function pageTitlePlaceKey(): string
-    {
-        return match ($this) {
-            self::All => 'events.page_title_listing_all_place',
-            self::Past => 'events.page_title_listing_past_place',
-            self::Future => 'events.page_title_listing_place',
-        };
-    }
-
     public function headingKey(): string
     {
         return match ($this) {

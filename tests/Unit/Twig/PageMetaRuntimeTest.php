@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 class PageMetaRuntimeTest extends TestCase
 {
@@ -251,5 +253,74 @@ class PageMetaRuntimeTest extends TestCase
         // Assert
         static::assertStringNotContainsString('</script>', $result);
         static::assertSame('https://schema.org', json_decode($result, true)['@context']);
+    }
+
+    #[DataProvider('pageTitleProvider')]
+    public function testPageTitleNamesTheSiteAndItsPlace(string $title, string $place, string $expected): void
+    {
+        // Arrange
+        $subject = $this->titleRuntime('Weiqi Club');
+
+        // Act
+        $result = $subject->getPageTitle($title, $place);
+
+        // Assert
+        static::assertSame($expected, $result);
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function pageTitleProvider(): iterable
+    {
+        yield 'a title gets the site name' => ['About', '', 'About - Weiqi Club'];
+        yield 'a title gets the site name and the place' => ['About', 'Berlin', 'About - Weiqi Club, Berlin'];
+        yield 'no title serves the site name alone' => ['', '', 'Weiqi Club'];
+        yield 'no title serves the site name with the place' => ['', 'Berlin', 'Weiqi Club, Berlin'];
+        yield 'a title naming the site stays alone' => ['Welcome to the weiqi club', 'Berlin', 'Welcome to the weiqi club'];
+        yield 'punctuation and spacing do not hide the site name' => ['weiqi-club.de - Go in Berlin', 'Berlin', 'weiqi-club.de - Go in Berlin'];
+        yield 'a title naming the place drops it' => ['Go evenings in Berlin', 'Berlin', 'Go evenings in Berlin - Weiqi Club'];
+        yield 'the place goes first when the length runs out' => [str_repeat('a', 45), 'Charlottenburg', str_repeat('a', 45) . ' - Weiqi Club'];
+        yield 'a long title keeps its words over the site name' => [str_repeat('a', 60), '', str_repeat('a', 60)];
+        yield 'escaped markup is read as text' => ['Q&amp;A', '', 'Q&A - Weiqi Club'];
+        yield 'whitespace collapses' => ["  Rules\n  and   dates ", '', 'Rules and dates - Weiqi Club'];
+    }
+
+    public function testATitleAtTheLengthLimitStillGetsTheSiteName(): void
+    {
+        // Arrange
+        $title = str_repeat('a', PageMetaRuntime::TITLE_MAX_LENGTH - strlen(' - Weiqi Club'));
+
+        // Act
+        $result = $this->titleRuntime('Weiqi Club')->getPageTitle($title);
+
+        // Assert
+        static::assertSame($title . ' - Weiqi Club', $result);
+    }
+
+    private function titleRuntime(string $siteName): PageMetaRuntime
+    {
+        $siteNameResolver = $this->createStub(SiteNameResolver::class);
+        $siteNameResolver->method('resolve')->willReturn($siteName);
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource(
+            'array',
+            [
+                'chrome.title_site_place' => '%site%, %place%',
+                'chrome.title_page_site' => '%title% - %site%',
+                'chrome.title_page_site_place' => '%title% - %site%, %place%',
+            ],
+            'en',
+        );
+
+        return new PageMetaRuntime(
+            $this->requestStackStub,
+            $this->configServiceStub,
+            $this->canonicalUrlServiceStub,
+            $siteNameResolver,
+            $this->noindexServiceStub,
+            $translator,
+        );
     }
 }

@@ -14,6 +14,7 @@ final class PageMetaExtension extends AbstractExtension
         return [
             new TwigFunction('get_canonical_url', [PageMetaRuntime::class, 'getCanonicalUrl']),
             new TwigFunction('get_site_name', [PageMetaRuntime::class, 'getSiteName']),
+            new TwigFunction('page_title', [PageMetaRuntime::class, 'getPageTitle']),
             new TwigFunction('get_meta_description', [PageMetaRuntime::class, 'getMetaDescription']),
             new TwigFunction(
                 'get_organization_schema',

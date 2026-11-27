@@ -23,7 +23,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\String\TruncateMode;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 use function Symfony\Component\String\u;
@@ -43,7 +42,6 @@ readonly class CmsService
         private CmsFilterService $cmsFilterService,
         #[Autowire(service: 'cache.cms_page_cache')]
         private TagAwareCacheInterface $cache,
-        private TranslatorInterface $translator,
         private RequestStack $requestStack,
         private ImageRepository $imageRepo,
         private SiteNameResolver $siteNameResolver,
@@ -90,7 +88,8 @@ readonly class CmsService
         }
 
         $content = $this->twig->render('cms/index.html.twig', [
-            'title' => $this->composeTitle($cms->getPageTitle($locale), $locale),
+            'title' => trim((string) $cms->getPageTitle($locale)),
+            'titlePlace' => (string) $this->siteNameResolver->resolvePlace($locale),
             'description' => $this->excerpt($cms->getPageContent($locale)),
             'home' => $slug === self::HOME_SLUG,
             'body' => $body,
@@ -125,44 +124,6 @@ readonly class CmsService
     public function invalidateMenuCaches(): void
     {
         $this->cache->invalidateTags(['cms_menu']);
-    }
-
-    private function composeTitle(?string $pageTitle, string $locale): string
-    {
-        $siteName = $this->siteNameResolver->resolve();
-        $pageTitle = trim((string) $pageTitle);
-        if ($pageTitle !== '' && $this->mentions($pageTitle, $siteName)) {
-            return $pageTitle;
-        }
-
-        $place = $this->siteNameResolver->resolvePlace($locale);
-        if ($place !== null && $this->mentions($pageTitle, $place)) {
-            $place = null;
-        }
-
-        if ($pageTitle === '' && $place === null) {
-            return $siteName;
-        }
-
-        $key = match (true) {
-            $pageTitle === '' => 'cms.title_site_place',
-            $place === null => 'cms.title_page_site',
-            default => 'cms.title_page_site_place',
-        };
-
-        return $this->translator->trans($key, ['%title%' => $pageTitle, '%site%' => $siteName, '%place%' => (string) $place], null, $locale);
-    }
-
-    private function mentions(string $title, string $name): bool
-    {
-        $name = $this->lettersAndDigits($name);
-
-        return $name === '' || str_contains($this->lettersAndDigits($title), $name);
-    }
-
-    private function lettersAndDigits(string $text): string
-    {
-        return mb_strtolower((string) preg_replace('/[^\p{L}\p{N}]+/u', '', $text));
     }
 
     private function excerpt(?string $html): ?string

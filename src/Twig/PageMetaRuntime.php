@@ -18,6 +18,7 @@ use Twig\Markup;
 final readonly class PageMetaRuntime implements RuntimeExtensionInterface
 {
     private const int LD_JSON_FLAGS = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+    public const int TITLE_MAX_LENGTH = 65;
 
     /**
      * @param iterable<MetaDescriptionProviderInterface>   $metaDescriptionProviders
@@ -56,6 +57,35 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
     public function getSiteName(): string
     {
         return $this->siteNameResolver->resolve();
+    }
+
+    public function getPageTitle(string $title, string $place = ''): string
+    {
+        $title = $this->plainText($title);
+        $siteName = $this->siteNameResolver->resolve();
+        if ($title !== '' && $this->mentions($title, $siteName)) {
+            return $title;
+        }
+
+        $place = $this->plainText($place);
+        if ($place !== '' && $this->mentions($title, $place)) {
+            $place = '';
+        }
+
+        $parameters = ['%title%' => $title, '%site%' => $siteName, '%place%' => $place];
+        if ($title === '') {
+            return $place === '' ? $siteName : $this->translator->trans('chrome.title_site_place', $parameters);
+        }
+
+        $keys = $place === '' ? ['chrome.title_page_site'] : ['chrome.title_page_site_place', 'chrome.title_page_site'];
+        foreach ($keys as $key) {
+            $composed = $this->translator->trans($key, $parameters);
+            if (mb_strlen($composed) <= self::TITLE_MAX_LENGTH) {
+                return $composed;
+            }
+        }
+
+        return $title;
     }
 
     public function getMetaDescription(string $context = 'default', ?string $pageFallback = null): string
@@ -107,5 +137,24 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
     public function ldJson(array $data): Markup
     {
         return new Markup(json_encode($data, self::LD_JSON_FLAGS) ?: '{}', 'UTF-8');
+    }
+
+    private function plainText(string $html): string
+    {
+        $text = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return trim((string) preg_replace('/\s+/u', ' ', $text));
+    }
+
+    private function mentions(string $title, string $name): bool
+    {
+        $name = $this->lettersAndDigits($name);
+
+        return $name === '' || str_contains($this->lettersAndDigits($title), $name);
+    }
+
+    private function lettersAndDigits(string $text): string
+    {
+        return mb_strtolower((string) preg_replace('/[^\p{L}\p{N}]+/u', '', $text));
     }
 }
