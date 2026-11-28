@@ -48,7 +48,7 @@ FROM runtime AS builder
 
 RUN echo 'memory_limit=1G' > "$PHP_INI_DIR/conf.d/zz-build.ini"
 
-COPY --from=composer:2.11.2@sha256:5bcb28b8d0edc4091125f8218f9d088f998bdfc843f8fbb9a4beb4dcd8625684 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.11.2@sha256:cd3a90dc5624c59a2f9ddf80dad08569f06416db31de519024f249d63bca554b /usr/bin/composer /usr/local/bin/composer
 
 ARG DART_SASS_VERSION=1.86.3
 RUN set -eux; \
