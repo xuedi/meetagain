@@ -16,10 +16,11 @@ class PageMetaExtensionTest extends TestCase
         $functionNames = array_map(static fn($f) => $f->getName(), $subject->getFunctions());
 
         // Assert
-        static::assertCount(7, $functionNames);
+        static::assertCount(8, $functionNames);
         static::assertContains('get_canonical_url', $functionNames);
         static::assertContains('get_site_name', $functionNames);
         static::assertContains('page_title', $functionNames);
+        static::assertContains('page_description', $functionNames);
         static::assertContains('get_meta_description', $functionNames);
         static::assertContains('get_organization_schema', $functionNames);
         static::assertContains('ld_json', $functionNames);

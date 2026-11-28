@@ -150,7 +150,9 @@ final class SecurityController extends AbstractController
         }
 
         $redirect = $this->sameHostPath($request->query->get('redirect'));
-        if ($form->isSubmitted() && $redirect !== null) {
+        if (!$form->isSubmitted()) {
+            $redirect ??= $this->refererTarget($request);
+        } elseif ($redirect !== null) {
             $request->getSession()->set('redirectUrl', $redirect);
         }
 

@@ -1,7 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
-{% block meta_description %}{{ event.metaDescription(app.locale, 'events.meta_description_meeting_at'|trans) }}{% endblock %}
+{% block title %}{{ event.title(app.locale) }}{% endblock %}
+{% block title_detail %}{{ event.start|date('Y-m-d') }}{% endblock %}
+{% block og_title %}{{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
+{% block meta_description %}{{ event.metaDescription(app.locale) }}{% endblock %}
+{% block meta_description_suffix %}{{ 'events.meta_description_meeting_at'|trans }} {{ event.start|date('Y-m-d H:i', false) }}{% endblock %}
 {% block og_type %}event{% endblock %}
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
 {% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
@@ -77,10 +80,10 @@
                         </div>
                         <div class="notification has-text-centered mt-6 is-warning">
                             <p>
-                                {{ 'events.guest_login_prompt'|trans({'%login_link%': '<a class="is-bold" href="' ~ path('app_login', {'redirect': app.request.requestUri}) ~ '">' ~ ('events.guest_login_link'|trans) ~ '</a>'})|raw }}
+                                {{ 'events.guest_login_prompt'|trans({'%login_link%': '<a class="is-bold" href="' ~ path('app_login') ~ '">' ~ ('events.guest_login_link'|trans) ~ '</a>'})|raw }}
                             </p>
                             <p class="mt-2">
-                                {{ 'events.guest_register_prompt'|trans({'%register_link%': '<a href="' ~ path('app_register', {'redirect': app.request.requestUri}) ~ '">' ~ ('events.guest_register_link'|trans) ~ '</a>'})|raw }}
+                                {{ 'events.guest_register_prompt'|trans({'%register_link%': '<a href="' ~ path('app_register') ~ '">' ~ ('events.guest_register_link'|trans) ~ '</a>'})|raw }}
                             </p>
                         </div>
                     {% endif %}
@@ -91,12 +94,11 @@
                         <span class="icon"><i class="fa-regular fa-calendar-plus"></i></span>
                         <span>{{ 'events.button_add_to_calendar'|trans }}</span>
                     </a>
-                    <a data-action="event-share-open" class="button is-fullwidth mt-2 modalTrigger"
-                       href="{{ path('app_event_share', {'id': event.id}) }}"
-                       data-modal-url="{{ path('app_event_share_modal', {'id': event.id}) }}">
+                    <button type="button" data-action="event-share-open" class="button is-fullwidth mt-2 modalTrigger"
+                            data-modal-url="{{ path('app_event_share_modal', {'id': event.id}) }}">
                         <span class="icon"><i class="fa-solid fa-share-nodes"></i></span>
                         <span>{{ 'events.button_share'|trans }}</span>
-                    </a>
+                    </button>
                 </div>
             </div>
 

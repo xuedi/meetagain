@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\String\TruncateMode;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Twig\Environment;
@@ -29,7 +28,6 @@ use function Symfony\Component\String\u;
 
 readonly class CmsService
 {
-    public const int DESCRIPTION_LENGTH = 155;
     private const string HOME_SLUG = 'index';
 
     private const string EVENT_TEASER_TAG = 'cms_event_teaser';
@@ -137,7 +135,7 @@ readonly class CmsService
             return null;
         }
 
-        return $text->truncate(self::DESCRIPTION_LENGTH, '…', TruncateMode::WordBefore)->toString();
+        return $text->toString();
     }
 
     /**

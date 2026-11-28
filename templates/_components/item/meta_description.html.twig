@@ -1,9 +1,9 @@
 {#
     Item Meta Description -- the meta description of an item detail page.
 
-    Cuts the item's own text the way a CMS page excerpt is cut - tags stripped, whitespace collapsed, a word
-    boundary before CmsService::DESCRIPTION_LENGTH - so every item type describes itself alike. Without text it
-    prints the line the caller built from the item's fields.
+    Hands over the item's own text the way a CMS page excerpt does - tags stripped, whitespace collapsed - so every
+    item type describes itself alike; page_description() cuts it to the snippet. Without text it prints the line the
+    caller built from the item's fields.
 
     Used in:    books / films / boardgames / dishes detail pages
     Parameters:
@@ -11,4 +11,4 @@
         - fallback (string, required) -- the line naming the item, printed when text is empty
 #}
 {%- set plain = (text|default('')|replace({'<': ' <'})|striptags|u).collapseWhitespace() -%}
-{{- plain.isEmpty() ? fallback : plain.truncate(constant('App\\Service\\Cms\\CmsService::DESCRIPTION_LENGTH'), '…', constant('Symfony\\Component\\String\\TruncateMode::WordBefore')) -}}
+{{- plain.isEmpty() ? fallback : plain -}}
