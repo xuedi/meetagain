@@ -41,7 +41,6 @@ readonly class PublishedContentAnonymizer implements AnonymizerInterface
             Claim::columns('mod_circulation_handover'),
             Claim::columns('mod_circulation_ledger', kept: ['context', 'item_type', 'payload']),
             Claim::columns('mod_circulation_request', kept: ['context', 'item_type']),
-            Claim::columns('mod_proposal_change', kept: ['target_type', 'changes']),
             Claim::columns('mod_proposal_suggestion', kept: ['target_type', 'payload', 'scope']),
             Claim::columns('mod_trust_grant', kept: ['context']),
             Claim::columns('mod_trust_context_config', kept: ['context', 'payload']),

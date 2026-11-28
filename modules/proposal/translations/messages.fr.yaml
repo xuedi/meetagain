@@ -1,6 +1,8 @@
 profile_review:
     suggestion_description: '%proposer% a proposé %target%'
     change_proposal_description: '%proposer% a proposé une modification de %target%'
+    change_proposal_reason: 'Motif : %reason%'
+    change_proposal_scope_requested: 'Demande une application plus large - ouvrez les détails pour en décider.'
 
 profile_social:
     activity_suggestion_created: 'A proposé : %target%'
@@ -45,6 +47,10 @@ review:
     flash_not_pending: 'Cette proposition a déjà été traitée.'
     flash_scope_unavailable: 'Cette modification ne peut plus être appliquée aux dates suivantes.'
     flash_already_resolved: 'Ce champ a déjà été traité.'
+    flash_own_proposal: 'Vous avez proposé cette modification, quelqu''un d''autre en décide donc.'
+    reason_label: 'Motif'
+    requested_scope: 'Demandé : %scope%'
+    own_proposal_note: 'Vous avez proposé cette modification, quelqu''un d''autre en décide donc.'
     flash_invalid_csrf: 'Jeton CSRF invalide.'
     flash_action_failed: 'L''action n''a pas pu être effectuée.'
     resolution_applied: 'Appliquée'

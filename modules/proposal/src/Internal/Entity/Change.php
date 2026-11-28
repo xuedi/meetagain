@@ -4,6 +4,7 @@ namespace Module\Proposal\Internal\Entity;
 
 use App\Entity\User;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 use Module\Proposal\Contract\Change\FieldChange;
@@ -42,6 +43,12 @@ class Change
     /** @var array<string, array{before: ?string, after: ?string, resolution: ?string}> */
     #[ORM\Column]
     private array $changes = [];
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $reason = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $requestedScope = null;
 
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
@@ -180,6 +187,35 @@ class Change
     public function hasAppliedField(): bool
     {
         return array_any($this->getChanges(), static fn(FieldChange $change): bool => $change->isApplied());
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?string $reason): static
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getRequestedScope(): ?string
+    {
+        return $this->requestedScope;
+    }
+
+    public function setRequestedScope(?string $requestedScope): static
+    {
+        $this->requestedScope = $requestedScope;
+
+        return $this;
+    }
+
+    public function isProposedBy(User $user): bool
+    {
+        return $this->proposedBy->getId() === $user->getId();
     }
 
     public function getCreatedAt(): DateTimeImmutable

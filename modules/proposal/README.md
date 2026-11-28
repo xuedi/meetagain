@@ -51,8 +51,8 @@ own `Portable*` value object for fixtures and archives. Both speak in user ids; 
 ## One public template
 
 `@Proposal/change/_card.html.twig` renders one pending change as a field table with its actions, and is the only
-template the application includes from outside: the `/contribute` correction forms show the member's own pending
-changes with it. It reads a `Change\View` plus the rows the caller hands in, so a caller never needs the entity.
+template the application includes from outside: the correction forms and the event suggestion page show the
+member's own pending changes with it. It reads a `Change\View` plus the rows the caller hands in, so a caller never needs the entity.
 
 ## Seams
 

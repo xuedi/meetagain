@@ -7,11 +7,12 @@ interface ChangeInterface
     public const string BALLOT_PURPOSE = 'contribution.field';
 
     /**
-     * Drops unchanged fields; null when nothing was left to propose, otherwise the new proposal id.
+     * Drops unchanged fields; null when nothing was left to propose, otherwise the new proposal id. A requested scope
+     * the target does not offer is not stored.
      *
      * @param list<FieldChange> $changes
      */
-    public function propose(string $targetType, int $targetId, int $proposerId, array $changes): ?int;
+    public function propose(string $targetType, int $targetId, int $proposerId, array $changes, ?string $reason = null, ?string $requestedScope = null): ?int;
 
     /** @return list<View> */
     public function pendingFor(string $targetType, int $targetId): array;

@@ -197,6 +197,76 @@ final class LifecycleTest extends KernelTestCase
         self::assertSame([], $this->changes()->exportPending([]));
     }
 
+    public function testTheReasonAndAnOfferedScopeAreStoredAndAnUnofferedScopeIsNot(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposerId = (int) $this->members()->member('Proposer')->getId();
+
+        // Act
+        $offered = $this->changes()->propose(Target::TYPE, 7, $proposerId, [new FieldChange('name', 'a', 'b')], '  Typo in the name  ', Target::SCOPE);
+        $forged = $this->changes()->propose(Target::TYPE, 8, $proposerId, [new FieldChange('name', 'a', 'c')], '   ', 'everything');
+
+        // Assert
+        self::assertNotNull($offered);
+        self::assertNotNull($forged);
+        self::assertSame('Typo in the name', $this->changes()->find($offered)?->reason);
+        self::assertSame(Target::SCOPE, $this->changes()->find($offered)?->requestedScope);
+        self::assertNull($this->changes()->find($forged)?->reason);
+        self::assertNull($this->changes()->find($forged)?->requestedScope);
+    }
+
+    public function testRestoreKeepsTheReasonAndTheRequestedScope(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposerId = (int) $this->members()->member('Proposer')->getId();
+
+        // Act
+        $this->changes()->restore(
+            new PortableChange(Target::TYPE, 9, $proposerId, [new FieldChange('name', 'a', 'b')], new DateTimeImmutable(), 'Why', Target::SCOPE),
+        );
+        $exported = $this->changes()->exportPending([Target::TYPE]);
+
+        // Assert
+        self::assertSame('Why', $exported[0]->reason);
+        self::assertSame(Target::SCOPE, $exported[0]->requestedScope);
+    }
+
+    public function testTheProposerCannotResolveTheirOwnProposal(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposer = $this->members()->member('Proposer');
+        $this->target()->reviewerIds = [(int) $proposer->getId()];
+        $id = (int) $this->changes()->propose(Target::TYPE, 7, (int) $proposer->getId(), [
+            new FieldChange('name', 'Cafe', 'Cafe Central'),
+            new FieldChange('street', 'Main 1', 'Main 2'),
+        ]);
+
+        // Act
+        $refusals = 0;
+        foreach ([
+            fn() => $this->service()->applyField($this->stored($id), 'name', $proposer),
+            fn() => $this->service()->denyField($this->stored($id), 'street', $proposer),
+            fn() => $this->service()->approveAll($this->stored($id), $proposer),
+            fn() => $this->service()->rejectAll($this->stored($id), $proposer),
+        ] as $attempt) {
+            try {
+                $attempt();
+            } catch (ChangeException $e) {
+                self::assertSame('review.flash_own_proposal', $e->getMessage());
+                ++$refusals;
+            }
+        }
+
+        // Assert
+        self::assertSame(4, $refusals);
+        self::assertSame([], $this->target()->applied);
+        self::assertSame(Status::Pending, $this->changes()->find($id)?->status);
+        self::assertSame([], $this->service()->pendingReviewableBy($proposer));
+    }
+
     public function testRemovingATargetsProposalsLeavesOthersAlone(): void
     {
         // Arrange

@@ -22,7 +22,7 @@
                         <p class="has-text-grey">{{ 'review.empty_state'|trans }}</p>
                     {% else %}
                         {% for card in cards %}
-                            {{ include('@Proposal/change/_card.html.twig', {card: card, canReview: canReview, targetType: targetType, targetId: targetId, applyScope: applyScope}) }}
+                            {{ include('@Proposal/change/_card.html.twig', {card: card, canReview: canReview and not card.isProposer, ownCard: canReview and card.isProposer, targetType: targetType, targetId: targetId, applyScope: applyScope}) }}
                         {% endfor %}
                     {% endif %}
 

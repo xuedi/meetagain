@@ -19,5 +19,6 @@ readonly class ReviewNotificationItem
         public ?string $approveLabelKey = null,
         public array $fields = [],
         public ?Image $image = null,
+        public bool $canApprove = true,
     ) {}
 }

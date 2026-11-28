@@ -97,6 +97,10 @@ final readonly class FieldBallotService implements SettlementListenerInterface
 
         $winner = $this->parse($winningKey);
         $winningProposal = $winner === null || $winner[0] === self::KEEP ? null : $this->proposals->get($winner[0]);
+        if ($winningProposal?->isProposedBy($steward) === true) {
+            throw new ChangeException('review.flash_own_proposal');
+        }
+
         if ($scope !== null && $view->subject !== null) {
             $this->proposals->assertApplyScope($view->subject->type, $view->subject->id, $scope);
         }
@@ -178,7 +182,7 @@ final readonly class FieldBallotService implements SettlementListenerInterface
         }
 
         if ($winningProposal !== null) {
-            $this->proposals->applyField($winningProposal, $field, $reviewer);
+            $this->proposals->applySettledField($winningProposal, $field, $reviewer);
         }
 
         $this->denyTheLosers($subject, $field, $reviewer, $winningProposal);
@@ -191,7 +195,7 @@ final readonly class FieldBallotService implements SettlementListenerInterface
                 continue;
             }
 
-            $this->proposals->denyField($proposal, $field, $reviewer);
+            $this->proposals->denySettledField($proposal, $field, $reviewer);
         }
     }
 

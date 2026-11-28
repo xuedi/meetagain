@@ -153,6 +153,8 @@ details.is-menu-dropdown {
 }
 #dropdown-cookie {
     min-width: 350px;
+
+    .dropdown-content:empty { display: none; }
 }
 
 .menu {

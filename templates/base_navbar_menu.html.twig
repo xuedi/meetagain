@@ -15,7 +15,6 @@
             <a class="navbar-item" href="{{ path('app_profile_social') }}">{{ "chrome.menu_profile_social" | trans }}</a>
             <a class="navbar-item" href="{{ path('app_profile_messages') }}">{{ "chrome.menu_profile_messages" | trans }}</a>
             <a class="navbar-item" href="{{ path('app_profile_images') }}">{{ "chrome.menu_profile_images" | trans }}</a>
-            <a class="navbar-item" href="{{ path('app_contribution_index') }}">{{ "chrome.menu_contribute" | trans }}</a>
             {% for link in get_plugin_profile_dropdown_links() %}
                 <a class="navbar-item" href="{{ link.slug }}">{{ link.name | trans }}</a>
             {% endfor %}

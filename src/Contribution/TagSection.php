@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Item\Tag\TypeRegistry;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class TagSection implements TargetProviderInterface
 {
@@ -15,7 +14,6 @@ readonly class TagSection implements TargetProviderInterface
     public function __construct(
         private TypeRegistry $types,
         private Security $security,
-        private TranslatorInterface $translator,
     ) {}
 
     #[Override]
@@ -28,33 +26,6 @@ readonly class TagSection implements TargetProviderInterface
     public function getPluginKey(): string
     {
         return '';
-    }
-
-    #[Override]
-    public function getLabelKey(): string
-    {
-        return 'contribution.section_tags';
-    }
-
-    #[Override]
-    public function getIcon(): string
-    {
-        return 'fa-tags';
-    }
-
-    #[Override]
-    public function listForMember(User $user): array
-    {
-        if ($this->security->isGranted('ROLE_STEWARD')) {
-            return [];
-        }
-
-        $entries = [];
-        foreach ($this->types->all() as $type) {
-            $entries[] = new Entry($type->getTypeKey(), $this->translator->trans($type->getLabelKey()));
-        }
-
-        return $entries;
     }
 
     #[Override]

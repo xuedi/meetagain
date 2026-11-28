@@ -40,12 +40,14 @@
                     {{ 'profile_review.link_details'|trans }}
                 </a>
                 {% endif %}
+                {% if item.canApprove %}
                 <a data-action="profile-review-approve-click" href="{{ path('app_profile_review_approve', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
                    class="button is-success"
                    data-post
                    data-csrf-token="{{ csrfToken }}">
                     {{ (item.approveLabelKey ?? 'profile_review.button_approve')|trans }}
                 </a>
+                {% endif %}
                 {% if item.canDeny %}
                 <a data-action="profile-review-deny-click" href="{{ path('app_profile_review_deny', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
                    class="button is-danger is-outlined"

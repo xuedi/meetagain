@@ -3,7 +3,6 @@
 namespace Plugin\Glossary\Contribution;
 
 use App\Contribution\Draft;
-use App\Contribution\Entry;
 use App\Contribution\RowFormInterface;
 use App\Entity\User;
 use App\Item\Tag\AssignmentFormHelper;
@@ -35,29 +34,6 @@ readonly class GlossarySection implements RowFormInterface
     public function getPluginKey(): string
     {
         return 'glossary';
-    }
-
-    #[Override]
-    public function getLabelKey(): string
-    {
-        return 'glossary.menu_main';
-    }
-
-    #[Override]
-    public function getIcon(): string
-    {
-        return 'fa-book';
-    }
-
-    #[Override]
-    public function listForMember(User $user): array
-    {
-        $entries = [];
-        foreach ($this->service->getList() as $entry) {
-            $entries[] = new Entry((int) $entry->getId(), (string) $entry->getPhrase(), $entry->getSecondary());
-        }
-
-        return $entries;
     }
 
     #[Override]

@@ -1,36 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'contribution.page_title'|trans }}{% endblock %}
+{% block title %}{{ ({suggest: 'contribution.suggest_page_title', correct_tags: 'item.tag_page_title'}[pane] ?? 'contribution.correct_page_title')|trans({'%type%': typeLabelKey|default('')|trans}) }}{% endblock %}
 
 {% block body %}
 
-    {% set activeSection = sections|filter(section => section.type == activeType)|first %}
-
     <section class="section">
         <div class="container">
-
-            {{ include('contribution/_tabs.html.twig') }}
-
-            <div class="columns">
-
-                {% if activeSection %}
-                    <div class="column is-3">
-                        {{ include('contribution/_nav.html.twig', {section: activeSection}) }}
-                    </div>
-                {% endif %}
-
-                <div class="column{{ activeSection ? ' is-9' : '' }}">
+            <div class="columns is-centered">
+                <div class="column is-two-thirds">
                     {% if pane == 'correct' %}
                         {{ include('contribution/_correct_form.html.twig') }}
                     {% elseif pane == 'correct_tags' %}
                         {{ include('contribution/_tag_form.html.twig') }}
-                    {% elseif pane == 'suggest' %}
-                        {{ include('contribution/_suggest_form.html.twig') }}
                     {% else %}
-                        {{ include('contribution/_intro.html.twig') }}
+                        {{ include('contribution/_suggest_form.html.twig') }}
                     {% endif %}
                 </div>
-
             </div>
         </div>
     </section>

@@ -65,7 +65,7 @@ final class ChangeController extends AbstractController
             'targetId' => $targetId,
             'cards' => $cards,
             'canReview' => $canReview,
-            'applyScope' => $canReview ? $this->service->applyScopeFor($targetType, $targetId) : null,
+            'applyScope' => $this->service->applyScopeFor($targetType, $targetId),
         ]);
     }
 
