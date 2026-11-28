@@ -1,10 +1,13 @@
+{% set on_cookie_page = app.current_route == 'app_cookie' %}
 <div class="navbar-item dropdown is-hoverable is-right" id="cookie-consent-dropdown" role="region" aria-label="{{ "cookie.consent_button" | trans }}">
     <div class="dropdown-trigger">
         <a data-action="cookie-consent-open" data-action-place="navbar"
             href="{{ path('app_cookie') }}"
             class="button cookie-button"
+            {% if not on_cookie_page %}
             aria-haspopup="dialog"
             aria-expanded="false"
+            {% endif %}
         >
             <span class="cookie-consent-label is-sr-only">{{ "cookie.consent_button" | trans }}</span>
             <span class="icon is-small">
@@ -12,7 +15,9 @@
             </span>
         </a>
     </div>
+    {% if not on_cookie_page %}
     <div class="dropdown-menu" id="dropdown-cookie">
         <div class="dropdown-content" role="dialog" aria-labelledby="cookie-form-title" aria-describedby="cookie-form-description" data-fragment-url="{{ path('app_cookie_consent_fragment') }}"></div>
     </div>
+    {% endif %}
 </div>
