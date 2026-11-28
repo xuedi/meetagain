@@ -309,18 +309,17 @@ class Event
         return $this->findTranslation($language)?->getDescription() ?? '';
     }
 
-    public function getMetaDescription(string $language, string $meetingAtLabel = 'meeting at'): string
+    public function getMetaDescription(string $language): string
     {
-        $base = $this->getTitle($language);
-        $description = strip_tags($this->getDescription($language));
-        if ($description !== '') {
-            $base = mb_substr($description, 0, 140);
-        }
-        if ($this->getTeaser($language) !== '') {
-            $base = $this->getTeaser($language);
+        $teaser = $this->getTeaser($language);
+        if ($teaser !== '') {
+            return $teaser;
         }
 
-        return $base . ' - ' . $meetingAtLabel . ' ' . $this->start->format('Y-m-d H:i');
+        $text = html_entity_decode(strip_tags(str_replace('<', ' <', $this->getDescription($language))), ENT_QUOTES | ENT_HTML5);
+        $description = trim((string) preg_replace('/\s+/u', ' ', $text));
+
+        return $description !== '' ? $description : $this->getTitle($language);
     }
 
     /**

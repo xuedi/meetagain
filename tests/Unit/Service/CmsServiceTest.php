@@ -353,7 +353,7 @@ class CmsServiceTest extends TestCase
     }
 
     #[DataProvider('descriptionProvider')]
-    public function testHandleCutsThePageExcerptAndFlagsTheHomePage(string $slug, ?string $content, ?string $expectedDescription, bool $expectedHome): void
+    public function testHandleHandsOverThePageExcerptAndFlagsTheHomePage(string $slug, ?string $content, ?string $expectedDescription, bool $expectedHome): void
     {
         // Arrange
         $cmsStub = $this->createStub(Cms::class);
@@ -382,7 +382,7 @@ class CmsServiceTest extends TestCase
         yield 'markup only gives none' => ['about', '<p> </p><br>', null, false];
         yield 'tags are stripped and blocks keep a space' => ['about', '<h2>Title</h2><p>Body &amp; soul</p>', 'Title Body & soul', false];
         yield 'whitespace collapses' => ['about', "Line one\n\n   line   two", 'Line one line two', false];
-        yield 'a long text is cut before a word with an ellipsis' => ['about', $long, rtrim(str_repeat('weiqi ', 25)) . '…', false];
+        yield 'a long text comes through whole' => ['about', $long, rtrim($long), false];
         yield 'the home page is flagged' => ['index', '<p>Welcome.</p>', 'Welcome.', true];
     }
 

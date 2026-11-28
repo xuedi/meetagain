@@ -11,6 +11,7 @@ chrome:
     meta_description_events: 'Entdecke kommende Veranstaltungen und Treffen.'
     meta_description_members: 'Lerne die Mitglieder dieser Community kennen.'
     title_page_site: '%title% - %site%'
+    title_page_detail: '%title% - %detail%'
     title_page_site_place: '%title% - %site%, %place%'
     title_site_place: '%site%, %place%'
     menu_login: 'Anmelden'
