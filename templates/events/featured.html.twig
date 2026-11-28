@@ -24,7 +24,7 @@
                                 </figure>
                             </div>
                             <div class="card-content">
-                                <h2 class="title is-5">{{ event.title(app.locale) }}</h2>
+                                <p class="title is-5">{{ event.title(app.locale) }}</p>
                                 <p class="subtitle is-6">{% if event.location %}{{ event.location.name }} - {% endif %}{{ event.start | time_diff }}</p>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                                 </figure>
                             </div>
                             <div class="card-content">
-                                <h2 class="title is-5">{{ event.title(app.locale) }}</h2>
+                                <p class="title is-5">{{ event.title(app.locale) }}</p>
                                 <p class="subtitle is-6">{% if event.location %}{{ event.location.name }} - {% endif %}{{ event.start | time_diff }}</p>
                             </div>
                         </div>
