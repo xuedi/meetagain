@@ -751,7 +751,7 @@ cookie:
     option_external_media_text: 'Load embedded videos from YouTube, TikTok and similar services. When a video loads, your IP address and browser details are sent to the provider, which may store data on your device. Without this, you are asked before each video.'
     button_accept: 'Accept'
     button_deny: 'Reject'
-    button_status: 'Status'
+    button_status: 'Settings'
     options: 'Optional cookies'
     cookies_text: 'Lets us store your language so the site opens in it on your next visit. We store your cookie decision either way, so the cookie popup does not appear again.'
     current_status: 'Current Status'

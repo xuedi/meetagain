@@ -1,0 +1,70 @@
+<form action="{{ path('app_cookie') }}" method="post" aria-labelledby="cookie-form-title">
+    <h2 id="cookie-form-title" class="navbar-item title is-5 mb-0">{{ "cookie.consent_headline" | trans }}</h2>
+    <p id="cookie-form-description" class="navbar-item is-6">
+        {{ "cookie.consent_text" | trans }}
+    </p>
+    <h3 id="cookie-options-title" class="navbar-item title mt-5 mb-0 is-size-6">{{ "cookie.options" | trans }}</h3>
+    <div class="navbar-item">
+        <div class="list" role="group" aria-labelledby="cookie-options-title">
+            <div class="list-item mt-0">
+                <div class="list-item-content">
+                    <div class="list-item-title">
+                        <label class="checkbox" for="osm_consent_checkbox">
+                            <input data-action="cookie-osm-toggle" data-action-place="navbar"
+                                type="checkbox"
+                                name="osm_consent_checkbox"
+                                {% if osmGranted %}checked{% endif %}
+                                id="osm_consent_checkbox"
+                                aria-describedby="osm-description"
+                            />
+                            <strong>{{ "cookie.option_osm" | trans }}</strong>
+                        </label>
+                    </div>
+                    <div id="osm-description" class="list-item-description has-text-grey is-size-7">
+                        {{ "cookie.option_osm_text" | trans }}
+                    </div>
+                </div>
+            </div>
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-title">
+                        <label class="checkbox" for="external_media_consent_checkbox">
+                            <input data-action="cookie-media-toggle" data-action-place="navbar"
+                                type="checkbox"
+                                name="external_media_consent_checkbox"
+                                {% if externalMediaGranted %}checked{% endif %}
+                                id="external_media_consent_checkbox"
+                                aria-describedby="external-media-description"
+                            />
+                            <strong>{{ "cookie.option_external_media" | trans }}</strong>
+                        </label>
+                    </div>
+                    <div id="external-media-description" class="list-item-description has-text-grey is-size-7">
+                        {{ "cookie.option_external_media_text" | trans }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navbar-item">
+        <button data-action="cookie-accept-click" data-action-place="navbar"
+            type="button"
+            class="button mr-2 cookieTrigger"
+            data-url="{{ path('app_ajax_cookie_accept') }}"
+            data-token="{{ csrf_token('cookie_accept') }}"
+            aria-label="{{ "cookie.button_accept" | trans }}"
+        >{{ "cookie.button_accept" | trans }}</button>
+        <button data-action="cookie-deny-click" data-action-place="navbar"
+            type="button"
+            class="button mr-2 cookieTrigger"
+            data-url="{{ path('app_ajax_cookie_deny') }}"
+            data-token="{{ csrf_token('cookie_deny') }}"
+            aria-label="{{ "cookie.button_deny" | trans }}"
+        >{{ "cookie.button_deny" | trans }}</button>
+        <a data-action="cookie-status-click" data-action-place="navbar"
+            href="{{ path('app_cookie') }}"
+            class="button"
+            aria-label="{{ "cookie.button_status" | trans }}"
+        >{{ "cookie.button_status" | trans }}</a>
+    </div>
+</form>

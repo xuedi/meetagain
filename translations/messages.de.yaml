@@ -751,7 +751,7 @@ cookie:
     option_external_media_text: 'Eingebettete Videos von YouTube, TikTok und ähnlichen Diensten laden. Beim Laden eines Videos werden deine IP-Adresse und Browserdaten an den Anbieter übertragen, der Daten auf deinem Gerät speichern kann. Ohne diese Zustimmung wirst du vor jedem Video gefragt.'
     button_accept: 'Akzeptieren'
     button_deny: 'Ablehnen'
-    button_status: 'Status'
+    button_status: 'Einstellungen'
     options: 'Optionale Cookies'
     cookies_text: 'Erlaubt uns, deine Sprache zu speichern, damit die Seite beim nächsten Besuch in deiner Sprache öffnet. Deine Cookie-Entscheidung speichern wir in jedem Fall, damit das Cookie-Popup nicht erneut erscheint.'
     current_status: 'Jetziger Status'

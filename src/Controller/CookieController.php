@@ -10,13 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/cookie')]
 final class CookieController extends AbstractController
 {
     public function __construct(
         private readonly LocaleCookieService $localeCookieService,
     ) {}
 
-    #[Route('/cookie/', name: 'app_cookie', methods: ['GET', 'POST'])]
+    #[Route('/', name: 'app_cookie', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
         $consent = Consent::getBySession($request->getSession());
@@ -56,5 +57,23 @@ final class CookieController extends AbstractController
             'form' => $form,
             'consent' => $consent,
         ]);
+    }
+
+    #[Route('/consent', name: 'app_cookie_consent_fragment', methods: ['GET'])]
+    public function consentFragment(Request $request): Response
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_cookie');
+        }
+
+        $consent = $request->hasPreviousSession() ? Consent::getBySession($request->getSession()) : new Consent();
+
+        $response = new Response($this->renderView('cookie/_consent_body.html.twig', [
+            'osmGranted' => $consent->getOsm() === ConsentType::Granted,
+            'externalMediaGranted' => $consent->getExternalMedia() === ConsentType::Granted,
+        ]));
+        $response->headers->set('X-Robots-Tag', 'noindex');
+
+        return $response;
     }
 }

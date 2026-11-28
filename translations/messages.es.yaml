@@ -751,7 +751,7 @@ cookie:
     option_external_media_text: 'Cargar vídeos incrustados de YouTube, TikTok y servicios similares. Al cargarse un vídeo, tu dirección IP y los datos de tu navegador se envían al proveedor, que puede guardar datos en tu dispositivo. Sin este permiso, se te preguntará antes de cada vídeo.'
     button_accept: 'Aceptar'
     button_deny: 'Rechazar'
-    button_status: 'Estado'
+    button_status: 'Ajustes'
     options: 'Cookies opcionales'
     cookies_text: 'Nos permite guardar tu idioma para que el sitio se abra en él en tu próxima visita. Tu elección de cookies la guardamos en cualquier caso, para que la ventana de cookies no vuelva a aparecer.'
     current_status: 'Estado actual'

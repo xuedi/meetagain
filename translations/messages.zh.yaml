@@ -751,7 +751,7 @@ cookie:
     option_external_media_text: '加载来自 YouTube、TikTok 等服务的嵌入视频。视频加载时，您的 IP 地址和浏览器信息会发送给该服务商，服务商可能会在您的设备上存储数据。如不允许，每个视频播放前都会先询问您。'
     button_accept: '接受'
     button_deny: '拒绝'
-    button_status: '状态'
+    button_status: '设置'
     options: '可选 Cookie'
     cookies_text: '允许我们保存您的语言，以便您下次访问时网站以该语言打开。无论您如何选择，我们都会保存您的 Cookie 决定，这样 Cookie 弹窗就不会再次出现。'
     current_status: '当前状态'

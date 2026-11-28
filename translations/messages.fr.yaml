@@ -751,7 +751,7 @@ cookie:
     option_external_media_text: 'Charger les vidéos intégrées de YouTube, TikTok et services similaires. Lorsqu''une vidéo se charge, ton adresse IP et les informations de ton navigateur sont transmises au fournisseur, qui peut stocker des données sur ton appareil. Sans cette autorisation, la question t''est posée avant chaque vidéo.'
     button_accept: 'Accepter'
     button_deny: 'Refuser'
-    button_status: 'Statut'
+    button_status: 'Paramètres'
     options: 'Cookies optionnels'
     cookies_text: 'Nous permet d''enregistrer ta langue pour que le site s''ouvre dans cette langue lors de ta prochaine visite. Nous enregistrons ton choix de cookies dans tous les cas, pour que la fenêtre de cookies ne réapparaisse pas.'
     current_status: 'Statut actuel'
