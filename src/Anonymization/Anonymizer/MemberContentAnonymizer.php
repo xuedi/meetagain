@@ -34,6 +34,7 @@ readonly class MemberContentAnonymizer implements AnonymizerInterface
             Claim::columns('moderation_report', rewritten: ['subject_label', 'excerpt', 'remarks', 'resolution_note'], kept: ['subject_type']),
             Claim::columns('item_report', rewritten: ['explanation', 'notifier_name', 'notifier_email'], kept: ['item_type', 'item_label', 'locale']),
             Claim::columns('image_report', rewritten: ['remarks']),
+            Claim::columns('mod_proposal_change', rewritten: ['reason'], kept: ['target_type', 'changes', 'requested_scope']),
             Claim::emptied('account_deletion_feedback'),
         ];
     }
@@ -49,6 +50,7 @@ readonly class MemberContentAnonymizer implements AnonymizerInterface
         $texts += $this->scrubber->fill('moderation_report', 'excerpt', 'remarks', 'resolution_note');
         $texts += $this->scrubber->fill('item_report', 'explanation');
         $texts += $this->scrubber->fill('image_report', 'remarks');
+        $texts += $this->scrubber->fill('mod_proposal_change', 'reason');
 
         $this->scrubber->rewrite('host', ['name' => "CONCAT('Host ', id)"]);
         $this->scrubber->rewrite('support_request', ['email' => $this->scrubber->address('support')], 'email IS NOT NULL');

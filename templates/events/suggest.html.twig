@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'events.suggest_page_title'|trans }} - {{ event.title(app.locale) }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{{ 'events.suggest_page_title'|trans }}</h1>
+            <p class="subtitle is-6">
+                <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.title(app.locale) }}</a>
+                <span class="has-text-grey">- {{ event.start|date(get_date_format()) }}</span>
+            </p>
+
+            {% if pendingCards is not empty %}
+                <h2 class="title is-5 mt-5">{{ 'events.suggest_pending_heading'|trans }}</h2>
+                {% for card in pendingCards %}
+                    {{ include('@Proposal/change/_card.html.twig', {card: card, canReview: false, applyScope: applyScope}) }}
+                {% endfor %}
+            {% endif %}
+
+            {{ form_start(form, {attr: {'data-action': 'event-suggest-submit'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<span hidden data-action="event-suggest-error" data-action-field="{{ form.children|filter(child => (child.vars.errors ?? [])|length > 0)|keys|join(',') }}"></span>{% endif %}
+            {% if preview %}
+                <div class="box" data-suggest-preview>
+                    <h2 class="title is-5">{{ 'events.suggest_preview_heading'|trans }}</h2>
+                    <p class="mb-4">{{ 'events.suggest_preview_intro'|trans }}</p>
+                    {% for row in preview %}
+                        {% include '_components/value_diff.html.twig' with {label: row.label, before: row.before, after: row.after} only %}
+                    {% endfor %}
+                    <p class="mt-4"><span class="has-text-weight-semibold">{{ 'events.suggest_label_reason'|trans }}:</span> {{ form.reason.vars.value|nl2br }}</p>
+                    {% if seriesRequested %}
+                        <p class="mt-2"><span class="tag is-success is-light">{{ 'events.suggest_label_series'|trans }}</span></p>
+                    {% endif %}
+                </div>
+                <div hidden>{{ form_widget(form) }}</div>
+                <div class="buttons">
+                    <button type="submit" name="step" value="back" class="button">
+                        {{ 'events.suggest_button_back'|trans }}
+                    </button>
+                    <button type="submit" name="step" value="submit" class="button is-primary">
+                        {{ 'events.suggest_button_submit'|trans }}
+                    </button>
+                </div>
+            {% else %}
+                <div class="box">
+                    <h2 class="title is-5">{{ 'events.suggest_box_heading'|trans }}</h2>
+                    <p class="mb-4 has-text-grey">{{ 'events.suggest_language_note'|trans({'%language%': ('language_' ~ app.locale)|trans}) }}</p>
+                    {% for property in ['title', 'teaser', 'description'] %}
+                        <p class="has-text-weight-semibold mb-2">{{ form[property].vars.label|trans }}</p>
+                        <div class="columns">
+                            <div class="column is-half">
+                                <p class="is-size-7 has-text-grey mb-1">{{ 'events.suggest_col_current'|trans }}</p>
+                                <div class="box is-shadowless has-background-light p-3">
+                                    {% if current[property] %}
+                                        {{ current[property]|nl2br }}
+                                    {% else %}
+                                        <em class="has-text-grey">{{ 'shared.value_diff_empty'|trans }}</em>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="column is-half">
+                                <p class="is-size-7 has-text-grey mb-1">{{ 'events.suggest_col_new'|trans }}</p>
+                                {{ form_widget(form[property], {attr: {'aria-label': form[property].vars.label|trans}}) }}
+                                {{ form_errors(form[property]) }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="columns">
+                    <div class="column is-half">
+                        {{ form_row(form.reason) }}
+                        {% if form.series is defined %}
+                            {{ form_row(form.series) }}
+                        {% endif %}
+                    </div>
+                    <div class="column is-half">
+                        <div class="notification is-info is-light">
+                            <p class="has-text-weight-semibold mb-2">{{ 'events.suggest_info_heading'|trans }}</p>
+                            <p>{{ 'events.suggest_info_body'|trans }}</p>
+                        </div>
+                    </div>
+                </div>
+                {{ form_rest(form) }}
+                <div class="buttons">
+                    <button type="submit" name="step" value="preview" class="button is-primary">
+                        {{ 'events.suggest_button_preview'|trans }}
+                    </button>
+                    <a href="{{ path('app_event_details', {id: event.id}) }}" class="button is-text">{{ 'events.suggest_link_cancel'|trans }}</a>
+                </div>
+            {% endif %}
+            {{ form_end(form) }}
+        </div>
+    </section>
+
+{% endblock %}

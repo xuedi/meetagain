@@ -1,6 +1,8 @@
 profile_review:
     suggestion_description: '%proposer% suggested %target%'
     change_proposal_description: '%proposer% proposed a change to %target%'
+    change_proposal_reason: 'Reason: %reason%'
+    change_proposal_scope_requested: 'Asks for a wider apply - open the details to decide it.'
 
 profile_social:
     activity_suggestion_created: 'Suggested: %target%'
@@ -45,6 +47,10 @@ review:
     flash_not_pending: 'This proposal has already been resolved.'
     flash_scope_unavailable: 'This change can no longer be applied to the following dates.'
     flash_already_resolved: 'This field has already been resolved.'
+    flash_own_proposal: 'You proposed this change, so someone else decides it.'
+    reason_label: 'Reason'
+    requested_scope: 'Requested: %scope%'
+    own_proposal_note: 'You proposed this change, so someone else decides it.'
     flash_invalid_csrf: 'Invalid CSRF token.'
     flash_action_failed: 'The action could not be completed.'
     resolution_applied: 'Applied'

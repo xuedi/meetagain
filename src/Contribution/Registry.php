@@ -7,8 +7,8 @@ use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Service\ResetInterface;
 
-// Gated on getActiveList(), not getGloballyActiveList(): the hub is a UI surface, so a section
-// follows whether its plugin is on for this request
+// Gated on getActiveList(), not getGloballyActiveList(): the correction forms are a UI surface, so a
+// provider follows whether its plugin is on for this request
 class Registry implements ResetInterface
 {
     private const string CORE_PLUGIN_KEY = '';
@@ -24,7 +24,6 @@ class Registry implements ResetInterface
     public function __construct(
         #[AutowireIterator(TargetProviderInterface::class)]
         private readonly iterable $providers,
-        private readonly ScopeFilterService $scope,
         private readonly PluginService $pluginService,
     ) {}
 
@@ -65,35 +64,6 @@ class Registry implements ResetInterface
         }
 
         return null;
-    }
-
-    /**
-     * @return list<Section>
-     */
-    public function sectionsFor(User $user): array
-    {
-        $sections = [];
-        foreach ($this->all() as $provider) {
-            $sections[] = new Section($provider->getType(), $provider->getLabelKey(), $provider->getIcon(), $this->entriesFor($provider->getType(), $user));
-        }
-
-        return $sections;
-    }
-
-    /**
-     * @return list<Entry>
-     */
-    public function entriesFor(string $type, User $user): array
-    {
-        $provider = $this->providerFor($type);
-        if ($provider === null) {
-            return [];
-        }
-
-        $entries = $provider->listForMember($user);
-        $reachable = array_fill_keys($this->scope->narrow($type, array_map(static fn(Entry $entry): int|string => $entry->id, $entries), $user), true);
-
-        return array_values(array_filter($entries, static fn(Entry $entry): bool => isset($reachable[$entry->id])));
     }
 
     public function mayTouch(string $type, User $user, int|string $id): bool

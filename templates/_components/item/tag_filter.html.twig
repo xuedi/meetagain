@@ -9,7 +9,7 @@
     nothing when the type has no tags.
 
     The header row carries a pencil for any logged-in visitor - to the steward's editor, or to the
-    contribution hub's tag pane - with the pending-proposal count as a badge for reviewers. It lives
+    tag suggestion form - with the pending-proposal count as a badge for reviewers. It lives
     inside the swapped fragment, so it survives a facet click.
 
     Used in:    _components/item/sidebar.html.twig, App\Controller\ItemController::listFragment
@@ -18,7 +18,7 @@
     Depends on: item_tag_rows(), item_tag_pending(), item_facet_current(),
                 item_facet_url(), item_facet_counts() (ItemTagExtension); item_list_url()
                 (ItemListExtension); _components/item/tag_indent.html.twig; the app_item_tags route
-                for a steward, the contribution hub's tag pane for everyone else;
+                for a steward, the tag suggestion form for everyone else;
                 assets/js/item-list.js for the swap, the mobile collapse and the "Show all" rows
 #}
 {% import _self as facet %}

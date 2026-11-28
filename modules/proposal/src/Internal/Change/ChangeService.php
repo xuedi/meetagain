@@ -34,7 +34,7 @@ readonly class ChangeService implements ChangeInterface
     ) {}
 
     #[Override]
-    public function propose(string $targetType, int $targetId, int $proposerId, array $changes): ?int
+    public function propose(string $targetType, int $targetId, int $proposerId, array $changes, ?string $reason = null, ?string $requestedScope = null): ?int
     {
         $provider = $this->providerFor($targetType);
 
@@ -53,6 +53,8 @@ readonly class ChangeService implements ChangeInterface
         $proposal->setTargetId($targetId);
         $proposal->setProposedBy($proposer);
         $proposal->setChanges($changed);
+        $proposal->setReason($this->normalizedReason($reason));
+        $proposal->setRequestedScope($this->offeredScope($provider, $targetId, $requestedScope));
 
         $this->em->persist($proposal);
         $this->em->flush();
@@ -63,6 +65,13 @@ readonly class ChangeService implements ChangeInterface
     }
 
     public function applyField(Change $proposal, string $field, User $reviewer, ?string $scope = null): void
+    {
+        $this->reviewableProvider($proposal, $reviewer);
+        $this->ensureNotOwn($proposal, $reviewer);
+        $this->applySettledField($proposal, $field, $reviewer, $scope);
+    }
+
+    public function applySettledField(Change $proposal, string $field, User $reviewer, ?string $scope = null): void
     {
         $provider = $this->reviewableProvider($proposal, $reviewer);
         $change = $this->unresolvedChange($proposal, $field);
@@ -83,6 +92,7 @@ readonly class ChangeService implements ChangeInterface
     public function applyAppliedFieldToScope(Change $proposal, string $field, User $reviewer, string $scope): void
     {
         $provider = $this->reviewableProvider($proposal, $reviewer);
+        $this->ensureNotOwn($proposal, $reviewer);
         $change = $proposal->getChange($field);
         if ($change->resolution !== FieldResolution::Applied) {
             throw new ChangeException('review.flash_scope_unavailable');
@@ -107,6 +117,13 @@ readonly class ChangeService implements ChangeInterface
     public function denyField(Change $proposal, string $field, User $reviewer): void
     {
         $this->reviewableProvider($proposal, $reviewer);
+        $this->ensureNotOwn($proposal, $reviewer);
+        $this->denySettledField($proposal, $field, $reviewer);
+    }
+
+    public function denySettledField(Change $proposal, string $field, User $reviewer): void
+    {
+        $this->reviewableProvider($proposal, $reviewer);
         $this->unresolvedChange($proposal, $field);
 
         $proposal->resolveField($field, FieldResolution::Denied);
@@ -117,6 +134,7 @@ readonly class ChangeService implements ChangeInterface
     public function approveAll(Change $proposal, User $reviewer): void
     {
         $provider = $this->reviewableProvider($proposal, $reviewer);
+        $this->ensureNotOwn($proposal, $reviewer);
         $this->ensurePending($proposal);
 
         $unresolved = $proposal->getUnresolvedChanges();
@@ -138,6 +156,7 @@ readonly class ChangeService implements ChangeInterface
     public function rejectAll(Change $proposal, User $reviewer): void
     {
         $this->reviewableProvider($proposal, $reviewer);
+        $this->ensureNotOwn($proposal, $reviewer);
         $this->ensurePending($proposal);
 
         foreach ($proposal->getUnresolvedChanges() as $change) {
@@ -149,7 +168,7 @@ readonly class ChangeService implements ChangeInterface
 
     public function withdraw(Change $proposal, User $user): void
     {
-        if ($proposal->getProposedBy()->getId() !== $user->getId()) {
+        if (!$proposal->isProposedBy($user)) {
             throw new AccessDeniedException('Only the proposer can withdraw a proposal.');
         }
         $this->ensurePending($proposal);
@@ -220,6 +239,8 @@ readonly class ChangeService implements ChangeInterface
         $proposal->setProposedBy($this->em->getReference(User::class, $change->proposerId));
         $proposal->setChanges($change->changes);
         $proposal->setCreatedAt($change->createdAt);
+        $proposal->setReason($this->normalizedReason($change->reason));
+        $proposal->setRequestedScope($change->requestedScope);
 
         $this->em->persist($proposal);
         $this->em->flush();
@@ -253,6 +274,10 @@ readonly class ChangeService implements ChangeInterface
     {
         $reviewable = [];
         foreach ($this->repo->findPending() as $proposal) {
+            if ($proposal->isProposedBy($user)) {
+                continue;
+            }
+
             $provider = $this->registry->providerFor($proposal->getTargetType());
             if ($provider === null || $provider->getTargetLabel($proposal->getTargetId()) === null) {
                 continue;
@@ -327,6 +352,8 @@ readonly class ChangeService implements ChangeInterface
             createdAt: $proposal->getCreatedAt(),
             changes: $proposal->getChanges(),
             rows: $this->fieldRows($proposal),
+            reason: $proposal->getReason(),
+            requestedScope: $proposal->getRequestedScope(),
         );
     }
 
@@ -357,6 +384,29 @@ readonly class ChangeService implements ChangeInterface
         }
 
         return $provider;
+    }
+
+    private function ensureNotOwn(Change $proposal, User $reviewer): void
+    {
+        if ($proposal->isProposedBy($reviewer)) {
+            throw new ChangeException('review.flash_own_proposal');
+        }
+    }
+
+    private function normalizedReason(?string $reason): ?string
+    {
+        $reason = trim((string) $reason);
+
+        return $reason === '' ? null : $reason;
+    }
+
+    private function offeredScope(TargetProviderInterface $provider, int $targetId, ?string $scope): ?string
+    {
+        if ($scope === null || !$provider instanceof ScopedTargetInterface) {
+            return null;
+        }
+
+        return ($provider->getApplyScope($targetId)['key'] ?? null) === $scope ? $scope : null;
     }
 
     private function ensurePending(Change $proposal): void

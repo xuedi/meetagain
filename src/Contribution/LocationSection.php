@@ -39,29 +39,6 @@ readonly class LocationSection implements RowFormInterface
     }
 
     #[Override]
-    public function getLabelKey(): string
-    {
-        return 'contribution.section_venues';
-    }
-
-    #[Override]
-    public function getIcon(): string
-    {
-        return 'fa-location-dot';
-    }
-
-    #[Override]
-    public function listForMember(User $user): array
-    {
-        $entries = [];
-        foreach ($this->locationRepo->findAllForAdmin() as $venue) {
-            $entries[] = new Entry((int) $venue->getId(), (string) $venue->getName(), $this->addressOf($venue));
-        }
-
-        return $entries;
-    }
-
-    #[Override]
     public function mayTouch(User $user, int|string $id): bool
     {
         $id = (int) $id;
@@ -144,12 +121,5 @@ readonly class LocationSection implements RowFormInterface
             'longitude' => $venue->getLongitude(),
             'latitude' => $venue->getLatitude(),
         ];
-    }
-
-    private function addressOf(Location $venue): ?string
-    {
-        $parts = array_filter([$venue->getStreet(), $venue->getCity()]);
-
-        return $parts === [] ? null : implode(', ', $parts);
     }
 }

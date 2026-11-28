@@ -1,6 +1,8 @@
 profile_review:
     suggestion_description: '%proposer% hat %target% vorgeschlagen'
     change_proposal_description: '%proposer% hat eine Änderung für %target% vorgeschlagen'
+    change_proposal_reason: 'Begründung: %reason%'
+    change_proposal_scope_requested: 'Wünscht eine breitere Übernahme - öffne die Details, um darüber zu entscheiden.'
 
 profile_social:
     activity_suggestion_created: 'Vorgeschlagen: %target%'
@@ -45,6 +47,10 @@ review:
     flash_not_pending: 'Dieser Vorschlag wurde bereits abgeschlossen.'
     flash_scope_unavailable: 'Diese Änderung lässt sich nicht mehr auf die folgenden Termine anwenden.'
     flash_already_resolved: 'Dieses Feld wurde bereits bearbeitet.'
+    flash_own_proposal: 'Du hast diese Änderung vorgeschlagen, deshalb entscheidet jemand anderes darüber.'
+    reason_label: 'Begründung'
+    requested_scope: 'Gewünscht: %scope%'
+    own_proposal_note: 'Du hast diese Änderung vorgeschlagen, deshalb entscheidet jemand anderes darüber.'
     flash_invalid_csrf: 'Ungültiges CSRF-Token.'
     flash_action_failed: 'Die Aktion konnte nicht abgeschlossen werden.'
     resolution_applied: 'Übernommen'

@@ -18,16 +18,7 @@
     </div>
 {% endfor %}
 <div class="box mt-5">
-    <div class="level is-mobile mb-0">
-        <div class="level-left">
-            <strong>{{ event.start|date('d. F Y') }}</strong>
-        </div>
-        {% if editLink %}
-            <div class="level-right">
-                {% include 'events/_partials/edit_icon.html.twig' with {link: editLink, sizeClass: ''} only %}
-            </div>
-        {% endif %}
-    </div>
+    <strong>{{ event.start|date('d. F Y') }}</strong>
     <p>
         {{ 'events.time_range'|trans({'%from%': event.start|date('H:i'), '%to%': event.stop|date('H:i')}) }}<br>
         {% if event.series and event.series.rule %}
@@ -45,21 +36,7 @@
     </div>
 </div>
 <div class="box mt-5">
-    <div class="level is-mobile mb-3">
-        <div class="level-left">
-            <h2 class="title is-4 mb-0">{{ 'events.label_location'|trans }}</h2>
-        </div>
-        {% if is_granted('ROLE_USER') and event.location %}
-            <div class="level-right">
-                <a href="{{ path('app_contribution_correct', {type: 'location', id: event.location.id}) }}"
-                   class="icon has-text-grey"
-                   title="{{ 'location.link_edit_venue'|trans }}"
-                   aria-label="{{ 'location.link_edit_venue'|trans }}">
-                    <i class="fas fa-pen"></i>
-                </a>
-            </div>
-        {% endif %}
-    </div>
+    <h2 class="title is-4">{{ 'events.label_location'|trans }}</h2>
     {% if event.location %}
         <strong>{{ event.location.name }}</strong>
         <p>

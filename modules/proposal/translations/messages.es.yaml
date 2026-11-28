@@ -1,6 +1,8 @@
 profile_review:
     suggestion_description: '%proposer% propuso %target%'
     change_proposal_description: '%proposer% propuso un cambio en %target%'
+    change_proposal_reason: 'Motivo: %reason%'
+    change_proposal_scope_requested: 'Pide una aplicación más amplia: abre los detalles para decidirlo.'
 
 profile_social:
     activity_suggestion_created: 'Propuso: %target%'
@@ -45,6 +47,10 @@ review:
     flash_not_pending: 'Esta propuesta ya ha sido resuelta.'
     flash_scope_unavailable: 'Este cambio ya no se puede aplicar a las fechas siguientes.'
     flash_already_resolved: 'Este campo ya ha sido resuelto.'
+    flash_own_proposal: 'Propusiste este cambio, así que otra persona decide sobre él.'
+    reason_label: 'Motivo'
+    requested_scope: 'Solicitado: %scope%'
+    own_proposal_note: 'Propusiste este cambio, así que otra persona decide sobre él.'
     flash_invalid_csrf: 'Token CSRF no válido.'
     flash_action_failed: 'No se pudo completar la acción.'
     resolution_applied: 'Aplicado'

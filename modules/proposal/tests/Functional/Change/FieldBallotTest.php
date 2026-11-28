@@ -10,6 +10,7 @@ use Module\Proposal\Contract\Change\ChangeInterface;
 use Module\Proposal\Contract\Change\FieldChange;
 use Module\Proposal\Contract\Change\FieldResolution;
 use Module\Proposal\Internal\Change\FieldBallotService;
+use Module\Proposal\Internal\ChangeException;
 use Module\Proposal\Tests\Stub\Change\Target;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Tests\Module\Members;
@@ -44,6 +45,32 @@ final class FieldBallotTest extends KernelTestCase
         self::assertSame([['targetId' => 7, 'field' => self::FIELD, 'value' => 'Winning Name']], $this->target()->applied);
         self::assertSame(FieldResolution::Applied, $this->changes()->find($winner)?->changes[0]->resolution);
         self::assertSame(FieldResolution::Denied, $this->changes()->find($loser)?->changes[0]->resolution);
+    }
+
+    public function testAStewardCannotConfirmABallotTheirOwnProposalWon(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $steward = $this->members()->member('Steward');
+        $this->target()->reviewerIds = [(int) $steward->getId()];
+        $this->propose($this->members()->member('First'), 'Other Name');
+        $this->propose($steward, 'Own Name');
+        $ballotId = $this->fieldBallots()->open(Target::TYPE, 7, self::FIELD, $steward);
+        $this->ballots()->cast($ballotId, (int) $steward->getId(), [$this->keyLabelled($ballotId, $steward, 'Own Name')]);
+        $this->closeTheDeadline($ballotId);
+        $this->ballots()->tally($ballotId);
+
+        // Act
+        $refused = null;
+        try {
+            $this->fieldBallots()->confirm($ballotId, $steward);
+        } catch (ChangeException $e) {
+            $refused = $e->getMessage();
+        }
+
+        // Assert
+        self::assertSame('review.flash_own_proposal', $refused);
+        self::assertSame([], $this->target()->applied);
     }
 
     public function testTheCandidatesAreTheDistinctValuesPlusLeavingItAlone(): void

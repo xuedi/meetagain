@@ -77,9 +77,9 @@ cannot be.
 
 ## Surfaces
 
-- **Propose** - the application's `/contribute` hub owns the entry point: a section whose type has a provider gets
-  `app_contribution_suggest`, shown when the provider's `canPropose()` says yes, and lists the member's own pending
-  suggestions. A new provider needs no template change.
+- **Propose** - the application owns the entry point: a correctable type that has a provider gets the form at
+  `app_contribution_suggest`, open when the provider's `canPropose()` says yes, listing the member's own pending
+  suggestions. The page that lists the rows links to it. A new provider needs no template change.
 - **Review hub** - identifier `suggestions`: one item per pending suggestion the viewer may review. Inline approve
   takes the suggestion exactly as submitted; inline deny rejects it.
 - **Detail page** - `app_review_suggestion`. The reviewer gets the provider's form pre-filled from the payload and one

@@ -1,6 +1,8 @@
 profile_review:
     suggestion_description: '%proposer% 建议新增 %target%'
     change_proposal_description: '%proposer% 对 %target% 提出了修改建议'
+    change_proposal_reason: '理由：%reason%'
+    change_proposal_scope_requested: '请求更大范围的应用 - 打开详情来决定。'
 
 profile_social:
     activity_suggestion_created: '提出了新建议：%target%'
@@ -45,6 +47,10 @@ review:
     flash_not_pending: '该建议已处理完毕。'
     flash_scope_unavailable: '此更改已无法应用到之后的日期。'
     flash_already_resolved: '该字段已处理完毕。'
+    flash_own_proposal: '这项修改是你提议的，所以由其他人来决定。'
+    reason_label: '理由'
+    requested_scope: '请求：%scope%'
+    own_proposal_note: '这项修改是你提议的，所以由其他人来决定。'
     flash_invalid_csrf: '无效的 CSRF 令牌。'
     flash_action_failed: '操作无法完成。'
     resolution_applied: '已采纳'

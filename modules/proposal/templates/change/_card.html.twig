@@ -1,12 +1,23 @@
 {% set proposal = card.proposal %}
 {% set csrfToken = csrf_token('change_proposal' ~ proposal.id) %}
 {% set ballotToken = canReview ? csrf_token('field_ballot' ~ targetType ~ targetId) : null %}
-{% set applyScope = canReview ? applyScope|default(null) : null %}
+{% set offeredScope = applyScope|default(null) %}
+{% set scopeRequested = offeredScope and proposal.requestedScope == offeredScope.key %}
+{% set applyScope = canReview ? offeredScope : null %}
 <div class="box">
     <p class="mb-3">
         <strong>{{ proposal.proposerName }}</strong>
         <span class="has-text-grey">{{ proposal.createdAt|time_diff }}</span>
+        {% if scopeRequested %}
+            <span class="tag is-success is-light ml-2" data-requested-scope>{{ 'review.requested_scope'|trans({'%scope%': offeredScope.label}) }}</span>
+        {% endif %}
     </p>
+    {% if proposal.reason %}
+        <p class="mb-3" data-proposal-reason><span class="has-text-weight-semibold">{{ 'review.reason_label'|trans }}:</span> {{ proposal.reason|nl2br }}</p>
+    {% endif %}
+    {% if ownCard|default(false) %}
+        <p class="mb-3 has-text-grey is-size-7">{{ 'review.own_proposal_note'|trans }}</p>
+    {% endif %}
     <table class="table is-fullwidth is-narrow">
         <thead>
             <tr>
@@ -76,7 +87,7 @@
                             {% endif %}
                             {% if applyScope %}
                                 <a data-action="proposal-approve-click" data-action-place="scope" href="{{ path('app_review_proposal_apply', {id: proposal.id, field: row.field, scope: applyScope.key}) }}"
-                                   class="button is-small is-success is-light mr-2"
+                                   class="button is-small is-success{{ scopeRequested ? '' : ' is-light' }} mr-2"
                                    title="{{ applyScope.label }}"
                                    data-post
                                    data-csrf-token="{{ csrfToken }}"

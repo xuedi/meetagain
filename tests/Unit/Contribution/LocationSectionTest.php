@@ -40,54 +40,6 @@ class LocationSectionTest extends TestCase
         yield 'reachable by neither route' => [true, false, false, false];
     }
 
-    public function testTheListingCarriesTheVenueNameAndItsAddress(): void
-    {
-        // Arrange
-        $venue = new Location();
-        $venue->setName('Cafe Central');
-        $venue->setStreet('Hauptstrasse 1');
-        $venue->setCity('Berlin');
-
-        $locationRepo = $this->createStub(LocationRepository::class);
-        $locationRepo->method('findAllForAdmin')->willReturn([$venue]);
-        $section = new LocationSection(
-            $locationRepo,
-            $this->createStub(EventRepository::class),
-            $this->createStub(EventFilterService::class),
-            new ScopeFilterService([]),
-        );
-
-        // Act
-        $entries = $section->listForMember(new User());
-
-        // Assert
-        self::assertCount(1, $entries);
-        self::assertSame('Cafe Central', $entries[0]->label);
-        self::assertSame('Hauptstrasse 1, Berlin', $entries[0]->sublabel);
-    }
-
-    public function testAVenueWithNoAddressHasNoSublabel(): void
-    {
-        // Arrange
-        $venue = new Location();
-        $venue->setName('Somewhere');
-
-        $locationRepo = $this->createStub(LocationRepository::class);
-        $locationRepo->method('findAllForAdmin')->willReturn([$venue]);
-        $section = new LocationSection(
-            $locationRepo,
-            $this->createStub(EventRepository::class),
-            $this->createStub(EventFilterService::class),
-            new ScopeFilterService([]),
-        );
-
-        // Act
-        $entries = $section->listForMember(new User());
-
-        // Assert
-        self::assertNull($entries[0]->sublabel);
-    }
-
     private function section(bool $exists, bool $carriedByVisibleEvent, bool $inScope): LocationSection
     {
         $locationRepo = $this->createStub(LocationRepository::class);

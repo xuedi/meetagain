@@ -28,6 +28,7 @@ readonly class ChangeReviewProvider implements ReviewNotificationProviderInterfa
     {
         $items = [];
         foreach ($this->service->pendingReviewableBy($user) as $proposal) {
+            $scopeRequested = $this->isScopeRequested($proposal);
             $items[] = new ReviewNotificationItem(
                 id: (string) $proposal->getId(),
                 description: $this->translator->trans('profile_review.change_proposal_description', [
@@ -36,11 +37,13 @@ readonly class ChangeReviewProvider implements ReviewNotificationProviderInterfa
                 ]),
                 canDeny: true,
                 icon: 'edit',
+                longDescription: $this->longDescription($proposal, $scopeRequested),
                 fields: $this->fields($proposal),
                 detailUrl: $this->router->generate('app_review_proposals', [
                     'targetType' => $proposal->getTargetType(),
                     'targetId' => $proposal->getTargetId(),
                 ]),
+                canApprove: !$scopeRequested,
             );
         }
 
@@ -65,6 +68,26 @@ readonly class ChangeReviewProvider implements ReviewNotificationProviderInterfa
         }
 
         return $proposal;
+    }
+
+    private function isScopeRequested(Change $proposal): bool
+    {
+        $requested = $proposal->getRequestedScope();
+
+        return $requested !== null && ($this->service->applyScopeFor($proposal->getTargetType(), $proposal->getTargetId())['key'] ?? null) === $requested;
+    }
+
+    private function longDescription(Change $proposal, bool $scopeRequested): ?string
+    {
+        $lines = [];
+        if ($proposal->getReason() !== null) {
+            $lines[] = $this->translator->trans('profile_review.change_proposal_reason', ['%reason%' => $proposal->getReason()]);
+        }
+        if ($scopeRequested) {
+            $lines[] = $this->translator->trans('profile_review.change_proposal_scope_requested');
+        }
+
+        return $lines === [] ? null : implode("\n", $lines);
     }
 
     /**

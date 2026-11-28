@@ -30,6 +30,18 @@ when the last field resolves. Resolved rows are kept for audit; nothing cleans t
 The target is a type and an id with no foreign key, so a plugin can make its own rows changeable. Values are stored
 as `string|null`; a structured target string-encodes.
 
+A proposal may carry the proposer's reason and a requested scope (see "A provider may offer a wider apply"). Both are
+optional at the module: a consumer whose form asks for a reason passes it, the others pass nothing. A requested
+scope the provider does not offer for that target at propose time is dropped, not stored.
+
+## Nobody resolves their own proposal
+
+Apply, deny, approve-all, reject-all and a ballot confirm whose winning value is the steward's own proposal are
+refused with `review.flash_own_proposal`, after the reviewer check, for every target type. A reviewer's own proposals
+are left out of their hub entries, and their card on the diff page shows no actions. A settled ballot writes through
+`applySettledField()` / `denySettledField()`, which skip the rule: the members decided, not the proposer. Withdrawing
+stays the proposer's only move.
+
 ## The provider owns every interpretation
 
 Labels (`getFieldLabel`, `formatValue` - resolving a category id to its label), permissions (`isVisible` for the
@@ -49,8 +61,10 @@ UI 404s on a null label.
   withdraw for the proposer. It is visible to reviewers and to the proposer of a pending proposal, and 404s when the
   provider is inactive or the target label is null.
 - **The hub** (identifier `change_proposals`) lists one entry per pending reviewable proposal with its unresolved
-  fields as before/after rows. Approve applies every unresolved field, validating all of them first and aborting
-  before any write on failure; deny rejects the whole proposal.
+  fields as before/after rows and the reason. Approve applies every unresolved field, validating all of them first and
+  aborting before any write on failure; deny rejects the whole proposal. An entry whose requested scope is still
+  offered has no approve button and sends the reviewer to the diff page, so the request is decided where the scoped
+  button is.
 
 Both surfaces, and the pending lists a consumer shows beside its own form, render a field through the application's
 `_components/value_diff.html.twig`: old and new value side by side, the changed words marked by `text_diff()`, which
@@ -107,6 +121,10 @@ ballot-confirm routes, and the module checks it against what the provider declar
 so a stale or forged key changes nothing. A field ballot picks the scope at confirm, not at open: settling applies
 unscoped, and confirming spreads the applied value. The hub's whole-proposal approve stays unscoped.
 
+The proposer can ask for the scope: `propose()` stores the key as the requested scope. A request is not a decision -
+the card tags it and makes the scoped button the solid one, and the reviewer still applies to the target alone if
+they choose.
+
 ## Moving data between instances
 
 `exportPending()` hands out the pending proposals of the given target types as `Change\View`s, and `restore()` writes a
@@ -124,4 +142,5 @@ id. Archive sections and fixtures are their callers; an importer remaps proposal
    rather than injecting the facade into a cell provider.
 
 The glossary plugin's `GlossaryChangeTarget` is the reference, with the propose side in its contribution section's
-`changesFrom()`, and `modules/proposal/tests/Stub/Change/` the smallest stand-in.
+`changesFrom()`; the application's event suggestion page (`EventSuggestController`) is the reference for a reason
+and a requested scope, and `modules/proposal/tests/Stub/Change/` the smallest stand-in.

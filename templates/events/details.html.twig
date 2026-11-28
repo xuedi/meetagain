@@ -31,19 +31,26 @@
 
     <section class="section">
         <div class="container">
-            <h1 class="title">
-                {{ event.title(app.locale) }}
-                {% if event.canceled %}
-                    <span class="tag is-danger is-medium ml-2">{{ "events.tag_canceled"|trans }}</span>
-                {% endif %}
-            </h1>
-            {% if event.canceled %}
-                <div class="notification is-danger is-light mb-5">
-                    <strong>{{ "events.notification_event_canceled"|trans }}</strong>
-                </div>
-            {% endif %}
             <div class="columns">
                 <div class="column is-9">
+                    <div class="is-flex is-align-items-flex-start is-justify-content-space-between mb-5">
+                        <h1 class="title mb-0">
+                            {{ event.title(app.locale) }}
+                            {% if event.canceled %}
+                                <span class="tag is-danger is-medium ml-2">{{ "events.tag_canceled"|trans }}</span>
+                            {% endif %}
+                        </h1>
+                        {% if editLink %}
+                            <span class="ml-3 is-flex-shrink-0">
+                                {% include 'events/_partials/edit_icon.html.twig' with {link: editLink, sizeClass: 'is-medium'} only %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    {% if event.canceled %}
+                        <div class="notification is-danger is-light mb-5">
+                            <strong>{{ "events.notification_event_canceled"|trans }}</strong>
+                        </div>
+                    {% endif %}
                     <div class="content event-description">
                         {{ event.description(app.locale)|replace({"\n": "<br>"})|sanitize_html('cms.content') }}
                     </div>

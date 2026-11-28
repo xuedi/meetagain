@@ -28,6 +28,37 @@ final class DiffPageTest extends WebTestCase
         self::assertStringContainsString('Cafe Central', $crawler->text());
     }
 
+    public function testAReviewerSeesTheReasonAndTheRequestedScopeButNoActionsOnTheirOwnChange(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $proposer = $this->members($client)->member('Proposer');
+        $reviewer = $this->members($client)->member('Reviewer');
+        $target = self::getContainer()->get(Target::class);
+        $target->reviewerIds = [(int) $reviewer->getId(), (int) $proposer->getId()];
+        $this->changes($client)->propose(
+            Target::TYPE,
+            7,
+            (int) $proposer->getId(),
+            [new FieldChange('name', 'Cafe', 'Cafe Central')],
+            'The sign says so',
+            Target::SCOPE,
+        );
+
+        // Act
+        $client->loginUser($reviewer);
+        $asReviewer = $client->request('GET', '/en/review/proposals/' . Target::TYPE . '/7');
+        $client->loginUser($proposer);
+        $asProposer = $client->request('GET', '/en/review/proposals/' . Target::TYPE . '/7');
+
+        // Assert
+        self::assertStringContainsString('The sign says so', $asReviewer->filter('[data-proposal-reason]')->text());
+        self::assertCount(1, $asReviewer->filter('[data-requested-scope]'));
+        self::assertCount(1, $asReviewer->filter('a.button.is-success:not(.is-light)[href*="scope=' . Target::SCOPE . '"]'));
+        self::assertCount(0, $asProposer->filter('[data-action="proposal-approve-click"]'));
+        self::assertCount(1, $asProposer->filter('[data-action="proposal-withdraw-click"]'));
+    }
+
     public function testAStrangerWhoMayNotReviewGetsA404(): void
     {
         // Arrange

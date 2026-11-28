@@ -76,6 +76,8 @@ readonly class ChangeProposalsSection implements SectionInterface
                 'changes' => $changes,
                 'email' => $this->em->find(User::class, $proposal->proposerId)?->getEmail(),
                 'created_at' => $proposal->createdAt->format(DateTimeInterface::ATOM),
+                'reason' => $proposal->reason,
+                'requested_scope' => $proposal->requestedScope,
             ];
         }
 
@@ -113,6 +115,8 @@ readonly class ChangeProposalsSection implements SectionInterface
                 (int) $proposer->getId(),
                 $changes,
                 $this->readDate($row['created_at'] ?? null) ?? new DateTimeImmutable(),
+                is_string($row['reason'] ?? null) ? $row['reason'] : null,
+                is_string($row['requested_scope'] ?? null) ? $row['requested_scope'] : null,
             );
             $existingId = $this->changes->findRestored($change);
             if ($existingId === null && $context->namesMatchedUser($row['email'] ?? null)) {

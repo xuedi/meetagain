@@ -20,6 +20,7 @@ use App\Event\AdminEntryProviderInterface;
 use App\Exception\Event\RsvpRefusedException;
 use App\FeaturedEventProviderInterface;
 use App\Filter\Admin\Event\AdminEventListFilterService;
+use App\Filter\Event\DirectEditFilterInterface;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
 use App\Form\EventGeoFilterContributor;
@@ -69,6 +70,8 @@ final class EventController extends AbstractController
         private readonly iterable $featuredEventProviders = [],
         #[AutowireIterator(AdminEntryProviderInterface::class)]
         private readonly iterable $adminEntryProviders = [],
+        #[AutowireIterator(DirectEditFilterInterface::class)]
+        private readonly iterable $directEditFilters = [],
     ) {}
 
     #[Route('/events', name: self::ROUTE_EVENT)]
@@ -342,16 +345,28 @@ final class EventController extends AbstractController
                 continue;
             }
             $id = (int) $event->getId();
-            if ($this->isGranted(PermissionAttribute::EVENT_UPDATE, $event) && $this->adminEventFilterService->isEventAccessible($id)) {
+            $direct = $this->allowsDirectEdit($event, $user);
+            if ($direct && $this->isGranted(PermissionAttribute::EVENT_UPDATE, $event) && $this->adminEventFilterService->isEventAccessible($id)) {
                 $links[$id] = ['url' => $this->generateUrl('app_admin_event_edit', ['id' => $id]), 'admin' => true];
-            } elseif (($entry = $this->adminEntry($id)) !== null) {
+            } elseif ($direct && ($entry = $this->adminEntry($id)) !== null) {
                 $links[$id] = ['url' => $entry->action, 'admin' => true, 'entry' => $entry];
             } elseif ($this->contributionRegistry->mayTouch(EventSection::TYPE, $user, $id)) {
-                $links[$id] = ['url' => $this->generateUrl('app_contribution_correct', ['type' => EventSection::TYPE, 'id' => $id]), 'admin' => false];
+                $links[$id] = ['url' => $this->generateUrl(EventSuggestController::ROUTE, ['id' => $id]), 'admin' => false];
             }
         }
 
         return $links;
+    }
+
+    private function allowsDirectEdit(Event $event, User $user): bool
+    {
+        foreach ($this->directEditFilters as $filter) {
+            if (!$filter->allowsDirectEdit($event, $user)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function adminEntry(int $eventId): ?AdminEntry

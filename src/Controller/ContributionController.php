@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Contribution\EventSection;
 use App\Contribution\Registry;
 use App\Contribution\RowFormInterface;
-use App\Contribution\Section;
 use App\Contribution\TagSection;
 use App\Entity\User;
 use App\Item\Tag\ChangeTarget;
@@ -34,22 +34,6 @@ final class ContributionController extends AbstractController
         private readonly SuggestionBuilder $suggestionBuilder,
     ) {}
 
-    #[Route('', name: 'app_contribution_index', methods: ['GET'])]
-    public function index(#[CurrentUser] User $user): Response
-    {
-        return $this->render('contribution/index.html.twig', $this->shell($user, null, null, null));
-    }
-
-    #[Route('/{type}', name: 'app_contribution_section', methods: ['GET'])]
-    public function section(string $type, #[CurrentUser] User $user): Response
-    {
-        if (!$this->registry->has($type)) {
-            throw $this->createNotFoundException();
-        }
-
-        return $this->render('contribution/index.html.twig', $this->shell($user, null, $type, null));
-    }
-
     #[Route('/{type}/suggest', name: 'app_contribution_suggest', methods: ['GET', 'POST'])]
     public function suggest(Request $request, string $type, #[CurrentUser] User $user): Response
     {
@@ -77,20 +61,21 @@ final class ContributionController extends AbstractController
             $this->addFlash('error', $error);
         }
 
-        return $this->render(
-            'contribution/index.html.twig',
-            $this->shell($user, 'suggest', $type, null)
-            + [
-                'form' => $form,
-                'typeLabelKey' => $provider->getLabelKey(),
-                'pending' => $this->suggestions->pendingFor((int) $user->getId(), $type),
-            ],
-        );
+        return $this->render('contribution/index.html.twig', [
+            'pane' => 'suggest',
+            'form' => $form,
+            'typeLabelKey' => $provider->getLabelKey(),
+            'pending' => $this->suggestions->pendingFor((int) $user->getId(), $type),
+        ]);
     }
 
     #[Route('/{type}/{id}', name: 'app_contribution_correct', requirements: ['id' => '[^/]+'], methods: ['GET', 'POST'])]
     public function correct(Request $request, string $type, string $id, #[CurrentUser] User $user): Response
     {
+        if ($type === EventSection::TYPE && ctype_digit($id)) {
+            return $this->redirectToRoute(EventSuggestController::ROUTE, ['id' => (int) $id], Response::HTTP_MOVED_PERMANENTLY);
+        }
+
         if (!$this->registry->has($type) || !$this->registry->mayTouch($type, $user, $id)) {
             throw $this->createNotFoundException();
         }
@@ -122,15 +107,12 @@ final class ContributionController extends AbstractController
             return $this->redirectToRoute('app_contribution_correct', ['type' => $provider->getType(), 'id' => $id]);
         }
 
-        return $this->render(
-            'contribution/index.html.twig',
-            $this->shell($user, 'correct', $provider->getType(), $id)
-            + [
-                'form' => $form,
-                'draft' => $draft,
-                'pendingProposals' => $this->pendingProposalCards($provider->getTargetType(), (int) $id),
-            ],
-        );
+        return $this->render('contribution/index.html.twig', [
+            'pane' => 'correct',
+            'form' => $form,
+            'draft' => $draft,
+            'pendingProposals' => $this->pendingProposalCards($provider->getTargetType(), (int) $id),
+        ]);
     }
 
     private function correctTags(Request $request, string $itemType, User $user): Response
@@ -152,17 +134,14 @@ final class ContributionController extends AbstractController
             return $this->redirectToRoute('app_contribution_correct', ['type' => TagSection::TYPE, 'id' => $itemType]);
         }
 
-        return $this->render(
-            'contribution/index.html.twig',
-            $this->shell($user, 'correct_tags', TagSection::TYPE, $itemType)
-            + [
-                'itemType' => $itemType,
-                'typeLabelKey' => (string) $this->tagTypes->providerFor($itemType)?->getLabelKey(),
-                'rows' => $this->suggestionBuilder->rows($itemType, $request->getLocale()),
-                'usage' => $this->tagService->getUsage($itemType),
-                'pendingProposals' => $this->pendingTagProposalCards($targetType),
-            ],
-        );
+        return $this->render('contribution/index.html.twig', [
+            'pane' => 'correct_tags',
+            'itemType' => $itemType,
+            'typeLabelKey' => (string) $this->tagTypes->providerFor($itemType)?->getLabelKey(),
+            'rows' => $this->suggestionBuilder->rows($itemType, $request->getLocale()),
+            'usage' => $this->tagService->getUsage($itemType),
+            'pendingProposals' => $this->pendingTagProposalCards($targetType),
+        ]);
     }
 
     /**
@@ -197,39 +176,6 @@ final class ContributionController extends AbstractController
         }
 
         return $cards;
-    }
-
-    /**
-     * @return array{sections: list<Section>, suggestable: array<string, string>, activeType: ?string, pane: ?string, activeId: int|string|null}
-     */
-    private function shell(User $user, ?string $pane, ?string $activeType, int|string|null $activeId): array
-    {
-        $sections = $this->registry->sectionsFor($user);
-
-        return [
-            'sections' => $sections,
-            'suggestable' => $this->suggestableTypes($sections, $user),
-            'activeType' => $activeType,
-            'pane' => $pane,
-            'activeId' => $activeId,
-        ];
-    }
-
-    /**
-     * @param  list<Section>         $sections
-     * @return array<string, string> section type => translation key of the row's own label
-     */
-    private function suggestableTypes(array $sections, User $user): array
-    {
-        $types = [];
-        foreach ($sections as $section) {
-            $provider = $this->suggestions->providerFor($section->type);
-            if ($provider !== null && $provider->canPropose((int) $user->getId())) {
-                $types[$section->type] = $provider->getLabelKey();
-            }
-        }
-
-        return $types;
     }
 
     /**

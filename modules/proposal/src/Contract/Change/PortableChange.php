@@ -15,5 +15,7 @@ final readonly class PortableChange
         public int $proposerId,
         public array $changes,
         public DateTimeImmutable $createdAt,
+        public ?string $reason = null,
+        public ?string $requestedScope = null,
     ) {}
 }

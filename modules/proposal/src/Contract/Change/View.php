@@ -21,5 +21,7 @@ final readonly class View
         public DateTimeImmutable $createdAt,
         public array $changes,
         public array $rows,
+        public ?string $reason = null,
+        public ?string $requestedScope = null,
     ) {}
 }
